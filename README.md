@@ -1,5 +1,5 @@
 
-# Ayu-HMS-Frontend
+# Harendra Ayurveda - HMS Frontend
 
 Ayu-HMS-Frontend is a modern and efficient Hospital Management System (HMS) frontend built using React.js and Vite. This project aims to deliver a seamless and user-friendly experience for managing hospital operations efficiently.
 
