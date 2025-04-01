@@ -1,0 +1,83 @@
+.dashboard-layout {
+  min-height: 100vh;
+}
+
+.dashboard-sider {
+  box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+}
+
+.dashboard-logo {
+  height: 64px;
+  padding: 16px;
+  text-align: center;
+  background: #001529;
+  overflow: hidden;
+}
+
+.logo-icon {
+  height: 32px;
+  width: 32px;
+  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.logo-icon svg {
+  color: white;
+  font-size: 20px;
+}
+
+.dashboard-header {
+  padding: 0 24px;
+  background: white;
+  box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.05);
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stats-card {
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 20px rgba(0, 21, 41, 0.12);
+}
+
+.welcome-banner {
+  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  color: white;
+}
+
+.chart-card {
+  height: 380px;
+  margin-top: 24px;
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #00b4db20 0%, #0083b020 100%) !important;
+}
+
+.ant-menu-item:hover {
+  background: #f0f2f5 !important;
+}
+
+.dashboard-content {
+  padding: 24px;
+  background: #f0f2f5;
+}
