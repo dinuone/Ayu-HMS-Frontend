@@ -2,6 +2,8 @@ import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, DashboardOutlined } from '@ant-design/icons';
 import '../styles/Login.css';
 
+
+
 function Login({ onLogin }) {
   const onFinish = (values) => {
     if (values.username === 'admin' && values.password === 'admin') {
@@ -19,7 +21,7 @@ function Login({ onLogin }) {
       <Card className="login-card">
         <div className="login-header">
           <div className="brand-logo">
-            <DashboardOutlined />
+            <img src="/logo.PNG" alt="Logo" />
           </div>
           <h1 className="login-title">Welcome Back</h1>
           <p className="login-subtitle">Enter your credentials to access your account</p>
@@ -68,9 +70,9 @@ function Login({ onLogin }) {
         </Form>
 
         <div className="login-footer">
-          <p>
-            Don't have an account? <a href="#">Sign up</a>
-          </p>
+          {/*<p>*/}
+          {/*  Don't have an account? <a href="#">Sign up</a>*/}
+          {/*</p>*/}
           <p>
             <a href="#">Forgot password?</a>
           </p>
