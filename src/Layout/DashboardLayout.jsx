@@ -1,6 +1,6 @@
 import {Suspense, useState} from 'react';
 import { Layout, Menu, theme, Avatar, Button, Typography, Breadcrumb } from 'antd';
-import {Outlet, useNavigate} from 'react-router-dom'; // Import useNavigate
+import {Outlet, useLocation, useNavigate} from 'react-router-dom'; // Import useNavigate
 import {
   DashboardOutlined,
   TeamOutlined,
@@ -22,10 +22,20 @@ export default function DashboardLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate(); // Initialize navigate
   const { signOut } = useAuth();
+  const location = useLocation();
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const routeTitles = {
+    '/dashboard': 'Dashboard',
+    '/user-list': 'Users',
+    '/branches': 'Branches',
+    '/settings': 'Settings',
+  };
+
+  const currentTitle = routeTitles[location.pathname] || 'Dashboard';
 
   const menuItems = [
     {
@@ -109,7 +119,7 @@ export default function DashboardLayout({ children }) {
         </Sider>
         <Layout>
           <Header className="dashboard-header">
-            <Breadcrumb items={[{ title: 'Home' }, { title: 'DashboardLayout' }]} />
+            <Breadcrumb items={[{ title: 'Home' }, { title: currentTitle }]} />
             <div className="header-actions">
               <Button type="text" icon={<BellOutlined />} />
               <Avatar icon={<UserOutlined />} />
