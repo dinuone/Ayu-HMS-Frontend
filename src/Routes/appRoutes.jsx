@@ -1,48 +1,55 @@
-// src/AppRoutes/appRoutes.jsx
-
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { useAuth } from "../Provider/authProvider.jsx";
-import { ProtectedRoute } from "./protectedRoutes.jsx";
+import {Navigate, Outlet, useRoutes} from "react-router-dom";
+import React, {Suspense} from "react";
+import {useAuth} from "../Provider/authProvider.jsx";
+import ProtectedRoute from "./protectedRoutes.jsx";
 import Login from "../pages/Login.jsx";
-import Dashboard from "../pages/Dashboard.jsx";
-import NotFound from "../pages/NotFound.jsx"; // Import the NotFound component
 
-const AppRoutes = () => {
+import NotFound from "../pages/Notfound.jsx";
+import DashboardLayout from "../Layout/DashboardLayout.jsx";
+import Dashboard from "../pages/Dashboard/Dashboard.jsx";
+
+// Lazy load components
+const UserList = React.lazy(() => import("../pages/User/UserList.jsx"));
+
+
+
+const RootRoute = () => {
     const { authData } = useAuth();
 
-    // Define routes accessible only to authenticated users
-    const authRoutes = [
-        {
-            path: "/",
-            element: <ProtectedRoute />, // Wrap the component in ProtectedRoute
-            children: [
-                {
-                    path: "/dashboard",
-                    element: <Dashboard />,
-                },
-            ],
-        },
-    ];
-
-    // Define routes accessible only to non-authenticated users
-    const publicRoutes = [
-        {
-            path: "/",
-            element: <Login />,
-        },
-    ];
-
-    const router = createBrowserRouter([
-        ...publicRoutes,
-        ...(!authData.token ? publicRoutes : []),
-        ...authRoutes,
-        {
-            path: "*",  // Catch-all route for undefined paths
-            element: <NotFound />,
-        },
-    ]);
-
-    return <RouterProvider router={router} />;
+    return authData ? <Navigate to="/dashboard" /> : <Login />;
 };
 
-export default AppRoutes;
+export default function AppRoutes (){
+
+    return useRoutes([
+        {
+            path: '/',
+            element: <RootRoute/>,
+        },
+        {
+            element: (
+                <ProtectedRoute>
+                    <DashboardLayout>
+                        <Suspense>
+                            <Outlet/>
+                        </Suspense>
+                    </DashboardLayout>
+                </ProtectedRoute>
+            ),
+            children: [
+                {path: 'dashboard', element: <Dashboard/>},
+                {path: 'user-list', element: <UserList/>},
+            ],
+        },
+        {
+            path: '*',
+            element: (
+                <Suspense fallback={<div>Loading...</div>}>
+                    <NotFound/>
+                </Suspense>
+            ),
+        },
+    ]);
+};
+
+
