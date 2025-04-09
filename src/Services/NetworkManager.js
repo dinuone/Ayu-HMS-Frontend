@@ -25,14 +25,25 @@ api.interceptors.request.use(
 
 // Add response interceptor
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        // Show message if status is 200 and response contains a message
+        if (response.data.statusCode === 200 && response.data?.data?.message) {
+            message.success(response.data.data.message);
+        }
+        return response;
+    },
     (error) => {
         // Handle errors globally
-        if (error.response && error.response.status === 401) {
-            // Token expired or unauthorized
+        if (error.response && error.data.statusCode === 401) {
             message.error('Session expired. Please log in again.');
             localStorage.removeItem('authData');
-            window.location.href = '/'; // Redirect to login page
+            window.location.href = '/'; // Redirect to login
+        } else if (error.response?.data?.data?.message) {
+            // Show specific error message if available
+            message.error(error.response.data.data?.message);
+        } else {
+            // Generic error
+            message.error('An error occurred. Please try again.');
         }
         return Promise.reject(error);
     }

@@ -8,7 +8,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   BranchesOutlined,
-  BellOutlined,
+  BellOutlined, MedicineBoxOutlined,
 } from '@ant-design/icons';
 import '../styles/Dashboard.css';
 import PropTypes from "prop-types";
@@ -30,8 +30,8 @@ export default function DashboardLayout({ children }) {
 
   const routeTitles = {
     '/dashboard': 'Dashboard',
-    '/user-list': 'Users',
     '/branches': 'Branches',
+    '/users': 'Users',
     '/settings': 'Settings',
   };
 
@@ -46,29 +46,36 @@ export default function DashboardLayout({ children }) {
     },
     {
       key: '2',
-      icon: <TeamOutlined />,
+      icon:<TeamOutlined />,
       label: 'User Management',
+      path: '/users',
+    },
+
+    {
+      key: '3',
+      icon: <SettingOutlined/>,
+      label: 'System Management',
       children: [
         {
-          key: '2-1',
-          icon: <UserOutlined />,
-          label: 'Users',
-          path: '/user-list',
-        },
-        {
-          key: '2-2',
+          key: '3-1',
           icon: <BranchesOutlined />,
           label: 'Branches',
           path: '/branches',
         },
+        {
+          key: '3-2',
+          icon: <MedicineBoxOutlined />,
+          label: 'Drugs Category',
+          path: '/drugs-category',
+        },
       ],
     },
-    {
-      key: '4',
-      icon: <SettingOutlined />,
-      label: 'Settings',
-      path: '/settings',
-    },
+    // {
+    //   key: '4',
+    //   icon: <SettingOutlined />,
+    //   label: 'Settings',
+    //   path: '/settings',
+    // },
   ];
 
 
