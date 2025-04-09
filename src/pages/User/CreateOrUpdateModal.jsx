@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {Button, Form, Input, Modal, Select, Space, Switch} from 'antd';
+import { Button, Form, Input, Modal, Select, Space, Switch } from 'antd';
 import api from '../../Services/NetworkManager.js';
 
 const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confirmLoading, branches, roles }) => {
@@ -7,14 +7,18 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
     const DEFAULT_PASSWORD = 'user@#123';
 
     useEffect(() => {
+        form.resetFields();
+
         if (initialValues) {
             form.setFieldsValue({
                 ...initialValues,
+                role: initialValues.role?.id, // Ensure it's just the role ID
+                branches: initialValues.branch?.map(b => b.id) || [], // Map branch objects to their IDs
                 password: DEFAULT_PASSWORD
             });
-        } else {
+        } else if (visible) {
             form.setFieldsValue({
-                password: DEFAULT_PASSWORD // Set default password for new users
+                password: DEFAULT_PASSWORD
             });
         }
     }, [initialValues, form, visible]);
@@ -33,7 +37,6 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
         onCancel(); // Call the original onCancel handler
     };
 
-
     return (
         <Modal
             visible={visible}
@@ -42,9 +45,9 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
             onCancel={handleCancel}
             onOk={handleSubmit}
             confirmLoading={confirmLoading}
-            destroyOnClose
+            destroyOnClose={true} // This ensures the form is destroyed when closed
         >
-            <Form form={form} layout="vertical" initialValues={initialValues}>
+            <Form form={form} layout="vertical">
                 <Form.Item
                     name="first_name"
                     label="First Name"
@@ -113,17 +116,18 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                     </Select>
                 </Form.Item>
 
-                <Form.Item
-                    name="password"
-                    label="Password"
-                    rules={[
-                        { required: true, message: 'Please input password!' },
-                        { min: 6, message: 'Password must be at least 6 characters!' }
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
-
+                {!initialValues && (
+                    <Form.Item
+                        name="password"
+                        label="Password"
+                        rules={[
+                            { required: true, message: 'Please input password!' },
+                            { min: 6, message: 'Password must be at least 6 characters!' }
+                        ]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+                )}
 
             </Form>
         </Modal>

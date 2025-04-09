@@ -17,11 +17,12 @@ const CustomTable = ({
                          onDelete,
                          onBulkDelete,
                          loading,
-                         handleFilterApply,
-                         handleClearFilters,
                          dateRange,
                          setDateRange,
                          handleSearch,
+                         clearFilter,
+                         handleFilter,
+                         clearButtonEnable
                      }) => {
 
     // Updated rendering of cell content with `onCell`
@@ -49,6 +50,7 @@ const CustomTable = ({
 
 
     const handleClearSearch = () => {
+        console.log('handleClearSearch');
         setSearchText('');  // Clear search text
         handleSearch();     // Reset the table data to show all records
     };
@@ -112,8 +114,11 @@ const CustomTable = ({
                                 </Col>
                             ))}
                             <Col>
-                                <Button icon={<FilterOutlined />} onClick={handleFilterApply}>Apply Filters</Button>
-                                <Button style={{ marginLeft: '10px' }} icon={<ClearOutlined />} variant="outlined" color="danger" onClick={handleClearFilters}>Clear</Button>
+                                <Button icon={<FilterOutlined />} onClick={handleFilter}>Apply Filters</Button>
+                                {clearButtonEnable && (
+                                    <Button style={{ marginLeft: '10px' }} icon={<ClearOutlined />} variant="outlined" color="danger" onClick={clearFilter}>Clear</Button>
+                                )}
+
                             </Col>
                         </Row>
                     </Space>

@@ -7,6 +7,8 @@ import Login from "../pages/Login.jsx";
 import NotFound from "../pages/Notfound.jsx";
 import DashboardLayout from "../Layout/DashboardLayout.jsx";
 import Dashboard from "../pages/Dashboard/Dashboard.jsx";
+import BranchList from "../pages/Branch/BranchList.jsx";
+import DrugCategoryList from "../pages/DrugCategory/DrugCategoryList.jsx";
 
 // Lazy load components
 const UserList = React.lazy(() => import("../pages/User/UserList.jsx"));
@@ -38,7 +40,9 @@ export default function AppRoutes (){
             ),
             children: [
                 {path: 'dashboard', element: <Dashboard/>},
-                {path: 'user-list', element: <UserList/>},
+                {path: 'users', element: <UserList/>},
+                {path: 'branches', element:<BranchList/>},
+                {path: 'drugs-category',element:<DrugCategoryList/>}
             ],
         },
         {

@@ -3,18 +3,18 @@ import {message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, T
 import api from '../../Services/NetworkManager.js';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, PlusOutlined, TeamOutlined} from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 
 const { Title } = Typography;
 
 const UserList = () => {
-    const [users, setUsers] = useState([]);
+    const [tableData, setTableData] = useState([]);
     const [branches, setBranches] = useState([]);
     const [roles, setRoles] = useState([]);
 
-    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -32,8 +32,8 @@ const UserList = () => {
         setModalLoading(true);
         try {
             if (selectedUser) {
-                await api.put(`/user/update/${selectedUser.id}`, values);
-                message.success('User updated successfully');
+                const response  = await api.put(`/user/update/${selectedUser.id}`, values);
+                message.success(response.data.data.message);
             } else {
                 const response = await api.post('/user/create', values);
                 console.log(response)
@@ -55,7 +55,8 @@ const UserList = () => {
         setLoading(true);
         try {
             const res = await api.get('/user/list');
-            setUsers(res.data.data);
+            setTableData(res.data.data);
+            setFilteredData(res.data.data);
         } catch (error) {
             console.log(error);
             const errorMessage = error.response?.data?.data?.message || 'Operation failed';
@@ -76,9 +77,20 @@ const UserList = () => {
         }
     };
 
+    const getSelectedRecord = async (id) => {
+        try {
+            const response = await api.get(`/user/get/${id}`);
+            setSelectedUser(response.data.data);
+            setModalVisible(true);
+        } catch (error){
+            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
+            message.error(errorMessage);
+        }
+    };
+
     const fetchBranches = async () => {
         try {
-            const res = await api.get('/branch/list');
+            const res = await api.get('/user/branch-list');
             setBranches(res.data.data);
         } catch (error) {
             console.log(error);
@@ -100,7 +112,7 @@ const UserList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            const response = await Promise.all(selectedRowKeys.map(id => api.delete(`api/user/delete/${id}`)));
+            const response = await api.post(`/user/delete-all`, selectedRowKeys)
             message.success(response.data.data.message);
             fetchUsers();
             setSelectedRowKeys([]);
@@ -110,10 +122,10 @@ const UserList = () => {
         }
     };
 
-    const toggleStatus = async (id, isActive) => {
+    const toggleStatus = async (id) => {
         try {
-            await api.put(`/user/status-toggle/${id}`, { is_active: isActive });
-            message.success(`User ${isActive ? 'activated' : 'deactivated'} successfully`);
+            const response  = await api.get(`/user/update-status/${id}`);
+            message.success(response.data.data.message);
             fetchUsers();
         } catch (error) {
             const errorMessage = error.response?.data?.data?.message || 'Operation failed';
@@ -162,19 +174,23 @@ const UserList = () => {
             ),
         },
         {
+            title: 'Created At',
+            dataIndex: 'created_at',
+        },
+        {
             title: 'Actions',
             render: (_, record) => {
                 const isSuperAdmin = record.role === 'SuperAdmin';
 
                 return(
                     <Space>
-                        <Popconfirm title="Sure to update status?" onConfirm={() => handleDelete(record.id)}>
+                        <Tooltip title={isSuperAdmin ? 'Locked' : 'Status Update'} placement="bottom" >
                             <Switch
                                 disabled={isSuperAdmin}
                                 checked={record.is_active}
-                                onChange={(checked) => toggleStatus(record.id, checked)}
+                                onChange={() => toggleStatus(record.id)}
                             />
-                        </Popconfirm>
+                        </Tooltip>
 
                         <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
                             <Tooltip title={isSuperAdmin ? 'Locked' : 'Delete Record'} placement="bottom" >
@@ -189,9 +205,9 @@ const UserList = () => {
                             <Button type="text" color="default" icon={<EditOutlined />}
                                     disabled={isSuperAdmin}
                                     onClick={() => {
-                                        setSelectedUser(record);
-                                        setModalVisible(true);
-                                    }} />
+                                        getSelectedRecord(record.id);
+
+                                    }}/>
                         </Tooltip>
 
 
@@ -233,14 +249,11 @@ const UserList = () => {
         },
     ];
 
-    const handleFilterApply = () => {
-        setFilteredUsers(users.filter((user) => {
-            const matchesRole = roleFilter ? user.role === roleFilter : true;
-            const matchesStatus = statusFilter ? (statusFilter === 'active' ? user.is_active : !user.is_active) : true;
-            const matchesDateRange = dateRange.length ? moment(user.created_at).isBetween(dateRange[0], dateRange[1], null, '[]') : true;
-            return matchesRole && matchesStatus && matchesDateRange;
-        }));
+    const handleCancel = () => {
+        setSelectedUser(null); // Clear the selected user
+        setModalVisible(false);
     };
+
 
     const handleClearFilters = () => {
         setRoleFilter('');
@@ -251,15 +264,17 @@ const UserList = () => {
     };
 
     const handleSearch = () => {
-        if (searchText) {
-            setFilteredUsers(users.filter(user =>
-                user.first_name.toLowerCase().includes(searchText.toLowerCase()) ||
-                user.last_name.toLowerCase().includes(searchText.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchText.toLowerCase())
-            ));
-        } else {
-            setFilteredUsers(users);  // Show all users when search is cleared
+        if (searchText.trim().length <= 1) {
+            setFilteredData(tableData); // reset to all if empty
+            return;
         }
+
+        const filtered = tableData.filter((item) =>
+            Object.values(item).some((field) =>
+                String(field).toLowerCase().includes(searchText.toLowerCase())
+            )
+        );
+        setFilteredData(filtered);
     };
 
     useEffect(() => {
@@ -275,11 +290,12 @@ const UserList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
+                            <span style={{fontSize:"20px", marginRight:"10px"}}><TeamOutlined/></span>
                             Users
                         </Title>
                     </Col>
                     <Col>
-                        <Button icon={<PlusOutlined />} variant="solid" color="blue"
+                        <Button icon={<PlusOutlined />} variant="solid" color="default"
                                 onClick={() => {
                                     setSelectedUser(null);
                                     setModalVisible(true);
@@ -293,17 +309,15 @@ const UserList = () => {
             <div className="user-list">
                 <CustomTable
                     columns={columns}
-                    data={filteredUsers.length ? filteredUsers : users}
+                    data={filteredData}
                     searchText={searchText}
                     setSearchText={setSearchText}
                     filters={filters}
-                    setFilters={(key, value) => key === 'role' ? setRoleFilter(value) : setStatusFilter(value)}
                     selectedRowKeys={selectedRowKeys}
                     onRowSelectionChange={(keys) => setSelectedRowKeys(keys)}
                     onDelete={handleDelete}
                     onBulkDelete={handleBulkDelete}
                     loading={loading}
-                    handleFilterApply={handleFilterApply}
                     handleClearFilters={handleClearFilters}
                     dateRange={dateRange}
                     setDateRange={setDateRange}
@@ -313,10 +327,7 @@ const UserList = () => {
 
             <CreateOrUpdateModal
                 visible={modalVisible}
-                onCancel={() => {
-                    setModalVisible(false);
-                    setSelectedUser(null);
-                }}
+                onCancel={handleCancel}
                 branches={branches}
                 roles={roles}
                 onSubmit={handleDataSubmit}
