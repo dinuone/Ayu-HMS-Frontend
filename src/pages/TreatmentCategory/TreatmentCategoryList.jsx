@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 import api from '../../Services/NetworkManager.js';
-import { BranchesOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, FileAddFilled, MedicineBoxOutlined, PlusOutlined} from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 
 const { Title } = Typography;
 
-const BranchList = () => {
+const TreatmentCategoryList = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -23,7 +23,7 @@ const BranchList = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/branch/list');
+            const res = await api.get('/treatment-category/list');
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -45,9 +45,9 @@ const BranchList = () => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await api.put(`/branch/update/${selectedRecord.id}`, values);
+                await api.put(`/treatment-category/update/${selectedRecord.id}`, values);
             } else {
-                await api.post('/branch/create', values);
+                await api.post('/treatment-category/create', values);
             }
             fetchData();
             setModalVisible(false);
@@ -60,7 +60,7 @@ const BranchList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await api.get(`/branch/update-status/${id}`);
+            await api.get(`/treatment-category/update-status/${id}`);
             fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -69,7 +69,7 @@ const BranchList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await api.post(`/branch/delete-all`, selectedRowKeys);
+            await api.post(`/treatment-category/delete-all`, selectedRowKeys);
             fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
@@ -79,7 +79,7 @@ const BranchList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/branch/get/${id}`);
+            const response = await api.get(`/treatment-category/get/${id}`);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -89,7 +89,7 @@ const BranchList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/branch/delete/${id}`);
+            await api.delete(`/treatment-category/delete/${id}`);
             fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -117,7 +117,7 @@ const BranchList = () => {
                 to_date : dateRange[1],
                 is_active : statusFilter
             }
-            const response = await api.post(`/branch/filter`, payload);
+            const response = await api.post(`/treatment-category/filter`, payload);
             setTableData(response.data.data);
             setFilteredData(response.data.data);
             setClearButtonEnable(true)
@@ -138,17 +138,14 @@ const BranchList = () => {
 
     const columns = [
         {
-            title: 'Name',
+            title: 'Treatment Name',
             dataIndex: 'name',
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
+            title: 'Description',
+            dataIndex: 'description',
         },
-        {
-            title: 'Phone Number',
-            dataIndex: 'phone_number',
-        },
+
         {
             title: 'Status',
             dataIndex: 'is_active',
@@ -218,8 +215,8 @@ const BranchList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <BranchesOutlined style={{ fontSize: 20, marginRight: 10 }} />
-                            Branches
+                            <FileAddFilled style={{ fontSize: 20, marginRight: 10 }} />
+                            Treatment Categories
                         </Title>
                     </Col>
                     <Col>
@@ -232,7 +229,7 @@ const BranchList = () => {
                                 setModalVisible(true);
                             }}
                         >
-                            Create Branch
+                            Create Treatment Category
                         </Button>
                     </Col>
                 </Row>
@@ -272,4 +269,4 @@ const BranchList = () => {
     );
 };
 
-export default BranchList;
+export default TreatmentCategoryList;

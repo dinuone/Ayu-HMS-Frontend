@@ -8,7 +8,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   BranchesOutlined,
-  BellOutlined, MedicineBoxOutlined,
+  BellOutlined, MedicineBoxOutlined, FileWordFilled, FileAddOutlined,
 } from '@ant-design/icons';
 import '../styles/Dashboard.css';
 import PropTypes from "prop-types";
@@ -31,6 +31,10 @@ export default function DashboardLayout({ children }) {
   const routeTitles = {
     '/dashboard': 'Dashboard',
     '/branches': 'Branches',
+    '/drugs-category': 'Drug Categories',
+    '/disease-codes': 'Disease Codes',
+    '/treatment-category': 'Treatment Categories',
+    '/clinic-category': 'Clinic Categories',
     '/users': 'Users',
     '/settings': 'Settings',
   };
@@ -51,6 +55,7 @@ export default function DashboardLayout({ children }) {
       path: '/users',
     },
 
+
     {
       key: '3',
       icon: <SettingOutlined/>,
@@ -68,6 +73,39 @@ export default function DashboardLayout({ children }) {
           label: 'Drugs Category',
           path: '/drugs-category',
         },
+        {
+          key: '3-3',
+          icon: <FileAddOutlined />,
+          label: 'Disease Codes',
+          path: '/disease-codes',
+        },
+        {
+          key: '3-4',
+          icon: <FileAddOutlined />,
+          label: 'Treatment Category',
+          path: '/treatment-category',
+        },
+
+      ],
+    },
+
+    {
+      key: '4',
+      icon: <MedicineBoxOutlined/>,
+      label: 'Clinic Management',
+      children: [
+        {
+          key: '4-1',
+          icon: <MedicineBoxOutlined />,
+          label: 'Clinic Category',
+          path: '/clinic-category',
+        },
+        // {
+        //   key: '4-2',
+        //   icon: <MedicineBoxOutlined />,
+        //   label: 'Clinic',
+        //   path: '/clinic',
+        // },
       ],
     },
     // {
