@@ -20,21 +20,21 @@ const DrugCategoryList = () => {
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
 
-    const fetchDurgCategory = async () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
             const res = await api.get('/drug-category/list');
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Failed to fetch branches');
+            message.error(error.response?.data?.message || 'Operation failed');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchDurgCategory();
+        fetchData();
     }, []);
 
 
@@ -49,7 +49,7 @@ const DrugCategoryList = () => {
             } else {
                 await api.post('/drug-category/create', values);
             }
-            fetchDurgCategory();
+            fetchData();
             setModalVisible(false);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -61,7 +61,7 @@ const DrugCategoryList = () => {
     const toggleStatus = async (id) => {
         try {
             await api.get(`/drug-category/update-status/${id}`);
-            fetchDurgCategory();
+            fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -70,7 +70,7 @@ const DrugCategoryList = () => {
     const handleBulkDelete = async () => {
         try {
             await api.post(`/drug-category/delete-all`, selectedRowKeys);
-            fetchDurgCategory();
+            fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -90,7 +90,7 @@ const DrugCategoryList = () => {
     const handleDelete = async (id) => {
         try {
             await api.delete(`/drug-category/delete/${id}`);
-            fetchDurgCategory();
+            fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -129,7 +129,7 @@ const DrugCategoryList = () => {
 
     const clearFilter = () => {
         setDateRange([])
-        fetchDurgCategory();
+        fetchData();
         setClearButtonEnable(false)
     }
 
@@ -140,7 +140,6 @@ const DrugCategoryList = () => {
         {
             title: 'Name',
             dataIndex: 'name',
-            sorter: (a, b) => a.name.localeCompare(b.name),
         },
         {
             title: 'Description',
