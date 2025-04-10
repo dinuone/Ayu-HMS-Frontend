@@ -24,7 +24,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
     return (
         <Modal
             open={visible}
-            title={initialValues ? "Edit Branch" : "Create Branch"}
+            title={initialValues ? "Edit Drug Category" : "Create Drug Category"}
             okText={initialValues ? "Update" : "Create"}
             onCancel={onCancel}
             onOk={handleSubmit}
@@ -34,29 +34,18 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
             <Form form={form} layout="vertical">
                 <Form.Item
                     name="name"
-                    label="Branch Name"
-                    rules={[{ required: true, message: 'Please input branch name!' }]}
+                    label="Category Name"
+                    rules={[{ required: true, message: 'Please input category name!' }]}
                 >
                     <Input />
                 </Form.Item>
 
                 <Form.Item
-                    name="address"
-                    label="Address"
-                    rules={[{ required: true, message: 'Please input address!' }]}
+                    name="description"
+                    label="Description"
+
                 >
                     <Input.TextArea rows={4} />
-                </Form.Item>
-
-                <Form.Item
-                    name="phone_number"
-                    label="Phone Number"
-                    rules={[{
-                        required: true,
-                        message: 'Please input phone number!',
-                    }]}
-                >
-                    <Input maxLength={10} />
                 </Form.Item>
             </Form>
         </Modal>

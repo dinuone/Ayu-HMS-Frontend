@@ -79,7 +79,7 @@ const DrugCategoryList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/branch/get/${id}`);
+            const response = await api.get(`/drug-category/get/${id}`);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -143,13 +143,10 @@ const DrugCategoryList = () => {
             sorter: (a, b) => a.name.localeCompare(b.name),
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
+            title: 'Description',
+            dataIndex: 'description',
         },
-        {
-            title: 'Phone Number',
-            dataIndex: 'phone_number',
-        },
+
         {
             title: 'Status',
             dataIndex: 'is_active',
