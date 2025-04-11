@@ -18,8 +18,8 @@ const UserList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [roleFilter, setRoleFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
+    const [roleFilter, setRoleFilter] = useState(null);
+    const [statusFilter, setStatusFilter] = useState('All');
     const [dateRange, setDateRange] = useState([]);
     const navigate = useNavigate();
 
@@ -32,12 +32,11 @@ const UserList = () => {
         setModalLoading(true);
         try {
             if (selectedUser) {
-                const response  = await api.put(`/user/update/${selectedUser.id}`, values);
-                message.success(response.data.data.message);
+                await api.put(`/user/update/${selectedUser.id}`, values);
             } else {
-                const response = await api.post('/user/create', values);
+                await api.post('/user/create', values);
                 console.log(response)
-                message.success(response.data.data.message);
+
             }
             setModalVisible(false);
             fetchUsers();
@@ -68,8 +67,7 @@ const UserList = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await api.delete(`/user/delete/${id}`);
-            message.success(response.data.data.message);
+            await api.delete(`/user/delete/${id}`);
             fetchUsers();
         } catch (error){
             const errorMessage = error.response?.data?.data?.message || 'Operation failed';
@@ -112,8 +110,7 @@ const UserList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            const response = await api.post(`/user/delete-all`, selectedRowKeys)
-            message.success(response.data.data.message);
+            await api.post(`/user/delete-all`, selectedRowKeys)
             fetchUsers();
             setSelectedRowKeys([]);
         } catch (error){
@@ -124,8 +121,7 @@ const UserList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            const response  = await api.get(`/user/update-status/${id}`);
-            message.success(response.data.data.message);
+            await api.get(`/user/update-status/${id}`);
             fetchUsers();
         } catch (error) {
             const errorMessage = error.response?.data?.data?.message || 'Operation failed';

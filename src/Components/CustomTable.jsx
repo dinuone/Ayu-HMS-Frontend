@@ -48,6 +48,10 @@ const CustomTable = ({
         };
     };
 
+    const isFilterEmpty = !(
+        (dateRange && dateRange[0] && dateRange[1]) || // if date range is selected
+        (filters && filters.some(f => f.value && (Array.isArray(f.value) ? f.value.length > 0 : true))) // if any select has value
+    );
 
     const handleClearSearch = () => {
         console.log('handleClearSearch');
@@ -91,6 +95,7 @@ const CustomTable = ({
                                 <Col key={index}>
                                     {filter.type === 'select' && (
                                         <Select
+                                            mode={filter.mode}
                                             placeholder={filter.placeholder}
                                             value={filter.value}
                                             onChange={(value) => setFilters(filter.key, value)}
@@ -114,7 +119,7 @@ const CustomTable = ({
                                 </Col>
                             ))}
                             <Col>
-                                <Button icon={<FilterOutlined />} onClick={handleFilter}>Apply Filters</Button>
+                                <Button icon={<FilterOutlined />} onClick={handleFilter} disabled={isFilterEmpty}>Apply Filters</Button>
                                 {clearButtonEnable && (
                                     <Button style={{ marginLeft: '10px' }} icon={<ClearOutlined />} variant="outlined" color="danger" onClick={clearFilter}>Clear</Button>
                                 )}

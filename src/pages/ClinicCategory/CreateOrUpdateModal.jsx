@@ -1,6 +1,8 @@
 // CreateOrUpdateModal.jsx
 import React, { useEffect } from 'react';
-import { Button, Form, Input, Modal } from 'antd';
+import { Button, Form, Input, Modal, Checkbox } from 'antd';
+
+const CheckboxGroup = Checkbox.Group;
 
 const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confirmLoading, }) => {
     const [form] = Form.useForm();
@@ -22,19 +24,14 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
     };
 
     const daysOfWeekOptions = [
-        { label: 'Mon', value: 'mon' },
-        { label: 'Tue', value: 'tue' },
-        { label: 'Wed', value: 'wed' },
-        { label: 'Thu', value: 'thu' },
-        { label: 'Fri', value: 'fri' },
-        { label: 'Sat', value: 'sat' },
-        { label: 'Sun', value: 'sun' },
+        'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun'
     ];
+
 
     return (
         <Modal
             open={visible}
-            title={initialValues ? "Edit Treatment Category" : "Create Treatment Category"}
+            title={initialValues ? "Edit Clinic Category" : "Create Clinic Category"}
             okText={initialValues ? "Update" : "Create"}
             onCancel={onCancel}
             onOk={handleSubmit}
@@ -56,6 +53,14 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
 
                 >
                     <Input.TextArea rows={4} />
+                </Form.Item>
+
+                <Form.Item
+                    name="available_days"
+                    label="Available Days"
+                    rules={[{ required: true, message: 'Please select at least one day!' }]}
+                >
+                    <CheckboxGroup  options={daysOfWeekOptions}  />
                 </Form.Item>
             </Form>
         </Modal>

@@ -8,7 +8,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   BranchesOutlined,
-  BellOutlined, MedicineBoxOutlined, FileWordFilled, FileAddOutlined,
+  BellOutlined, MedicineBoxOutlined, FileWordFilled, FileAddOutlined, DollarCircleOutlined,
 } from '@ant-design/icons';
 import '../styles/Dashboard.css';
 import PropTypes from "prop-types";
@@ -81,33 +81,40 @@ export default function DashboardLayout({ children }) {
         },
         {
           key: '3-4',
-          icon: <FileAddOutlined />,
-          label: 'Treatment Category',
-          path: '/treatment-category',
-        },
-
-      ],
-    },
-
-    {
-      key: '4',
-      icon: <MedicineBoxOutlined/>,
-      label: 'Clinic Management',
-      children: [
-        {
-          key: '4-1',
           icon: <MedicineBoxOutlined />,
           label: 'Clinic Category',
           path: '/clinic-category',
         },
-        // {
-        //   key: '4-2',
-        //   icon: <MedicineBoxOutlined />,
-        //   label: 'Clinic',
-        //   path: '/clinic',
-        // },
+        {
+          key: '3-5',
+          icon: <DollarCircleOutlined />,
+          label: 'Rates Configuration',
+          path: '/rates-config',
+        },
+
       ],
     },
+    {
+      key: '4',
+      icon: <MedicineBoxOutlined/>,
+      label: 'Treatment Management',
+      children: [
+        {
+          key: '4-1',
+          icon: <FileAddOutlined />,
+          label: 'Treatment Category',
+          path: '/treatment-category',
+        },
+        {
+          key: '4-2',
+          icon: <MedicineBoxOutlined />,
+          label: 'Treatment',
+          path: '/clinic',
+        },
+      ],
+    },
+
+
     // {
     //   key: '4',
     //   icon: <SettingOutlined />,
