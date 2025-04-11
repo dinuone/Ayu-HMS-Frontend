@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 import api from '../../Services/NetworkManager.js';
-import { BranchesOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {BranchesOutlined, DeleteOutlined, EditOutlined, FileExcelOutlined, PlusOutlined} from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
+import {exportToExcel} from "../../Services/ExcelExport.js";
 
 const { Title } = Typography;
 
@@ -13,7 +14,7 @@ const BranchList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
+    const [statusFilter, setStatusFilter] = useState(null);
     const [dateRange, setDateRange] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
@@ -129,12 +130,15 @@ const BranchList = () => {
 
     const clearFilter = () => {
         setDateRange([])
+        setStatusFilter(null)
         fetchData();
         setClearButtonEnable(false)
     }
 
 
-
+    const handleExport = () => {
+        exportToExcel(columns, filteredData, 'Branches');
+    };
 
     const columns = [
         {
@@ -233,6 +237,16 @@ const BranchList = () => {
                             }}
                         >
                             Create Branch
+                        </Button>
+
+                        <Button
+                            variant="outlined"
+                            color="green"
+                            icon={<FileExcelOutlined />}
+                            onClick={handleExport}
+                            style={{ marginLeft: '10px' }}
+                        >
+                            Export to Excel
                         </Button>
                     </Col>
                 </Row>

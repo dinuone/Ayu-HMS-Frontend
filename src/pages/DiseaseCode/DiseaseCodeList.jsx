@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 import api from '../../Services/NetworkManager.js';
-import {DeleteOutlined, EditOutlined, FileAddFilled, MedicineBoxOutlined, PlusOutlined} from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    EditOutlined,
+    FileAddFilled,
+    FileExcelOutlined,
+    MedicineBoxOutlined,
+    PlusOutlined
+} from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
+import {exportToExcel} from "../../Services/ExcelExport.js";
 
 const { Title } = Typography;
 
@@ -129,11 +137,14 @@ const DiseaseCodeList = () => {
 
     const clearFilter = () => {
         setDateRange([])
+        setStatusFilter('All')
         fetchData();
         setClearButtonEnable(false)
     }
 
-
+    const handleExport = () => {
+        exportToExcel(columns, filteredData, 'Disease Codes');
+    };
 
 
     const columns = [
@@ -234,6 +245,16 @@ const DiseaseCodeList = () => {
                             }}
                         >
                             Create Disease Code
+                        </Button>
+                        <Button
+                            disabled={tableData.length === 0}
+                            variant="outlined"
+                            color="green"
+                            icon={<FileExcelOutlined />}
+                            onClick={handleExport}
+                            style={{ marginLeft: '10px' }}
+                        >
+                            Export to Excel
                         </Button>
                     </Col>
                 </Row>
