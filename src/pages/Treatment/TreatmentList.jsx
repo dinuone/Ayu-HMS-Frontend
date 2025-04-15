@@ -34,7 +34,7 @@ const TreatmentList = () => {
     const [filterValues, setFilterValues] = useState({
         status: "All",
         date:[],
-        treatment_Category:[]
+        treatment_category:[]
         // add more in future as needed
     });
 
@@ -133,7 +133,7 @@ const TreatmentList = () => {
                 from_date : filterValues.date[0],
                 to_date : filterValues.date[1],
                 is_active : filterValues.status,
-                category_ids : filterValues.treatment_Category
+                category_ids : filterValues.treatment_category
             }
             const response = await crudService.filter(payload);
             setTableData(response.data.data);
@@ -149,7 +149,7 @@ const TreatmentList = () => {
         setFilterValues({
             status: 'All',
             date: [],
-            treatment_Category: []
+            treatment_category: []
         });
         fetchData();
         setClearButtonEnable(false);
@@ -228,13 +228,13 @@ const TreatmentList = () => {
             key: 'treatment_category',
             type: 'select',
             mode:'multiple',
-            value: filterValues.treatmentCategory,
+            value: filterValues.treatment_category,
             placeholder: 'Filter by Treatment Category',
             options: treatmentCategory.map(treatmentCtg => ({
                 label: treatmentCtg.name,
                 value: treatmentCtg.id
             })),
-            setValue: filterValues.treatmentCategory,
+            setValue: filterValues.treatment_category,
         },
         {
             key: 'status',
