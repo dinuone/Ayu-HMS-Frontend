@@ -12,8 +12,11 @@ import {
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
+import CrudService from "../../Services/CrudService.js";
+import {globalSearch} from "../../Utils/Search.js";
 
 const { Title } = Typography;
+const crudService = CrudService('treatment-category');
 
 const TreatmentCategoryList = () => {
     const [tableData, setTableData] = useState([]);
@@ -28,10 +31,16 @@ const TreatmentCategoryList = () => {
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
 
+    const [filterValues, setFilterValues] = useState({
+        status: "All",
+        date:[],
+        // add more in future as needed
+    });
+
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/treatment-category/list');
+            const res = await crudService.fetchAll();
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -53,11 +62,11 @@ const TreatmentCategoryList = () => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await api.put(`/treatment-category/update/${selectedRecord.id}`, values);
+                await crudService.update(selectedRecord.id,values);
             } else {
-                await api.post('/treatment-category/create', values);
+                await crudService.create(values);
             }
-            fetchData();
+            await fetchData();
             setModalVisible(false);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -68,8 +77,8 @@ const TreatmentCategoryList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await api.get(`/treatment-category/update-status/${id}`);
-            fetchData();
+            await crudService.updateStatus(id);
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -77,8 +86,8 @@ const TreatmentCategoryList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await api.post(`/treatment-category/delete-all`, selectedRowKeys);
-            fetchData();
+            await crudService.deleteAll(selectedRowKeys);
+            await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -87,7 +96,7 @@ const TreatmentCategoryList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/treatment-category/get/${id}`);
+            const response = await crudService.getOne(id);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -97,25 +106,16 @@ const TreatmentCategoryList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/treatment-category/delete/${id}`);
-            fetchData();
+            await crudService.delete(id);
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
     const handleSearch = () => {
-        if (searchText.trim().length <= 1) {
-            setFilteredData(tableData); // reset to all if empty
-            return;
-        }
-
-        const filtered = tableData.filter((item) =>
-            Object.values(item).some((field) =>
-                String(field).toLowerCase().includes(searchText.toLowerCase())
-            )
-        );
-        setFilteredData(filtered);
+        const result = globalSearch(tableData, searchText); // Use global search function
+        setFilteredData(result);
     };
 
     const handleFilter = async () => {
@@ -125,7 +125,7 @@ const TreatmentCategoryList = () => {
                 to_date : dateRange[1],
                 is_active : statusFilter
             }
-            const response = await api.post(`/treatment-category/filter`, payload);
+            const response = await crudService.filter(payload);
             setTableData(response.data.data);
             setFilteredData(response.data.data);
             setClearButtonEnable(true)
@@ -136,11 +136,13 @@ const TreatmentCategoryList = () => {
     }
 
     const clearFilter = () => {
-        setDateRange([])
-        setStatusFilter('All')
+        setFilterValues({
+            status: 'All',
+            date: [],
+        });
         fetchData();
-        setClearButtonEnable(false)
-    }
+        setClearButtonEnable(false);
+    };
 
 
     const handleExport = () => {
@@ -204,19 +206,20 @@ const TreatmentCategoryList = () => {
         {
             key: 'status',
             type: 'select',
-            value: statusFilter,
+            value: filterValues.status,
             placeholder: 'Filter by Status',
             options: [
                 { label: 'All', value: 'All' },
                 { label: 'Active', value: 'active' },
                 { label: 'Inactive', value: 'inactive' },
             ],
-            setValue: setStatusFilter,
+            setValue: filterValues.status,
         },
         {
             key: 'date',
             type: 'dateRange',
-            setValue: setDateRange,
+            setValue: filterValues.date,
+            value: filterValues.date,
         },
     ];
 
@@ -267,13 +270,16 @@ const TreatmentCategoryList = () => {
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 loading={loading}
-                dateRange={dateRange}
-                setDateRange={setDateRange}
                 handleSearch={handleSearch}
                 handleFilter={handleFilter}
                 clearFilter={clearFilter}
                 clearButtonEnable={clearButtonEnable}
-                setFilters={(key, value) => key === 'status' ? setStatusFilter(value) : setStatusFilter(value)}
+                setFilters={(key, value) => {
+                    setFilterValues(prev => ({
+                        ...prev,
+                        [key]: value
+                    }));
+                }}
             />
 
             <CreateOrUpdateModal

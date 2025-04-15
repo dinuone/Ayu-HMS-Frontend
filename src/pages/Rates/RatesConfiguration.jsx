@@ -13,7 +13,9 @@ import {
 } from "antd";
 import { PlusOutlined, DeleteOutlined, SaveOutlined, UndoOutlined } from "@ant-design/icons";
 import api from "../../Services/NetworkManager.js";
+import CrudService from "../../Services/CrudService.js";
 
+const crudService = CrudService('rates');
 
 const RatesConfiguration = () => {
     const [form] = Form.useForm();
@@ -26,7 +28,7 @@ const RatesConfiguration = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await api.get("/rates/list");
+                const response = await crudService.fetchAll()
 
                 form.setFieldsValue({
                     hospital_charge: response.data.data.hospital_charge,

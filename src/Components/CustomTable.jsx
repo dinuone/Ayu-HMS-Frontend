@@ -17,8 +17,6 @@ const CustomTable = ({
                          onDelete,
                          onBulkDelete,
                          loading,
-                         dateRange,
-                         setDateRange,
                          handleSearch,
                          clearFilter,
                          handleFilter,
@@ -49,7 +47,6 @@ const CustomTable = ({
     };
 
     const isFilterEmpty = !(
-        (dateRange && dateRange[0] && dateRange[1]) || // if date range is selected
         (filters && filters.some(f => f.value && (Array.isArray(f.value) ? f.value.length > 0 : true))) // if any select has value
     );
 
@@ -112,8 +109,8 @@ const CustomTable = ({
                                     {filter.type === 'dateRange' && (
                                         <DatePicker.RangePicker
                                             style={{ width: 300 }}
-                                            onChange={(dates) => setDateRange(dates)}
-                                            value={dateRange}
+                                            onChange={(value) => setFilters(filter.key, value)}
+                                            value={filter.value}
                                         />
                                     )}
                                 </Col>

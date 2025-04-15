@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import {message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip} from 'antd';
+import {message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip, Modal} from 'antd';
 import api from '../../Services/NetworkManager.js';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import {DeleteOutlined, EditOutlined, PlusOutlined, TeamOutlined} from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    EditOutlined,
+    ExclamationCircleFilled,
+    KeyOutlined,
+    PlusOutlined, SecurityScanOutlined,
+    TeamOutlined
+} from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
+import CrudService from "../../Services/CrudService.js";
+import {globalSearch} from "../../Utils/Search.js";
 
+const { confirm } = Modal;
 const { Title } = Typography;
+const crudService = CrudService('user');
 
 const UserList = () => {
     const [tableData, setTableData] = useState([]);
@@ -18,8 +29,6 @@ const UserList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [roleFilter, setRoleFilter] = useState(null);
-    const [statusFilter, setStatusFilter] = useState('All');
     const [dateRange, setDateRange] = useState([]);
     const navigate = useNavigate();
 
@@ -28,22 +37,26 @@ const UserList = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
 
+    const [filterValues, setFilterValues] = useState({
+        status: "All",
+        role: null,
+        branch: null,
+        date:[]
+        // add more in future as needed
+    });
+
     const handleDataSubmit = async (values) => {
         setModalLoading(true);
         try {
             if (selectedUser) {
-                await api.put(`/user/update/${selectedUser.id}`, values);
+                await crudService.update(selectedUser.id,values);
             } else {
-                await api.post('/user/create', values);
-                console.log(response)
-
+                await crudService.create(values);
             }
             setModalVisible(false);
-            fetchUsers();
+            await fetchUsers();
         } catch (error) {
-            console.log(error)
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         } finally {
             setModalLoading(false);
             setSelectedUser(null);
@@ -53,13 +66,11 @@ const UserList = () => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/user/list');
+            const res = await crudService.fetchAll();
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
-            console.log(error);
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         } finally {
             setLoading(false);
         }
@@ -67,22 +78,20 @@ const UserList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/user/delete/${id}`);
-            fetchUsers();
+            await crudService.delete(id);
+            await fetchUsers();
         } catch (error){
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         }
     };
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/user/get/${id}`);
+            const response = await crudService.getOne(id);
             setSelectedUser(response.data.data);
             setModalVisible(true);
         } catch (error){
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         }
     };
 
@@ -91,9 +100,7 @@ const UserList = () => {
             const res = await api.get('/user/branch-list');
             setBranches(res.data.data);
         } catch (error) {
-            console.log(error);
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         }
     }
 
@@ -102,31 +109,42 @@ const UserList = () => {
             const res = await api.get('/user/role-list');
             setRoles(res.data.data);
         } catch (error) {
-            console.log(error);
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         }
     }
 
     const handleBulkDelete = async () => {
         try {
-            await api.post(`/user/delete-all`, selectedRowKeys)
-            fetchUsers();
+            await crudService.deleteAll(selectedRowKeys)
+            await fetchUsers();
             setSelectedRowKeys([]);
         } catch (error){
-            const errorMessage = error.response?.data?.data?.message || 'Operation failed';
-            message.error(errorMessage);
+            message.error(error.response?.data?.data?.message || 'Operation failed');
         }
     };
 
     const toggleStatus = async (id) => {
         try {
-            await api.get(`/user/update-status/${id}`);
-            fetchUsers();
+            await crudService.updateStatus(id);
+            await fetchUsers();
         } catch (error) {
             const errorMessage = error.response?.data?.data?.message || 'Operation failed';
             message.error(errorMessage);
         }
+    }
+
+    const showPromiseConfirm = () => {
+        confirm({
+            title: 'Do you want to reset password?',
+            icon: <ExclamationCircleFilled />,
+            content: 'new password is "user@#123"',
+            onOk() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+                }).catch(() => console.log('Oops errors!'));
+            },
+            onCancel() {},
+        });
     };
 
 
@@ -206,7 +224,11 @@ const UserList = () => {
                                     }}/>
                         </Tooltip>
 
-
+                        <Tooltip title={isSuperAdmin ? 'Locked' : 'Reset Password'} placement="bottom" >
+                            <Button type="text" color="default" icon={<SecurityScanOutlined />}
+                                    disabled={isSuperAdmin}
+                                    onClick={showPromiseConfirm}/>
+                        </Tooltip>
                     </Space>
                 )
             }
@@ -217,31 +239,39 @@ const UserList = () => {
         {
             key: 'role',
             type: 'select',
-            value: roleFilter,
+            value: filterValues.role,
             placeholder: 'Filter by Role',
             options: [
-                { label: 'All Roles', value: '' },
-                { label: 'Admin', value: 'admin' },
-                { label: 'User', value: 'user' },
+                { label: 'All Roles', value: 'All' },
+                ...roles.map(role => ({ label: role.name, value: role.id }))
             ],
-            setValue: setRoleFilter,
+        },
+        {
+            key: 'branch',
+            type: 'select',
+            mode:'multiple',
+            placeholder: 'Select Branch',
+            value: filterValues.branch,
+            options: branches.map(branch => ({
+                label: branch.name,
+                value: branch.id
+            }))
         },
         {
             key: 'status',
             type: 'select',
-            value: statusFilter,
+            value: filterValues.status,
             placeholder: 'Filter by Status',
             options: [
-                { label: 'All Statuses', value: '' },
+                { label: 'All Statuses', value: 'All' },
                 { label: 'Active', value: 'active' },
                 { label: 'Inactive', value: 'inactive' },
             ],
-            setValue: setStatusFilter,
         },
         {
             key: 'date',
             type: 'dateRange',
-            setValue: setDateRange,
+            setValue: filterValues.date,
         },
     ];
 
@@ -260,17 +290,8 @@ const UserList = () => {
     };
 
     const handleSearch = () => {
-        if (searchText.trim().length <= 1) {
-            setFilteredData(tableData); // reset to all if empty
-            return;
-        }
-
-        const filtered = tableData.filter((item) =>
-            Object.values(item).some((field) =>
-                String(field).toLowerCase().includes(searchText.toLowerCase())
-            )
-        );
-        setFilteredData(filtered);
+        const result = globalSearch(tableData, searchText); // Use global search function
+        setFilteredData(result);
     };
 
     useEffect(() => {
@@ -318,6 +339,12 @@ const UserList = () => {
                     dateRange={dateRange}
                     setDateRange={setDateRange}
                     handleSearch={handleSearch}
+                    setFilters={(key, value) => {
+                        setFilterValues(prev => ({
+                            ...prev,
+                            [key]: value
+                        }));
+                    }}
                 />
             </div>
 

@@ -5,8 +5,12 @@ import {BranchesOutlined, DeleteOutlined, EditOutlined, FileExcelOutlined, PlusO
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
+import CrudService from "../../Services/CrudService.js";
+import {globalSearch} from "../../Utils/Search.js";
 
 const { Title } = Typography;
+
+const crudService = CrudService('branch');
 
 const BranchList = () => {
     const [tableData, setTableData] = useState([]);
@@ -14,17 +18,20 @@ const BranchList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [statusFilter, setStatusFilter] = useState(null);
-    const [dateRange, setDateRange] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
+    const [filterValues, setFilterValues] = useState({
+        status: "All",
+        date:[]
+        // add more in future as needed
+    });
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/branch/list');
+            const res = await crudService.fetchAll()
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -46,11 +53,11 @@ const BranchList = () => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await api.put(`/branch/update/${selectedRecord.id}`, values);
+                await crudService.update(selectedRecord.id, values);
             } else {
-                await api.post('/branch/create', values);
+                await crudService.create(values);
             }
-            fetchData();
+            await fetchData();
             setModalVisible(false);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -61,8 +68,8 @@ const BranchList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await api.get(`/branch/update-status/${id}`);
-            fetchData();
+            await crudService.updateStatus(id);
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -70,8 +77,8 @@ const BranchList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await api.post(`/branch/delete-all`, selectedRowKeys);
-            fetchData();
+            await crudService.deleteAll(selectedRowKeys);
+            await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -80,7 +87,7 @@ const BranchList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/branch/get/${id}`);
+            const response = await crudService.getOne(id);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -90,35 +97,26 @@ const BranchList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/branch/delete/${id}`);
-            fetchData();
+            await crudService.delete(id);
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
     const handleSearch = () => {
-        if (searchText.trim().length <= 1) {
-            setFilteredData(tableData); // reset to all if empty
-            return;
-        }
-
-        const filtered = tableData.filter((item) =>
-            Object.values(item).some((field) =>
-                String(field).toLowerCase().includes(searchText.toLowerCase())
-            )
-        );
-        setFilteredData(filtered);
+        const result = globalSearch(tableData, searchText); // Use global search function
+        setFilteredData(result);
     };
 
     const handleFilter = async () => {
         try {
             const payload = {
-                from_date : dateRange[0],
-                to_date : dateRange[1],
-                is_active : statusFilter
+                from_date: filterValues.date?.[0] || null,
+                to_date: filterValues.date?.[1] || null,
+                is_active: filterValues.status
             }
-            const response = await api.post(`/branch/filter`, payload);
+            const response = await crudService.filter(payload);
             setTableData(response.data.data);
             setFilteredData(response.data.data);
             setClearButtonEnable(true)
@@ -129,11 +127,13 @@ const BranchList = () => {
     }
 
     const clearFilter = () => {
-        setDateRange([])
-        setStatusFilter(null)
+        setFilterValues({
+            status: 'All',
+            date: [],
+        });
         fetchData();
-        setClearButtonEnable(false)
-    }
+        setClearButtonEnable(false);
+    };
 
 
     const handleExport = () => {
@@ -200,19 +200,20 @@ const BranchList = () => {
         {
             key: 'status',
             type: 'select',
-            value: statusFilter,
+            value: filterValues.status,
             placeholder: 'Filter by Status',
             options: [
                 { label: 'All', value: 'All' },
                 { label: 'Active', value: 'active' },
                 { label: 'Inactive', value: 'inactive' },
             ],
-            setValue: setStatusFilter,
+            setValue: filterValues.status,
         },
         {
             key: 'date',
             type: 'dateRange',
-            setValue: setDateRange,
+            value: filterValues.date,
+            setValue: filterValues.date,
         },
     ];
 
@@ -263,13 +264,16 @@ const BranchList = () => {
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 loading={loading}
-                dateRange={dateRange}
-                setDateRange={setDateRange}
                 handleSearch={handleSearch}
                 handleFilter={handleFilter}
                 clearFilter={clearFilter}
                 clearButtonEnable={clearButtonEnable}
-                setFilters={(key, value) => key === 'status' ? setStatusFilter(value) : setStatusFilter(value)}
+                setFilters={(key, value) => {
+                    setFilterValues(prev => ({
+                        ...prev,
+                        [key]: value
+                    }));
+                }}
             />
 
             <CreateOrUpdateModal

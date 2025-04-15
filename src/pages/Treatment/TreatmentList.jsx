@@ -16,9 +16,10 @@ import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
 
 const { Title } = Typography;
-const crudService = CrudService('disease-code');
+const crudService = CrudService('treatment');
+const treatmentService = CrudService('treatment-category');
 
-const DiseaseCodeList = () => {
+const TreatmentList = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -28,11 +29,12 @@ const DiseaseCodeList = () => {
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
-
+    const [treatmentCategory, setTreatmentCategory] = useState([]);
 
     const [filterValues, setFilterValues] = useState({
         status: "All",
         date:[],
+        treatment_Category:[]
         // add more in future as needed
     });
 
@@ -51,16 +53,27 @@ const DiseaseCodeList = () => {
 
     useEffect(() => {
         fetchData();
+        fetchTreatmentCategories()
     }, []);
+
+
+    const fetchTreatmentCategories= async() =>{
+        try {
+            const res = await api.get(`/treatment-category/list/${true}`);
+            setTreatmentCategory(res.data.data);
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Operation failed');
+        }
+    }
 
 
     const handleDataSubmit = async (values) => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await crudService.update(selectedRecord.id,values)
+                await crudService.update(selectedRecord.id,values);
             } else {
-                await crudService.create(values)
+                await crudService.create(values);
             }
             await fetchData();
             setModalVisible(false);
@@ -73,7 +86,7 @@ const DiseaseCodeList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await crudService.updateStatus(id)
+            await crudService.updateStatus(id);
             await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -82,7 +95,7 @@ const DiseaseCodeList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await crudService.deleteAll(selectedRowKeys)
+            await crudService.deleteAll(selectedRowKeys);
             await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
@@ -92,7 +105,7 @@ const DiseaseCodeList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await crudService.getOne(id)
+            const response = await crudService.getOne(id);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -102,7 +115,7 @@ const DiseaseCodeList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await crudService.delete(id)
+            await crudService.delete(id);
             await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -117,9 +130,10 @@ const DiseaseCodeList = () => {
     const handleFilter = async () => {
         try {
             const payload = {
-                from_date : dateRange[0],
-                to_date : dateRange[1],
-                is_active : statusFilter
+                from_date : filterValues.date[0],
+                to_date : filterValues.date[1],
+                is_active : filterValues.status,
+                category_ids : filterValues.treatment_Category
             }
             const response = await crudService.filter(payload);
             setTableData(response.data.data);
@@ -130,32 +144,40 @@ const DiseaseCodeList = () => {
         }
 
     }
+
     const clearFilter = () => {
         setFilterValues({
             status: 'All',
             date: [],
+            treatment_Category: []
         });
         fetchData();
         setClearButtonEnable(false);
     };
 
-    const handleExport = () => {
-        exportToExcel(columns, filteredData, 'Disease Codes');
-    };
 
+    const handleExport = () => {
+        exportToExcel(columns, filteredData, 'Treatment Category');
+    };
 
     const columns = [
         {
-            title: 'Disease Code',
-            dataIndex: 'disease_code',
+            title: 'Treatment Name',
+            dataIndex: 'name',
         },
         {
-            title: 'Disease Name',
-            dataIndex: 'disease_name',
+            title: 'Treatment Price',
+            dataIndex: 'price',
+            render: (price) => `LKR ${price.toLocaleString()}`,
         },
         {
-            title: 'Description',
-            dataIndex: 'description',
+            title: 'Treatment Category',
+            dataIndex: 'treatment_category',
+            render: (category) => (
+                <Tag color="geekblue-inverse">
+                    {category.name}
+                </Tag>
+            ),
         },
 
         {
@@ -203,6 +225,18 @@ const DiseaseCodeList = () => {
 
     const filters = [
         {
+            key: 'treatment_category',
+            type: 'select',
+            mode:'multiple',
+            value: filterValues.treatmentCategory,
+            placeholder: 'Filter by Treatment Category',
+            options: treatmentCategory.map(treatmentCtg => ({
+                label: treatmentCtg.name,
+                value: treatmentCtg.id
+            })),
+            setValue: filterValues.treatmentCategory,
+        },
+        {
             key: 'status',
             type: 'select',
             value: filterValues.status,
@@ -229,7 +263,7 @@ const DiseaseCodeList = () => {
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
                             <FileAddFilled style={{ fontSize: 20, marginRight: 10 }} />
-                             Disease Codes
+                            Treatments
                         </Title>
                     </Col>
                     <Col>
@@ -242,7 +276,7 @@ const DiseaseCodeList = () => {
                                 setModalVisible(true);
                             }}
                         >
-                            Create Disease Code
+                            Create Treatments
                         </Button>
                         <Button
                             disabled={tableData.length === 0}
@@ -287,6 +321,7 @@ const DiseaseCodeList = () => {
                     setSelectedRecord(null);
                     setModalVisible(false);
                 }}
+                treatmentCategories={treatmentCategory}
                 onSubmit={handleDataSubmit}
                 initialValues={selectedRecord}
                 confirmLoading={modalLoading}
@@ -295,4 +330,4 @@ const DiseaseCodeList = () => {
     );
 };
 
-export default DiseaseCodeList;
+export default TreatmentList;

@@ -12,8 +12,12 @@ import {
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
+import CrudService from "../../Services/CrudService.js";
+import {globalSearch} from "../../Utils/Search.js";
 
 const { Title } = Typography;
+
+const crudService = CrudService('clinic-category');
 
 const ClinicCategoryList = () => {
     const [tableData, setTableData] = useState([]);
@@ -21,18 +25,22 @@ const ClinicCategoryList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
-    const [dateRange, setDateRange] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
-    const [dayFilter, setdayFilter] = useState(null)
+
+    const [filterValues, setFilterValues] = useState({
+        status: "All",
+        date:[],
+        available_days:[]
+        // add more in future as needed
+    });
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/clinic-category/list');
+            const res = await crudService.fetchAll();
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -46,10 +54,6 @@ const ClinicCategoryList = () => {
         fetchData();
     }, []);
 
-
-
-
-
     const handleDataSubmit = async (values) => {
         setModalLoading(true);
         try {
@@ -59,9 +63,9 @@ const ClinicCategoryList = () => {
             };
 
             if (selectedRecord) {
-                await api.put(`/clinic-category/update/${selectedRecord.id}`, payload);
+                await crudService.update(selectedRecord.id, payload);
             } else {
-                await api.post('/clinic-category/create', payload);
+                await crudService.create(payload);
             }
             fetchData();
             setModalVisible(false);
@@ -74,8 +78,8 @@ const ClinicCategoryList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await api.get(`/clinic-category/update-status/${id}`);
-            fetchData();
+            await crudService.updateStatus(id)
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -83,8 +87,8 @@ const ClinicCategoryList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await api.post(`/clinic-category/delete-all`, selectedRowKeys);
-            fetchData();
+            await crudService.deleteAll(selectedRowKeys)
+            await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -93,7 +97,7 @@ const ClinicCategoryList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/clinic-category/get/${id}`);
+            const response = await crudService.getOne(id)
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -103,36 +107,27 @@ const ClinicCategoryList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/clinic-category/delete/${id}`);
-            fetchData();
+            await crudService.delete(id);
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
     const handleSearch = () => {
-        if (searchText.trim().length <= 1) {
-            setFilteredData(tableData); // reset to all if empty
-            return;
-        }
-
-        const filtered = tableData.filter((item) =>
-            Object.values(item).some((field) =>
-                String(field).toLowerCase().includes(searchText.toLowerCase())
-            )
-        );
-        setFilteredData(filtered);
+        const result = globalSearch(tableData, searchText); // Use global search function
+        setFilteredData(result);
     };
 
     const handleFilter = async () => {
         try {
             const payload = {
-                from_date : dateRange[0],
-                to_date : dateRange[1],
-                is_active : statusFilter,
-                available_days : dayFilter
+                from_date : filterValues.date[0],
+                to_date : filterValues.date[1],
+                is_active : filterValues.status,
+                available_days : filterValues.available_days
             }
-            const response = await api.post(`/clinic-category/filter`, payload);
+            const response = await crudService.filter(payload);
             setTableData(response.data.data);
             setFilteredData(response.data.data);
             setClearButtonEnable(true)
@@ -143,11 +138,14 @@ const ClinicCategoryList = () => {
     }
 
     const clearFilter = () => {
-        setDateRange([])
-        setStatusFilter(null)
+        setFilterValues({
+            status: 'All',
+            date: [],
+            available_days: []
+        });
         fetchData();
-        setClearButtonEnable(false)
-    }
+        setClearButtonEnable(false);
+    };
 
 
     const handleExport = () => {
@@ -229,9 +227,9 @@ const ClinicCategoryList = () => {
         {
             key: 'available_days',
             type: 'select',
-            value: dayFilter,
-            placeholder: 'Filter by Day',
             mode:'multiple',
+            value: filterValues.available_days,
+            placeholder: 'Filter by Day',
             options: [
                 { label: 'Mon', value: 'Mon' },
                 { label: 'Tue', value: 'Tue' },
@@ -241,24 +239,25 @@ const ClinicCategoryList = () => {
                 { label: 'Sat', value: 'Sat' },
                 { label: 'Sun', value: 'Sun' },
             ],
-            setValue: setdayFilter,
+            setValue: filterValues.available_days,
         },
         {
             key: 'status',
             type: 'select',
-            value: statusFilter,
+            value: filterValues.status,
             placeholder: 'Filter by Status',
             options: [
                 { label: 'All', value: 'All' },
                 { label: 'Active', value: 'active' },
                 { label: 'Inactive', value: 'inactive' },
             ],
-            setValue: setStatusFilter,
+            setValue: filterValues.status,
         },
         {
             key: 'date',
             type: 'dateRange',
-            setValue: setDateRange,
+            value: filterValues.date,
+            setValue: filterValues.date,
         },
     ];
 
@@ -309,13 +308,16 @@ const ClinicCategoryList = () => {
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 loading={loading}
-                dateRange={dateRange}
-                setDateRange={setDateRange}
                 handleSearch={handleSearch}
                 handleFilter={handleFilter}
                 clearFilter={clearFilter}
                 clearButtonEnable={clearButtonEnable}
-                setFilters={(key, value) => key === 'status' ? setStatusFilter(value) : setdayFilter(value)}
+                setFilters={(key, value) => {
+                    setFilterValues(prev => ({
+                        ...prev,
+                        [key]: value
+                    }));
+                }}
             />
 
             <CreateOrUpdateModal

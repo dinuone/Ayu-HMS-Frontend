@@ -109,7 +109,7 @@ export default function DashboardLayout({ children }) {
           key: '4-2',
           icon: <MedicineBoxOutlined />,
           label: 'Treatment',
-          path: '/clinic',
+          path: '/treatment',
         },
       ],
     },

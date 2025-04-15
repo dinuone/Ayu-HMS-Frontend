@@ -5,8 +5,11 @@ import {DeleteOutlined, EditOutlined, FileExcelOutlined, MedicineBoxOutlined, Pl
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
+import {globalSearch} from "../../Utils/Search.js";
+import CrudService from "../../Services/CrudService.js";
 
 const { Title } = Typography;
+const crudService = CrudService('drug-category');
 
 const DrugCategoryList = () => {
     const [tableData, setTableData] = useState([]);
@@ -14,17 +17,21 @@ const DrugCategoryList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
-    const [dateRange, setDateRange] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
 
+    const [filterValues, setFilterValues] = useState({
+        status: "All",
+        date:[],
+        // add more in future as needed
+    });
+
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/drug-category/list');
+            const res = await crudService.fetchAll();
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -46,11 +53,11 @@ const DrugCategoryList = () => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await api.put(`/drug-category/update/${selectedRecord.id}`, values);
+                await crudService.update(selectedRecord.id, values);
             } else {
-                await api.post('/drug-category/create', values);
+                await crudService.create(values);
             }
-            fetchData();
+            await fetchData();
             setModalVisible(false);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -61,8 +68,8 @@ const DrugCategoryList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await api.get(`/drug-category/update-status/${id}`);
-            fetchData();
+            await crudService.updateStatus(id);
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -70,8 +77,8 @@ const DrugCategoryList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await api.post(`/drug-category/delete-all`, selectedRowKeys);
-            fetchData();
+            await crudService.deleteAll(selectedRowKeys);
+            await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -80,7 +87,7 @@ const DrugCategoryList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await api.get(`/drug-category/get/${id}`);
+            const response = await crudService.getOne(id);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -90,35 +97,26 @@ const DrugCategoryList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/drug-category/delete/${id}`);
-            fetchData();
+            await crudService.delete(id)
+            await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
     const handleSearch = () => {
-        if (searchText.trim().length <= 1) {
-            setFilteredData(tableData); // reset to all if empty
-            return;
-        }
-
-        const filtered = tableData.filter((item) =>
-            Object.values(item).some((field) =>
-                String(field).toLowerCase().includes(searchText.toLowerCase())
-            )
-        );
-        setFilteredData(filtered);
+        const result = globalSearch(tableData, searchText); // Use global search function
+        setFilteredData(result);
     };
 
     const handleFilter = async () => {
         try {
             const payload = {
-                from_date : dateRange[0],
-                to_date : dateRange[1],
-                is_active : statusFilter
+                from_date : filterValues.date[0],
+                to_date : filterValues.date[1],
+                is_active : filterValues.status
             }
-            const response = await api.post(`/drug-category/filter`, payload);
+            const response = await crudService.filter(payload);
             setTableData(response.data.data);
             setFilteredData(response.data.data);
             setClearButtonEnable(true)
@@ -129,11 +127,13 @@ const DrugCategoryList = () => {
     }
 
     const clearFilter = () => {
-        setDateRange([])
-        setStatusFilter('All')
+        setFilterValues({
+            status: 'All',
+            date: [],
+        });
         fetchData();
-        setClearButtonEnable(false)
-    }
+        setClearButtonEnable(false);
+    };
 
 
     const handleExport = () => {
@@ -197,19 +197,20 @@ const DrugCategoryList = () => {
         {
             key: 'status',
             type: 'select',
-            value: statusFilter,
+            value: filterValues.status,
             placeholder: 'Filter by Status',
             options: [
                 { label: 'All', value: 'All' },
                 { label: 'Active', value: 'active' },
                 { label: 'Inactive', value: 'inactive' },
             ],
-            setValue: setStatusFilter,
+            setValue: filterValues.status,
         },
         {
             key: 'date',
             type: 'dateRange',
-            setValue: setDateRange,
+            setValue: filterValues.date,
+            value: filterValues.date,
         },
     ];
 
@@ -260,13 +261,16 @@ const DrugCategoryList = () => {
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 loading={loading}
-                dateRange={dateRange}
-                setDateRange={setDateRange}
                 handleSearch={handleSearch}
                 handleFilter={handleFilter}
                 clearFilter={clearFilter}
                 clearButtonEnable={clearButtonEnable}
-                setFilters={(key, value) => key === 'status' ? setStatusFilter(value) : setStatusFilter(value)}
+                setFilters={(key, value) => {
+                    setFilterValues(prev => ({
+                        ...prev,
+                        [key]: value
+                    }));
+                }}
             />
 
             <CreateOrUpdateModal
