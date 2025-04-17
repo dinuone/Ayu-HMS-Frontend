@@ -32,11 +32,14 @@ export default function DashboardLayout({ children }) {
     '/dashboard': 'Dashboard',
     '/branches': 'Branches',
     '/drugs-category': 'Drug Categories',
+    '/drugs': 'Drugs',
     '/disease-codes': 'Disease Codes',
     '/treatment-category': 'Treatment Categories',
+    '/treatment':'Treatments',
     '/clinic-category': 'Clinic Categories',
     '/users': 'Users',
     '/settings': 'Settings',
+    '/rates-config': 'Rates Configuration'
   };
 
   const currentTitle = routeTitles[location.pathname] || 'Dashboard';
@@ -67,26 +70,21 @@ export default function DashboardLayout({ children }) {
           label: 'Branches',
           path: '/branches',
         },
+
         {
           key: '3-2',
-          icon: <MedicineBoxOutlined />,
-          label: 'Drugs Category',
-          path: '/drugs-category',
-        },
-        {
-          key: '3-3',
           icon: <FileAddOutlined />,
           label: 'Disease Codes',
           path: '/disease-codes',
         },
         {
-          key: '3-4',
+          key: '3-3',
           icon: <MedicineBoxOutlined />,
           label: 'Clinic Category',
           path: '/clinic-category',
         },
         {
-          key: '3-5',
+          key: '3-4',
           icon: <DollarCircleOutlined />,
           label: 'Rates Configuration',
           path: '/rates-config',
@@ -94,19 +92,39 @@ export default function DashboardLayout({ children }) {
 
       ],
     },
+
     {
       key: '4',
+      icon: <MedicineBoxOutlined/>,
+      label: 'Drug Management',
+      children: [
+        {
+          key: '4-1',
+          icon: <MedicineBoxOutlined />,
+          label: 'Drugs Category',
+          path: '/drugs-category',
+        },
+        {
+          key: '4-2',
+          icon: <MedicineBoxOutlined />,
+          label: 'Drugs',
+          path: '/drugs',
+        },
+      ],
+    },
+    {
+      key: '5',
       icon: <MedicineBoxOutlined/>,
       label: 'Treatment Management',
       children: [
         {
-          key: '4-1',
+          key: '5-1',
           icon: <FileAddOutlined />,
           label: 'Treatment Category',
           path: '/treatment-category',
         },
         {
-          key: '4-2',
+          key: '5-2',
           icon: <MedicineBoxOutlined />,
           label: 'Treatment',
           path: '/treatment',

@@ -14,11 +14,12 @@ import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
+import ExcelImporter from "../../Components/ExcelImporter.jsx";
 
 const { Title } = Typography;
-const crudService = CrudService('treatment');
+const crudService = CrudService('drug');
 
-const TreatmentList = () => {
+const DrugList = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -28,12 +29,12 @@ const TreatmentList = () => {
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
-    const [treatmentCategory, setTreatmentCategory] = useState([]);
+    const [drugCategory, setDrugCategory] = useState([]);
 
     const [filterValues, setFilterValues] = useState({
         status: "All",
         date:[],
-        treatment_category:[]
+        drug_category:[]
         // add more in future as needed
     });
 
@@ -52,14 +53,14 @@ const TreatmentList = () => {
 
     useEffect(() => {
         fetchData();
-        fetchTreatmentCategories()
+        fetchDrugCategories()
     }, []);
 
 
-    const fetchTreatmentCategories= async() =>{
+    const fetchDrugCategories= async() =>{
         try {
-            const res = await api.get(`/treatment-category/list/${true}`);
-            setTreatmentCategory(res.data.data);
+            const res = await api.get(`/drug-category/list/${true}`);
+            setDrugCategory(res.data.data);
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
@@ -132,7 +133,7 @@ const TreatmentList = () => {
                 from_date : filterValues.date[0],
                 to_date : filterValues.date[1],
                 is_active : filterValues.status,
-                category_ids : filterValues.treatment_category
+                category_ids : filterValues.drug_category
             }
             const response = await crudService.filter(payload);
             setTableData(response.data.data);
@@ -148,35 +149,78 @@ const TreatmentList = () => {
         setFilterValues({
             status: 'All',
             date: [],
-            treatment_category: []
+            drug_category: []
         });
         fetchData();
         setClearButtonEnable(false);
     };
 
+    const submitExcelData = async (data) => {
+        try {
+            // Send the data to your backend API
+            const response = await axios.post('/drug/bulk-import', { data });
+
+            // Handle success
+            if (response.status === 200) {
+                message.success('Imported successfully');
+                // Optionally refresh the data here
+            }
+        } catch (error) {
+            message.error('Failed to import data');
+        }
+    };
+
 
     const handleExport = () => {
-        exportToExcel(columns, filteredData, 'Treatments');
+        const flatData = filteredData.map(item => ({
+            name: item.name,
+            unit_price: item.unit_price,
+            drug_category: item.drug_category?.name || '',
+            brand: item.brand,
+            description: item.description || '',
+            is_active: item.is_active ? 'Active' : 'Inactive',
+            created_at: item.created_at,
+        }));
+
+        const exportColumns = [
+            { title: 'Drug Name', dataIndex: 'name' },
+            { title: 'Unit Price', dataIndex: 'unit_price' },
+            { title: 'Drug Category', dataIndex: 'drug_category' },
+            { title: 'Brand', dataIndex: 'brand' },
+            { title: 'Description', dataIndex: 'description' },
+            { title: 'Status', dataIndex: 'is_active' },
+            { title: 'Created At', dataIndex: 'created_at' }
+        ];
+
+        exportToExcel(exportColumns, flatData, 'Drugs');
     };
 
     const columns = [
         {
-            title: 'Treatment Name',
+            title: 'Drug Name',
             dataIndex: 'name',
         },
         {
-            title: 'Treatment Price',
-            dataIndex: 'price',
-            render: (price) => `LKR ${price.toLocaleString()}`,
+            title: 'Unit Price',
+            dataIndex: 'unit_price',
+            render: (unit_price) => `LKR ${unit_price.toLocaleString()}`,
         },
         {
-            title: 'Treatment Category',
-            dataIndex: 'treatment_category',
+            title: 'Drug Category',
+            dataIndex: 'drug_category',
             render: (category) => (
                 <Tag color="geekblue-inverse">
                     {category.name}
                 </Tag>
             ),
+        },
+        {
+            title: 'Brand',
+            dataIndex: 'brand',
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
         },
 
         {
@@ -224,16 +268,16 @@ const TreatmentList = () => {
 
     const filters = [
         {
-            key: 'treatment_category',
+            key: 'drug_category',
             type: 'select',
             mode:'multiple',
-            value: filterValues.treatment_category,
-            placeholder: 'Filter by Treatment Category',
-            options: treatmentCategory.map(treatmentCtg => ({
-                label: treatmentCtg.name,
-                value: treatmentCtg.id
+            value: filterValues.drug_category,
+            placeholder: 'Filter by Drug Category',
+            options: drugCategory.map(drugCtg => ({
+                label: drugCtg.name,
+                value: drugCtg.id
             })),
-            setValue: filterValues.treatment_category,
+            setValue: filterValues.drug_category,
         },
         {
             key: 'status',
@@ -262,7 +306,7 @@ const TreatmentList = () => {
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
                             <FileAddFilled style={{ fontSize: 20, marginRight: 10 }} />
-                            Treatments
+                            Drugs
                         </Title>
                     </Col>
                     <Col>
@@ -274,9 +318,16 @@ const TreatmentList = () => {
                                 setSelectedRecord(null);
                                 setModalVisible(true);
                             }}
+                            style={{ marginRight: '10px' }}
                         >
-                            Create Treatments
+                            Create Drug
                         </Button>
+                        <ExcelImporter
+                            onDataParsed={(data) => {
+                                console.log(data);
+                            }}
+                            onSubmit={submitExcelData}  // Pass submit logic to the child component
+                        />
                         <Button
                             disabled={tableData.length === 0}
                             variant="outlined"
@@ -320,7 +371,7 @@ const TreatmentList = () => {
                     setSelectedRecord(null);
                     setModalVisible(false);
                 }}
-                treatmentCategories={treatmentCategory}
+                drugCategories={drugCategory}
                 onSubmit={handleDataSubmit}
                 initialValues={selectedRecord}
                 confirmLoading={modalLoading}
@@ -329,4 +380,4 @@ const TreatmentList = () => {
     );
 };
 
-export default TreatmentList;
+export default DrugList;

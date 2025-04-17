@@ -14,6 +14,7 @@ import TreatmentCategoryList from "../pages/TreatmentCategory/TreatmentCategoryL
 import ClinicCategoryList from "../pages/ClinicCategory/ClinicCategoryList.jsx";
 import RatesConfiguration from "../pages/Rates/RatesConfiguration.jsx";
 import TreatmentList from "../pages/Treatment/TreatmentList.jsx";
+import DrugList from "../pages/Drugs/DrugList.jsx";
 
 // Lazy load components
 const UserList = React.lazy(() => import("../pages/User/UserList.jsx"));
@@ -48,6 +49,7 @@ export default function AppRoutes (){
                 {path: 'users', element: <UserList/>},
                 {path: 'branches', element:<BranchList/>},
                 {path: 'drugs-category',element:<DrugCategoryList/>},
+                {path: 'drugs',element:<DrugList/>},
                 {path: 'disease-codes',element:<DiseaseCodeList/>},
                 {path: 'treatment-category',element:<TreatmentCategoryList/>},
                 {path: 'clinic-category',element:<ClinicCategoryList/>},
