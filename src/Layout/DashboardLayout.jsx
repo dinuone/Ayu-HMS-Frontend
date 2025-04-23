@@ -8,7 +8,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   BranchesOutlined,
-  BellOutlined, MedicineBoxOutlined, FileWordFilled, FileAddOutlined, DollarCircleOutlined,
+  BellOutlined, MedicineBoxOutlined, FileWordFilled, FileAddOutlined, DollarCircleOutlined, UserAddOutlined,
 } from '@ant-design/icons';
 import '../styles/Dashboard.css';
 import PropTypes from "prop-types";
@@ -39,7 +39,8 @@ export default function DashboardLayout({ children }) {
     '/clinic-category': 'Clinic Categories',
     '/users': 'Users',
     '/settings': 'Settings',
-    '/rates-config': 'Rates Configuration'
+    '/rates-config': 'Rates Configuration',
+    '/patients': 'Patients',
   };
 
   const currentTitle = routeTitles[location.pathname] || 'Dashboard';
@@ -133,12 +134,12 @@ export default function DashboardLayout({ children }) {
     },
 
 
-    // {
-    //   key: '4',
-    //   icon: <SettingOutlined />,
-    //   label: 'Settings',
-    //   path: '/settings',
-    // },
+    {
+      key: '6',
+      icon: <UserAddOutlined />,
+      label: 'Patients Management',
+      path: '/patients',
+    },
   ];
 
 
