@@ -15,6 +15,7 @@ import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
 import ExcelImporter from "../../Components/ExcelImporter.jsx";
+import RegistrationSuccessModal from "./RegistrationSuccessModal.jsx";
 
 const { Title } = Typography;
 const crudService = CrudService('patient');
@@ -30,11 +31,13 @@ const PatientList = () => {
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
     const [drugCategory, setDrugCategory] = useState([]);
+    const [qrCodeData, setQrCodeData] = useState(null);
+    const [registrationModalVisible, setRegistrationModalVisible] = useState(false);
 
     const [filterValues, setFilterValues] = useState({
         status: "All",
         date:[],
-        drug_category:[]
+        patient_type:[]
         // add more in future as needed
     });
 
@@ -73,10 +76,17 @@ const PatientList = () => {
             if (selectedRecord) {
                 await crudService.update(selectedRecord.id,values);
             } else {
-                await crudService.create(values);
+                 const response = await api.post('patient/create',values)
+                 console.log(response)
+                 setQrCodeData(response.data.data.qr_code);
             }
             await fetchData();
             setModalVisible(false);
+
+            if (!selectedRecord) {
+                setRegistrationModalVisible(true)
+            }
+
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         } finally {
@@ -197,32 +207,34 @@ const PatientList = () => {
 
     const columns = [
         {
-            title: 'Drug Name',
+            title: 'Name',
             dataIndex: 'name',
         },
         {
-            title: 'Unit Price',
-            dataIndex: 'unit_price',
-            render: (unit_price) => `LKR ${unit_price.toLocaleString()}`,
+            title: 'Nic No',
+            dataIndex: 'nic_number',
         },
         {
-            title: 'Drug Category',
-            dataIndex: 'drug_category',
-            render: (category) => (
+            title: 'Gender',
+            dataIndex: 'gender',
+        },
+        {
+            title: 'Age',
+            dataIndex: 'age',
+        },
+        {
+            title: 'Contact No',
+            dataIndex: 'contact_no',
+        },
+        {
+            title: 'Patient Type',
+            dataIndex: 'patient_type',
+            render: (type) => (
                 <Tag color="geekblue-inverse">
-                    {category.name}
+                    {type}
                 </Tag>
             ),
         },
-        {
-            title: 'Brand',
-            dataIndex: 'brand',
-        },
-        {
-            title: 'Description',
-            dataIndex: 'description',
-        },
-
         {
             title: 'Status',
             dataIndex: 'is_active',
@@ -267,18 +279,7 @@ const PatientList = () => {
     ];
 
     const filters = [
-        {
-            key: 'drug_category',
-            type: 'select',
-            mode:'multiple',
-            value: filterValues.drug_category,
-            placeholder: 'Filter by Drug Category',
-            options: drugCategory.map(drugCtg => ({
-                label: drugCtg.name,
-                value: drugCtg.id
-            })),
-            setValue: filterValues.drug_category,
-        },
+
         {
             key: 'status',
             type: 'select',
@@ -375,6 +376,13 @@ const PatientList = () => {
                 onSubmit={handleDataSubmit}
                 initialValues={selectedRecord}
                 confirmLoading={modalLoading}
+            />
+
+            <RegistrationSuccessModal
+                visible={registrationModalVisible}
+                onCancel={() => setRegistrationModalVisible(false)}
+                qrCodeData={qrCodeData}
+                onDownload={() => setRegistrationModalVisible(false)}
             />
         </>
     );
