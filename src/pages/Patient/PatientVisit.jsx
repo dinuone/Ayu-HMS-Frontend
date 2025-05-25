@@ -7,11 +7,11 @@ import {
     Row,
     Col,
     Tag,
-    message, Divider
+    message, Divider, List
 } from 'antd';
 import {
-    ArrowLeftOutlined,
-    CheckOutlined,
+    ArrowLeftOutlined, CheckCircleTwoTone,
+    CheckOutlined, CloseCircleTwoTone,
     UserOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -31,6 +31,7 @@ const PatientVisit = () => {
     const [clinicData, setClinicData] = useState([]);
     const [treatmentData, setTreatmentData] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
+    const [selectedClinic, setSelectedClinic] = useState(null);
     const doctors = ['Dr. Sharma', 'Dr. Patel', 'Dr. Gupta', 'Dr. Desai'];
 
 
@@ -89,6 +90,14 @@ const PatientVisit = () => {
         }, 0);
         setTotalCost(sum);
     }, [selectedTreatments]);
+
+    const clearVisitData = () =>{
+        setVisitSubType(null);
+        setVisitType(null);
+        setTreatmentData([])
+        setClinicData([])
+        setSelectedTreatments([])
+    }
 
     return (
         <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px' }}>
@@ -179,7 +188,7 @@ const PatientVisit = () => {
                                     rules={[{ required: true, message: 'Please select visit sub-type' }]}
                                 >
                                     <Select
-                                        placeholder="Select visit type"
+                                        placeholder="Select Assign"
                                         onChange={handleVisitTypeChange}
                                     >
                                         <Option value="CLINIC /OPD">CLINIC /OPD</Option>
@@ -188,19 +197,61 @@ const PatientVisit = () => {
                                 </Form.Item>
 
                                 {visitSubType === 'CLINIC /OPD' && (
-                                    <Form.Item
-                                        label="Select Clinic"
-                                        name="clinic"
-                                        rules={[{ required: true, message: 'Please select clinic' }]}
-                                    >
-                                        <Select showSearch placeholder="Search clinics" >
-                                            {clinicData.map(clinic => (
-                                                <Option key={clinic} value={clinic}>
-                                                    {clinic}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
+
+                                    <>
+                                        <Form.Item
+                                            label="Select Clinic"
+                                            name="clinic"
+                                            rules={[{ required: true, message: 'Please select clinic' }]}
+                                        >
+                                            <Select showSearch placeholder="Search clinics"
+                                                    onChange={(value) => {
+                                                        const selectedClinic = clinicData.find(c => c.name === value);
+                                                        setSelectedClinic(selectedClinic);
+                                                    }}>
+                                                {clinicData.map(clinic => (
+                                                    <Option key={clinic.id} value={clinic.name}>
+                                                        {clinic.name}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+
+
+                                        {selectedClinic && (
+                                            <div style={{ marginBottom: 24,}}>
+                                                <h4>Available Days</h4>
+                                                <Row gutter={[8, 8]}>
+                                                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                                                        <Col key={day} span={3}>
+                                                            <Card
+                                                                size="small"
+                                                                hoverable
+                                                                style={{
+                                                                    fontWeight: 'bold',
+                                                                    textAlign: 'center',
+                                                                    backgroundColor: selectedClinic.available_days.includes(day)
+                                                                        ? '#f6ffed'
+                                                                        : '#fff2f0',
+                                                                    borderColor: selectedClinic.available_days.includes(day)
+                                                                        ? '#b7eb8f'
+                                                                        : '#ffccc7'
+                                                                }}
+                                                            >
+                                                                <div style={{ fontSize: 12, marginBottom: 4 }}>{day}</div>
+                                                                {selectedClinic.available_days.includes(day) ? (
+                                                                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                                                                ) : (
+                                                                    <CloseCircleTwoTone twoToneColor="#ff4d4f" />
+                                                                )}
+                                                            </Card>
+                                                        </Col>
+                                                    ))}
+                                                </Row>
+                                            </div>
+                                        )}
+                                    </>
+
                                 )}
 
                                 {visitSubType === 'TREATMENT' && (
@@ -257,7 +308,7 @@ const PatientVisit = () => {
                             >
                                 Submit Visit
                             </Button>
-                            <Button onClick={() => setVisitType(null)}>
+                            <Button onClick={clearVisitData}>
                                 Cancel
                             </Button>
                         </Form.Item>
@@ -265,7 +316,7 @@ const PatientVisit = () => {
                 )}
 
 
-                {selectedTreatments.length > 0 && (
+                {visitType && selectedTreatments.length > 0 && (
                     <div style={{
                         marginTop: 16,
                         padding: '12px 16px',
@@ -278,14 +329,14 @@ const PatientVisit = () => {
                                 <strong>Selected Treatments:</strong>
                             </Col>
                             <Col>
-                                <strong>Total:</strong> ₹{totalCost.toFixed(2)}
+                                <strong>Total:</strong> LKR.{totalCost.toFixed(2)}
                             </Col>
                         </Row>
                         <Divider style={{ margin: '12px 0' }} />
                         {selectedTreatments.map(treatment => (
                             <Row key={treatment.id} justify="space-between" style={{ marginBottom: 8 }}>
                                 <Col>{treatment.name}</Col>
-                                <Col>₹{treatment.price.toFixed(2)}</Col>
+                                <Col>LKR.{treatment.price.toFixed(2)}</Col>
                             </Row>
                         ))}
                     </div>

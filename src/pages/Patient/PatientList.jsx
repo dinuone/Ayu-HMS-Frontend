@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 import api from '../../Services/NetworkManager.js';
 import {
+    CheckCircleFilled,
     DeleteOutlined,
     EditOutlined,
     FileExcelOutlined,
@@ -13,12 +14,16 @@ import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
 import ExcelImporter from "../../Components/ExcelImporter.jsx";
-import RegistrationSuccessModal from "./RegistrationSuccessModal.jsx";;
+import RegistrationSuccessModal from "./RegistrationSuccessModal.jsx";
+import {useNavigate} from "react-router-dom";
+
+;
 
 const { Title } = Typography;
 const crudService = CrudService('patient');
 
 const PatientList = () => {
+    const navigate = useNavigate()
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -176,6 +181,10 @@ const PatientList = () => {
         }
     };
 
+    const navigateToVisitPage = (patientRegNo) => {
+        navigate(`/patient-visit/${patientRegNo}`)
+    }
+
 
     const handleExport = () => {
         const flatData = filteredData.map(item => ({
@@ -240,12 +249,21 @@ const PatientList = () => {
             title: 'Actions',
             render: (_, record) => (
                 <Space>
+                    <Button
+                        onClick={() => {navigateToVisitPage(record.registration_number)}}
+                        icon={<CheckCircleFilled/>}
+                        color="default"
+                        variant="solid" size="small">
+                        Add Visit
+                    </Button>
+
                     <Tooltip title="Status Update">
                         <Switch
                             checked={record.is_active}
                             onChange={() => toggleStatus(record.id)}
                         />
                     </Tooltip>
+
                     <Popconfirm
                         title="Sure to delete?"
                         onConfirm={() => handleDelete(record.id)}

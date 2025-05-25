@@ -109,7 +109,7 @@ const CreateOrUpdateModal = ({visible, onCancel, initialValues, onFinish, loadin
             const values = await form.validateFields();
             const payload = {
                 doctor_id: values.doctorId,
-                assign_unit: values.assign_unit === 'CLINIC' ? 1 : 2,
+                assign_unit: assignedUnit === 'CLINIC' ? 1 : 2,
                 clinic_categories: assignedUnit === "CLINIC" ? values.clinicCategories : [],
                 treatments: assignedUnit === "TREATMENT" ? selectedTreatments.map(t => t.id) : [],
                 days_and_shift: selectedDays.map(day => ({
