@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 import api from '../../Services/NetworkManager.js';
 import {
     DeleteOutlined,
     EditOutlined,
+    FileAddFilled,
     FileExcelOutlined,
-    PlusOutlined, UsergroupAddOutlined
+    MedicineBoxOutlined,
+    PlusOutlined
 } from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
 import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
-import ExcelImporter from "../../Components/ExcelImporter.jsx";
-import RegistrationSuccessModal from "./RegistrationSuccessModal.jsx";;
 
 const { Title } = Typography;
-const crudService = CrudService('patient');
+const crudService = CrudService('doctor-assign');
 
-const PatientList = () => {
+const DoctorAssignList = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -28,16 +28,14 @@ const PatientList = () => {
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
-    const [drugCategory, setDrugCategory] = useState([]);
-    const [qrCodeData, setQrCodeData] = useState(null);
-    const [patientRegNo, setPatientRegNo] = useState(null);
-    const [registrationModalVisible, setRegistrationModalVisible] = useState(false);
+    const [doctors, setDoctors] = useState([]);
+    const [treartments, setTreatments] = useState([]);
+    const [clinics,setClinics] = useState([]);
 
 
     const [filterValues, setFilterValues] = useState({
         status: "All",
         date:[],
-        patient_type:[]
         // add more in future as needed
     });
 
@@ -54,32 +52,47 @@ const PatientList = () => {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-        fetchDrugCategories()
-    }, []);
-
-
-    const fetchDrugCategories= async() =>{
-        try {
-            const res = await api.get(`/drug-category/list/${true}`);
-            setDrugCategory(res.data.data);
-        } catch (error) {
+    const fetchDoctors = async () => {
+        try{
+            const res = await api.get('/user/doctors-list');
+            setDoctors(res.data.data);
+        }catch(error){
+            message.error(error.response?.data?.message || 'Operation failed');
+        }
+    };
+    const fetchTreatments = async () => {
+        try{
+            const res = await api.get('/treatment/list');
+            setTreatments(res.data.data);
+        }catch(error){
             message.error(error.response?.data?.message || 'Operation failed');
         }
     }
+
+    const fetchClinics = async () => {
+        try{
+            const res = await api.get('/clinic-category/list');
+            setClinics(res.data.data);
+        }catch(error){
+            message.error(error.response?.data?.message || 'Operation failed');
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+        fetchDoctors()
+        fetchTreatments()
+        fetchClinics()
+    }, []);
 
 
     const handleDataSubmit = async (values) => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await crudService.update(selectedRecord.id, values);
+                await crudService.update(selectedRecord.id,values)
             } else {
-                const response = await api.post('patient/create', values);
-                setQrCodeData(response.data.data.qr_code);
-                setPatientRegNo(response.data.data.reg_no)
-                setRegistrationModalVisible(true);
+                await crudService.create(values)
             }
             await fetchData();
             setModalVisible(false);
@@ -92,7 +105,7 @@ const PatientList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await crudService.updateStatus(id);
+            await crudService.updateStatus(id)
             await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -101,7 +114,7 @@ const PatientList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await crudService.deleteAll(selectedRowKeys);
+            await crudService.deleteAll(selectedRowKeys)
             await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
@@ -111,7 +124,7 @@ const PatientList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await crudService.getOne(id);
+            const response = await crudService.getOne(id)
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -121,7 +134,7 @@ const PatientList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await crudService.delete(id);
+            await crudService.delete(id)
             await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -136,10 +149,9 @@ const PatientList = () => {
     const handleFilter = async () => {
         try {
             const payload = {
-                from_date : filterValues.date[0],
-                to_date : filterValues.date[1],
-                is_active : filterValues.status,
-                category_ids : filterValues.drug_category
+                from_date : dateRange[0],
+                to_date : dateRange[1],
+                is_active : statusFilter
             }
             const response = await crudService.filter(payload);
             setTableData(response.data.data);
@@ -150,77 +162,69 @@ const PatientList = () => {
         }
 
     }
-
     const clearFilter = () => {
         setFilterValues({
             status: 'All',
             date: [],
-            drug_category: []
         });
         fetchData();
         setClearButtonEnable(false);
     };
 
-    const submitExcelData = async (data) => {
-        try {
-            // Send the data to your backend API
-            const response = await axios.post('/drug/bulk-import', { data });
-
-            // Handle success
-            if (response.status === 200) {
-                message.success('Imported successfully');
-                // Optionally refresh the data here
-            }
-        } catch (error) {
-            message.error('Failed to import data');
-        }
-    };
-
-
     const handleExport = () => {
-        const flatData = filteredData.map(item => ({
-            name: item.name,
-            unit_price: item.unit_price,
-            drug_category: item.drug_category?.name || '',
-            brand: item.brand,
-            description: item.description || '',
-            is_active: item.is_active ? 'Active' : 'Inactive',
-            created_at: item.created_at,
-        }));
-
-        const exportColumns = [
-            { title: 'Drug Name', dataIndex: 'name' },
-            { title: 'Unit Price', dataIndex: 'unit_price' },
-            { title: 'Drug Category', dataIndex: 'drug_category' },
-            { title: 'Brand', dataIndex: 'brand' },
-            { title: 'Description', dataIndex: 'description' },
-            { title: 'Status', dataIndex: 'is_active' },
-            { title: 'Created At', dataIndex: 'created_at' }
-        ];
-
-        exportToExcel(exportColumns, flatData, 'Drugs');
+        exportToExcel(columns, filteredData, 'Disease Codes');
     };
+
+
 
     const columns = [
         {
-            title: 'Name',
+            title: "Doctor's Name",
             dataIndex: 'name',
         },
         {
-            title: 'Nic No',
-            dataIndex: 'nic_number',
+            title: 'Assign Unit',
+            dataIndex: 'assign_unit',
         },
         {
-            title: 'Gender',
-            dataIndex: 'gender',
+            title: 'Clinic Categories',
+            dataIndex: 'clinic_categories',
+            render: (categories) => (
+                <Space wrap>
+                    {categories?.map(category => (
+                        <Tag key={category.id} color="geekblue-inverse">
+                            {category.name}
+                        </Tag>
+                    ))}
+                </Space>
+            ),
         },
         {
-            title: 'Age',
-            dataIndex: 'age',
+            title: 'Treatments',
+            dataIndex: 'treatments',
+            render: (treatments) => (
+                <Space wrap>
+                    {treatments?.map(treatment => (
+                        <Tag key={treatment.id} color="geekblue-inverse">
+                            {treatment.name}
+                        </Tag>
+                    ))}
+                </Space>
+            ),
         },
         {
-            title: 'Contact No',
-            dataIndex: 'contact_no',
+            title: 'Schedule',
+            dataIndex: 'days_and_shift',
+            render: (days) => (
+                <div style={{ maxWidth: 300 }}>
+                    {days?.map((day, index) => (
+                        <div key={index} style={{ marginBottom: 4 }}>
+                            <Tag color="blue">{day.day}</Tag>
+                            <span style={{ marginLeft: 8 }}>{day.shift}</span>
+                        </div>
+                    ))}
+                </div>
+            ),
         },
 
         {
@@ -267,7 +271,6 @@ const PatientList = () => {
     ];
 
     const filters = [
-
         {
             key: 'status',
             type: 'select',
@@ -294,8 +297,8 @@ const PatientList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <UsergroupAddOutlined style={{ fontSize: 20, marginRight: 10 }} />
-                            Patients
+                            <FileAddFilled style={{ fontSize: 20, marginRight: 10 }} />
+                            Assign Doctors to Clinics
                         </Title>
                     </Col>
                     <Col>
@@ -307,16 +310,9 @@ const PatientList = () => {
                                 setSelectedRecord(null);
                                 setModalVisible(true);
                             }}
-                            style={{ marginRight: '10px' }}
                         >
-                            Register New Patient
+                            Assign Clinic
                         </Button>
-                        <ExcelImporter
-                            onDataParsed={(data) => {
-                                console.log(data);
-                            }}
-                            onSubmit={submitExcelData}  // Pass submit logic to the child component
-                        />
                         <Button
                             disabled={tableData.length === 0}
                             variant="outlined"
@@ -360,21 +356,15 @@ const PatientList = () => {
                     setSelectedRecord(null);
                     setModalVisible(false);
                 }}
-                drugCategories={drugCategory}
                 onSubmit={handleDataSubmit}
                 initialValues={selectedRecord}
                 confirmLoading={modalLoading}
+                doctors={doctors}
+                treatments={treartments}
+                clinics={clinics}
             />
-
-            <RegistrationSuccessModal
-                visible={registrationModalVisible}
-                qrCodeData={qrCodeData}
-                patientRegNo={patientRegNo}
-            />
-
-
         </>
     );
 };
 
-export default PatientList;
+export default DoctorAssignList;

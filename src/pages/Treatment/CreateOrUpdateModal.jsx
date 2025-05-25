@@ -64,6 +64,15 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                         ))}
                     </Select>
                 </Form.Item>
+
+
+                <Form.Item
+                    name="description"
+                    label="Description"
+
+                >
+                    <Input.TextArea rows={4} />
+                </Form.Item>
             </Form>
         </Modal>
     );

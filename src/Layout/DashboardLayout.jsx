@@ -90,6 +90,12 @@ export default function DashboardLayout({ children }) {
           label: 'Rates Configuration',
           path: '/rates-config',
         },
+        {
+          key: '3-5',
+          icon: <MedicineBoxOutlined />,
+          label: 'Doctor Assign',
+          path: '/doctor-assign',
+        },
 
       ],
     },

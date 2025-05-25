@@ -20,11 +20,6 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
         { label: 'UnMarried', value: 'UnMarried' },
     ];
 
-    const customerType = [
-        { label: 'Feelo', value: 'Feelo' },
-        { label: 'Normal', value: 'Normal' },
-    ];
-
     const generateQRCode = async (patientData) => {
         try {
             const qrString = JSON.stringify(patientData);
@@ -201,6 +196,9 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
 
     return (
         <Modal
+            closable={true}         // allow only X button to close
+            maskClosable={false}    // block outside click
+            keyboard={false}        // block Esc key
             open={visible}
             title={initialValues ? "Edit Patient Data" : "Register New Patient"}
             okText={initialValues ? "Update" : "Create"}
@@ -218,6 +216,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                 labelCol={{ span: 6 }}
                 wrapperCol={{ span: 18 }}
             >
+                <Divider orientation="center">Personal Details</Divider>
                 <Form.Item
                     name="name"
                     label="Name"
@@ -277,7 +276,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                     <Radio.Group options={maritalOptions}  />
                 </Form.Item>
 
-                <Divider/>
+                <Divider orientation="center">Address</Divider>
                 <Form.Item
                     name="address_line_1"
                     label="Address Line 01"
@@ -365,7 +364,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
 
 
 
-                <Divider/>
+                <Divider orientation="center">Contact Details</Divider>
 
                 <Form.Item
                     name="contact_no"
@@ -389,15 +388,8 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                     <Input />
                 </Form.Item>
 
-                <Divider/>
+                <Divider orientation="center">Additional Notes</Divider>
 
-                <Form.Item
-                    name="patient_type"
-                    label="Patient Type"
-                    rules={[{ required: true, message: 'Please select Patient type!' }]}
-                >
-                    <Radio.Group options={customerType}  />
-                </Form.Item>
 
                 <Form.Item
                     name="remark"
