@@ -18,6 +18,7 @@ import DrugList from "../pages/Drugs/DrugList.jsx";
 import PatientList from "../pages/Patient/PatientList.jsx";
 import PatientVisit from "../pages/Patient/PatientVisit.jsx";
 import DoctorAssignList from "../pages/DoctorAssign/DoctorAssignList.jsx";
+import OfferList from "../pages/Offer/OfferList.jsx";
 
 // Lazy load components
 const UserList = React.lazy(() => import("../pages/User/UserList.jsx"));
@@ -60,7 +61,8 @@ export default function AppRoutes (){
                 {path: 'treatment',element:<TreatmentList/>},
                 {path: 'patients', element:<PatientList/>},
                 {path: 'doctor-assign',element:<DoctorAssignList/>},
-                {path: 'patient-visit/:patientRegNo', element:<PatientVisit/>}
+                {path: 'patient-visit/:patientRegNo', element:<PatientVisit/>},
+                {path: 'offer',element:<OfferList/>},
             ],
         },
         {

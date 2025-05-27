@@ -15,6 +15,8 @@ import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
 import ExcelImporter from "../../Components/ExcelImporter.jsx";
+import {GiMedicines} from "react-icons/gi";
+import {AiFillMedicineBox} from "react-icons/ai";
 
 const { Title } = Typography;
 const crudService = CrudService('drug');
@@ -305,7 +307,7 @@ const DrugList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <FileAddFilled style={{ fontSize: 20, marginRight: 10 }} />
+                            <AiFillMedicineBox style={{ fontSize: 20, marginRight: 10 }} />
                             Drugs
                         </Title>
                     </Col>

@@ -8,11 +8,24 @@ import {
   UserOutlined,
   LogoutOutlined,
   BranchesOutlined,
-  BellOutlined, MedicineBoxOutlined, FileWordFilled, FileAddOutlined, DollarCircleOutlined, UserAddOutlined,
+  BellOutlined,
+  MedicineBoxOutlined,
+  FileWordFilled,
+  FileAddOutlined,
+  DollarCircleOutlined,
+  UserAddOutlined,
+  MoneyCollectFilled,
 } from '@ant-design/icons';
 import '../styles/Dashboard.css';
 import PropTypes from "prop-types";
 import {useAuth} from "../Provider/authProvider.jsx";
+import {AiFillMedicineBox, AiOutlineTag} from "react-icons/ai";
+import {MdOutlineAssignmentInd} from "react-icons/md";
+import {IoMdPricetags} from "react-icons/io";
+import {FaClinicMedical} from "react-icons/fa";
+import {GiHealthNormal, GiMedicines} from "react-icons/gi";
+import {RiMedicineBottleFill} from "react-icons/ri";
+import {FaUserDoctor} from "react-icons/fa6";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -41,6 +54,9 @@ export default function DashboardLayout({ children }) {
     '/settings': 'Settings',
     '/rates-config': 'Rates Configuration',
     '/patients': 'Patients',
+    '/patient-visit/':'Patient Visit',
+    '/doctor-assign': 'Doctor Assign',
+    '/offer':'Offer',
   };
 
   const currentTitle = routeTitles[location.pathname] || 'Dashboard';
@@ -80,21 +96,27 @@ export default function DashboardLayout({ children }) {
         },
         {
           key: '3-3',
-          icon: <MedicineBoxOutlined />,
+          icon: <FaClinicMedical />,
           label: 'Clinic Category',
           path: '/clinic-category',
         },
         {
           key: '3-4',
-          icon: <DollarCircleOutlined />,
+          icon: <IoMdPricetags />,
           label: 'Rates Configuration',
           path: '/rates-config',
         },
         {
           key: '3-5',
-          icon: <MedicineBoxOutlined />,
+          icon: <FaUserDoctor />,
           label: 'Doctor Assign',
           path: '/doctor-assign',
+        },
+        {
+          key: '3-6',
+          icon: <AiOutlineTag />,
+          label: 'Offers',
+          path: '/offer',
         },
 
       ],
@@ -102,18 +124,18 @@ export default function DashboardLayout({ children }) {
 
     {
       key: '4',
-      icon: <MedicineBoxOutlined/>,
+      icon: <GiMedicines/>,
       label: 'Drug Management',
       children: [
         {
           key: '4-1',
-          icon: <MedicineBoxOutlined />,
+          icon: <RiMedicineBottleFill />,
           label: 'Drugs Category',
           path: '/drugs-category',
         },
         {
           key: '4-2',
-          icon: <MedicineBoxOutlined />,
+          icon: <AiFillMedicineBox />,
           label: 'Drugs',
           path: '/drugs',
         },
@@ -121,7 +143,7 @@ export default function DashboardLayout({ children }) {
     },
     {
       key: '5',
-      icon: <MedicineBoxOutlined/>,
+      icon: <GiHealthNormal/>,
       label: 'Treatment Management',
       children: [
         {

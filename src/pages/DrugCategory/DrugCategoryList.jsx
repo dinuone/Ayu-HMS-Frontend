@@ -7,6 +7,8 @@ import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
 import {globalSearch} from "../../Utils/Search.js";
 import CrudService from "../../Services/CrudService.js";
+import {GiMedicines} from "react-icons/gi";
+import {RiMedicineBottleFill} from "react-icons/ri";
 
 const { Title } = Typography;
 const crudService = CrudService('drug-category');
@@ -220,7 +222,7 @@ const DrugCategoryList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <MedicineBoxOutlined style={{ fontSize: 20, marginRight: 10 }} />
+                            <RiMedicineBottleFill style={{ fontSize: 20, marginRight: 10 }} />
                             Drug Categories
                         </Title>
                     </Col>

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 import api from '../../Services/NetworkManager.js';
 import {
+    AimOutlined,
+    BranchesOutlined,
     DeleteOutlined,
     EditOutlined,
-    FileAddFilled,
     FileExcelOutlined,
-    MedicineBoxOutlined,
     PlusOutlined
 } from '@ant-design/icons';
 import CustomTable from '../../Components/CustomTable.jsx';
@@ -14,12 +14,13 @@ import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
-import {FaUserDoctor} from "react-icons/fa6";
+import {AiOutlineTag} from "react-icons/ai";
 
 const { Title } = Typography;
-const crudService = CrudService('doctor-assign');
 
-const DoctorAssignList = () => {
+const crudService = CrudService('offer');
+
+const OfferList = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -29,21 +30,19 @@ const DoctorAssignList = () => {
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [clearButtonEnable, setClearButtonEnable] = useState(false);
-    const [doctors, setDoctors] = useState([]);
-    const [treartments, setTreatments] = useState([]);
-    const [clinics,setClinics] = useState([]);
-
-
     const [filterValues, setFilterValues] = useState({
         status: "All",
-        date:[],
+        date:[]
         // add more in future as needed
     });
+    const [treatments, setTreatments] = useState([]);
+
+    const platforms = ["Feelo App","Facebook",]
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await crudService.fetchAll();
+            const res = await crudService.fetchAll()
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -53,47 +52,29 @@ const DoctorAssignList = () => {
         }
     };
 
-    const fetchDoctors = async () => {
-        try{
-            const res = await api.get('/user/doctors-list');
-            setDoctors(res.data.data);
-        }catch(error){
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    };
-    const fetchTreatments = async () => {
-        try{
-            const res = await api.get('/treatment/list');
-            setTreatments(res.data.data);
-        }catch(error){
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    }
-
-    const fetchClinics = async () => {
-        try{
-            const res = await api.get('/clinic-category/list');
-            setClinics(res.data.data);
-        }catch(error){
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    }
-
     useEffect(() => {
         fetchData();
-        fetchDoctors()
         fetchTreatments()
-        fetchClinics()
     }, []);
+
+
+    const fetchTreatments = async() =>{
+        try {
+            const res = await api.get(`/treatment/list`);
+            setTreatments(res.data.data);
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Operation failed');
+        }
+    }
 
 
     const handleDataSubmit = async (values) => {
         setModalLoading(true);
         try {
             if (selectedRecord) {
-                await crudService.update(selectedRecord.id,values)
+                await crudService.update(selectedRecord.id, values);
             } else {
-                await crudService.create(values)
+                await crudService.create(values);
             }
             await fetchData();
             setModalVisible(false);
@@ -106,7 +87,7 @@ const DoctorAssignList = () => {
 
     const toggleStatus = async (id) => {
         try {
-            await crudService.updateStatus(id)
+            await crudService.updateStatus(id);
             await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -115,7 +96,7 @@ const DoctorAssignList = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await crudService.deleteAll(selectedRowKeys)
+            await crudService.deleteAll(selectedRowKeys);
             await fetchData();
             setSelectedRowKeys([]);
         } catch (error) {
@@ -125,7 +106,7 @@ const DoctorAssignList = () => {
 
     const getSelectedRecord = async (id) => {
         try {
-            const response = await crudService.getOne(id)
+            const response = await crudService.getOne(id);
             setSelectedRecord(response.data.data);
             setModalVisible(true);
         } catch (error) {
@@ -135,7 +116,7 @@ const DoctorAssignList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await crudService.delete(id)
+            await crudService.delete(id);
             await fetchData();
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
@@ -150,9 +131,9 @@ const DoctorAssignList = () => {
     const handleFilter = async () => {
         try {
             const payload = {
-                from_date : dateRange[0],
-                to_date : dateRange[1],
-                is_active : statusFilter
+                from_date: filterValues.date?.[0] || null,
+                to_date: filterValues.date?.[1] || null,
+                is_active: filterValues.status
             }
             const response = await crudService.filter(payload);
             setTableData(response.data.data);
@@ -163,6 +144,7 @@ const DoctorAssignList = () => {
         }
 
     }
+
     const clearFilter = () => {
         setFilterValues({
             status: 'All',
@@ -172,62 +154,45 @@ const DoctorAssignList = () => {
         setClearButtonEnable(false);
     };
 
+
     const handleExport = () => {
-        exportToExcel(columns, filteredData, 'Disease Codes');
+        exportToExcel(columns, filteredData, 'Branches');
     };
-
-
 
     const columns = [
         {
-            title: "Doctor's Name",
-            dataIndex: 'name',
+            title: 'Offer Name',
+            dataIndex: 'offer_name',
         },
         {
-            title: 'Assign Unit',
-            dataIndex: 'assign_unit',
+            title: 'description',
+            dataIndex: 'description',
         },
         {
-            title: 'Clinic Categories',
-            dataIndex: 'clinic_categories',
-            render: (categories) => (
-                <Space wrap>
-                    {categories?.map(category => (
-                        <Tag key={category.id} color="geekblue-inverse">
-                            {category.name}
-                        </Tag>
-                    ))}
-                </Space>
+            title: 'Discount Percentage %',
+            dataIndex: 'discount_percentage',
+        },
+        {
+            title: 'Treatment',
+            dataIndex: 'treatment',
+            render: (record) => (
+                <Tag color='geekblue-inverse' >
+                    {record.treatment_name}
+                </Tag>
             ),
         },
         {
-            title: 'Treatments',
-            dataIndex: 'treatments',
-            render: (treatments) => (
-                <Space wrap>
-                    {treatments?.map(treatment => (
-                        <Tag key={treatment.id} color="geekblue-inverse">
-                            {treatment.name}
-                        </Tag>
-                    ))}
-                </Space>
-            ),
+            title: 'Start Date',
+            dataIndex: 'start_date',
         },
         {
-            title: 'Schedule',
-            dataIndex: 'days_and_shift',
-            render: (days) => (
-                <div style={{ maxWidth: 300 }}>
-                    {days?.map((day, index) => (
-                        <div key={index} style={{ marginBottom: 4 }}>
-                            <Tag color="blue">{day.day}</Tag>
-                            <span style={{ marginLeft: 8 }}>{day.shift}</span>
-                        </div>
-                    ))}
-                </div>
-            ),
+            title: 'End Date',
+            dataIndex: 'end_date',
         },
-
+        {
+            title: 'Platform',
+            dataIndex: 'platform',
+        },
         {
             title: 'Status',
             dataIndex: 'is_active',
@@ -287,8 +252,8 @@ const DoctorAssignList = () => {
         {
             key: 'date',
             type: 'dateRange',
-            setValue: filterValues.date,
             value: filterValues.date,
+            setValue: filterValues.date,
         },
     ];
 
@@ -298,8 +263,8 @@ const DoctorAssignList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <FaUserDoctor style={{ fontSize: 20, marginRight: 10 }} />
-                            Assign Doctors to Clinics
+                            <AiOutlineTag style={{ fontSize: 20, marginRight: 10 }} />
+                            Offers
                         </Title>
                     </Col>
                     <Col>
@@ -312,10 +277,10 @@ const DoctorAssignList = () => {
                                 setModalVisible(true);
                             }}
                         >
-                            Assign Clinic
+                            Create Offers
                         </Button>
+
                         <Button
-                            disabled={tableData.length === 0}
                             variant="outlined"
                             color="green"
                             icon={<FileExcelOutlined />}
@@ -360,12 +325,11 @@ const DoctorAssignList = () => {
                 onSubmit={handleDataSubmit}
                 initialValues={selectedRecord}
                 confirmLoading={modalLoading}
-                doctors={doctors}
-                treatments={treartments}
-                clinics={clinics}
+                treatmentOptions={treatments}
+                platformOptions={platforms}
             />
         </>
     );
 };
 
-export default DoctorAssignList;
+export default OfferList;

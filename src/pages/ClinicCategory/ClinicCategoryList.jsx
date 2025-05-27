@@ -14,6 +14,7 @@ import CreateOrUpdateModal from "./CreateOrUpdateModal.jsx";
 import {exportToExcel} from "../../Services/ExcelExport.js";
 import CrudService from "../../Services/CrudService.js";
 import {globalSearch} from "../../Utils/Search.js";
+import {FaClinicMedical} from "react-icons/fa";
 
 const { Title } = Typography;
 
@@ -267,7 +268,7 @@ const ClinicCategoryList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <MedicineBoxOutlined style={{ fontSize: 20, marginRight: 10 }} />
+                            <FaClinicMedical style={{ fontSize: 20, marginRight: 10 }} />
                             Clinic Categories
                         </Title>
                     </Col>

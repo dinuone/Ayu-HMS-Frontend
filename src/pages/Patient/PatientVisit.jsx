@@ -1,103 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Button,
-    Card,
-    Select,
-    Form,
-    Row,
-    Col,
-    Tag,
-    message, Divider, List
-} from 'antd';
-import {
-    ArrowLeftOutlined, CheckCircleTwoTone,
-    CheckOutlined, CloseCircleTwoTone,
-    UserOutlined
-} from '@ant-design/icons';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from "../../Services/NetworkManager.js";
+import React from 'react';
+import { Button, Card, Col, Form, Row, Select, message } from 'antd';
+import { ArrowLeftOutlined, CheckOutlined } from '@ant-design/icons';
+import { useNavigate, useParams } from 'react-router-dom';
+import {useVisitLogic} from "./helper/useVisitLogic.js";
+import VisitTypeSelector from "./Components/VisitTypeSelector.jsx";
+import FeeloVisitForm from "./Forms/FeeloVisitForm.jsx";
+import NormalVisitForm from "./Forms/NormalVisitForm.jsx";
+import DoctorAvailability from "./Components/DoctorAvailability.jsx";
+import PriceCalculation from "./Components/PriceCalculation.jsx";
 
-const { Option } = Select;
 
 const PatientVisit = () => {
-    const { patientRegNo } = useParams(); // Access route parameter
+    const { patientRegNo } = useParams();
     const navigate = useNavigate();
-    const [visitType, setVisitType] = useState(null);
-    const [visitSubType, setVisitSubType] = useState(null);
-    const [selectedTreatments, setSelectedTreatments] = useState([]);
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [patientData, setPatientData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [clinicData, setClinicData] = useState([]);
-    const [treatmentData, setTreatmentData] = useState([]);
-    const [totalCost, setTotalCost] = useState(0);
-    const [selectedClinic, setSelectedClinic] = useState(null);
-    const doctors = ['Dr. Sharma', 'Dr. Patel', 'Dr. Gupta', 'Dr. Desai'];
+    const [form] = Form.useForm();
 
+    const {
+        visitType,
+        setVisitType,
+        visitSubType,
+        selectedTreatments,
+        selectedDoctor,
+        loading,
+        clinicData,
+        treatmentData,
+        totalCost,
+        selectedClinic,
+        doctors,
+        hospitalCharge,
+        customCharges,
+        handleTreatmentSelect,
+        handleVisitTypeChange,
+        checkDoctorAvailability,
+        handleClinicChange,
+        handleDoctorChange,
+        clearVisitData,
+    } = useVisitLogic(patientRegNo,form);
 
-
-    const handleTreatmentSelect = (values) => {
-        // values will be an array when mode="multiple"
-        const newTreatments = treatmentData.filter(t => values.includes(t.id));
-        setSelectedTreatments(newTreatments);
-    };
-
-    const GetClinicsOrTreatments = async (visitType) => {
-        try{
-            const res = await api.get(`patient-visit/get-available-clinics-or-treatments/${visitType}`)
-            console.log(res);
-            if(visitType ===1 ){
-                setClinicData(res.data.data)
-            }else{
-                setTreatmentData(res.data.data)
-            }
-
-        }catch (err){
-            console.error(err);
-        }
-    }
-
-    const handleVisitTypeChange = (value) =>
-    {
-        let visitType = null
-        if(value === "CLINIC /OPD"){
-            visitType =1
-        }else{
-            visitType =2
-        }
-        setVisitSubType(value)
-        GetClinicsOrTreatments(visitType)
-    }
-
-    const handleSubmit = (values) => {
-        // Prepare form data with patientRegNo
-        const formData = {
-            patientRegNo,
-            visitType,
-            visitSubType,
-            treatments: selectedTreatments,
-            doctor: selectedDoctor,
-            ...values
+    const preparePayload = () => {
+        // Base payload structure
+        const payload = {
+            patient_id: parseInt(patientRegNo), // Assuming patientRegNo is from props/params
+            clinic_category_id: selectedClinic?.id || 0,
+            remarks: "", // You might want to add a remarks field in your form
+            patient_type: 1, // Default value, adjust as needed
+            visit_type: visitType === 'feelo' ? 2 : 1, // Example mapping
+            treatments: [],
+            doctor_id: selectedDoctor?.id || 0,
+            doctor_name: selectedDoctor?.doctor_name || "",
+            feelo_app_ref: visitType === 'feelo' ? form.getFieldValue('feeloReference') || "" : ""
         };
 
-        console.log('Form submitted:', formData);
-        message.success('Visit registered successfully!');
-        navigate('/patients'); // Redirect after submission
-    };
-    useEffect(() => {
-        const sum = selectedTreatments.reduce((acc, treatment) => {
-            return acc + (treatment.price || 0);
-        }, 0);
-        setTotalCost(sum);
-    }, [selectedTreatments]);
+        // Add treatments if they exist
+        if (selectedTreatments.length > 0) {
+            payload.treatments = selectedTreatments.map(treatment => ({
+                id: treatment.id,
+                name: treatment.name
+            }));
+        }
 
-    const clearVisitData = () =>{
-        setVisitSubType(null);
-        setVisitType(null);
-        setTreatmentData([])
-        setClinicData([])
-        setSelectedTreatments([])
-    }
+        // Additional logic for clinic/OPD vs treatment visits
+        if (visitSubType === 'CLINIC /OPD') {
+            payload.visit_type = 1; // Example value for clinic visit
+        } else if (visitSubType === 'TREATMENT') {
+            payload.visit_type = 2; // Example value for treatment visit
+        }
+
+        return payload;
+    };
+
+    const handleSubmit = async (values) => {
+        if (!selectedDoctor) {
+            message.error('Please select a doctor');
+            return;
+        }
+
+        const isAvailable = checkDoctorAvailability(selectedDoctor);
+        if (!isAvailable) {
+            message.error(`Selected doctor is not available today during the current shift`);
+            return;
+        }
+
+        try {
+            const payload = preparePayload();
+            console.log('Submitting payload:', payload);
+            const response = await api.post('patient-visit/create', payload);
+            message.success('Visit created successfully!');
+            clearVisitData();
+            navigate('/patients');
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            message.error('Failed to register visit');
+        }
+    };
 
     return (
         <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px' }}>
@@ -110,171 +105,26 @@ const PatientVisit = () => {
                 Go Back
             </Button>
 
-            <Card
-                title={`Patient Visit - Registration #${patientRegNo}`}
-                loading={loading}
-
-            >
+            <Card title={`Patient Visit - Registration #${patientRegNo}`} loading={loading}>
                 {!visitType ? (
-                    <Row gutter={16}>
-                        <Col span={24}>
-                            <h3 style={{ marginBottom: 24 }}>Select Visit Type</h3>
-                            <Row gutter={16}>
-                                <Col span={12}>
-                                    <Button
-                                        block
-                                        size="large"
-                                        variant="solid"
-                                        onClick={() => setVisitType('feelo')}
-                                        color="orange"
-                                    >
-                                        Feelo App Visit
-                                    </Button>
-                                </Col>
-                                <Col span={12}>
-                                    <Button
-                                        block
-                                        size="large"
-                                        variant="solid"
-                                        onClick={() => setVisitType('normal')}
-                                        color="purple"
-                                    >
-                                        Normal Visit
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
+                    <VisitTypeSelector onSelect={setVisitType} />
                 ) : (
-                    <Form layout="vertical" onFinish={handleSubmit}>
+                    <Form form={form} layout="vertical" onFinish={handleSubmit}>
                         {visitType === 'feelo' ? (
-                            <>
-                                <Form.Item
-                                    label="Feelo Reference ID"
-                                    name="feeloReference"
-                                    rules={[{ required: true, message: 'Please enter Feelo reference ID' }]}
-                                >
-                                    <Select showSearch placeholder="Enter Feelo Reference ID">
-                                        <Option value="ref-123">REF-123</Option>
-                                        <Option value="ref-456">REF-456</Option>
-                                    </Select>
-                                </Form.Item>
-
-                                <Form.Item label="Select Treatments">
-                                    <Select
-                                        mode="multiple"
-                                        placeholder="Search Treatments"
-                                        showSearch
-                                        optionFilterProp="children"
-                                        onChange={handleTreatmentSelect}
-                                        filterOption={(input, option) =>
-                                            option.children.toLowerCase().includes(input.toLowerCase())
-                                        }
-                                    >
-                                        {treatmentData.map(treatment => (
-                                            <Option key={treatment.id} value={treatment.id}>
-                                                {treatment.name}
-                                            </Option>
-                                        ))}
-                                    </Select>
-
-                                </Form.Item>
-                            </>
+                            <FeeloVisitForm
+                                treatmentData={treatmentData}
+                                onTreatmentSelect={handleTreatmentSelect}
+                            />
                         ) : (
-                            <>
-                                <Form.Item
-                                    label="Assign to"
-                                    name="assign_to"
-                                    rules={[{ required: true, message: 'Please select visit sub-type' }]}
-                                >
-                                    <Select
-                                        placeholder="Select Assign"
-                                        onChange={handleVisitTypeChange}
-                                    >
-                                        <Option value="CLINIC /OPD">CLINIC /OPD</Option>
-                                        <Option value="TREATMENT">TREATMENT</Option>
-                                    </Select>
-                                </Form.Item>
-
-                                {visitSubType === 'CLINIC /OPD' && (
-
-                                    <>
-                                        <Form.Item
-                                            label="Select Clinic"
-                                            name="clinic"
-                                            rules={[{ required: true, message: 'Please select clinic' }]}
-                                        >
-                                            <Select showSearch placeholder="Search clinics"
-                                                    onChange={(value) => {
-                                                        const selectedClinic = clinicData.find(c => c.name === value);
-                                                        setSelectedClinic(selectedClinic);
-                                                    }}>
-                                                {clinicData.map(clinic => (
-                                                    <Option key={clinic.id} value={clinic.name}>
-                                                        {clinic.name}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
-
-
-                                        {selectedClinic && (
-                                            <div style={{ marginBottom: 24,}}>
-                                                <h4>Available Days</h4>
-                                                <Row gutter={[8, 8]}>
-                                                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                                                        <Col key={day} span={3}>
-                                                            <Card
-                                                                size="small"
-                                                                hoverable
-                                                                style={{
-                                                                    fontWeight: 'bold',
-                                                                    textAlign: 'center',
-                                                                    backgroundColor: selectedClinic.available_days.includes(day)
-                                                                        ? '#f6ffed'
-                                                                        : '#fff2f0',
-                                                                    borderColor: selectedClinic.available_days.includes(day)
-                                                                        ? '#b7eb8f'
-                                                                        : '#ffccc7'
-                                                                }}
-                                                            >
-                                                                <div style={{ fontSize: 12, marginBottom: 4 }}>{day}</div>
-                                                                {selectedClinic.available_days.includes(day) ? (
-                                                                    <CheckCircleTwoTone twoToneColor="#52c41a" />
-                                                                ) : (
-                                                                    <CloseCircleTwoTone twoToneColor="#ff4d4f" />
-                                                                )}
-                                                            </Card>
-                                                        </Col>
-                                                    ))}
-                                                </Row>
-                                            </div>
-                                        )}
-                                    </>
-
-                                )}
-
-                                {visitSubType === 'TREATMENT' && (
-                                    <Form.Item label="Select Treatments">
-                                        <Select
-                                            mode="multiple"
-                                            placeholder="Search Treatments"
-                                            showSearch
-                                            optionFilterProp="children"
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().includes(input.toLowerCase())
-                                            }
-                                            onChange={handleTreatmentSelect}
-                                        >
-                                            {treatmentData.map(treatment => (
-                                                <Option key={treatment.id} value={treatment.id}>
-                                                    {treatment.name}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-                                )}
-                            </>
+                            <NormalVisitForm
+                                visitSubType={visitSubType}
+                                clinicData={clinicData}
+                                treatmentData={treatmentData}
+                                selectedClinic={selectedClinic}
+                                onVisitTypeChange={handleVisitTypeChange}
+                                onClinicChange={handleClinicChange}
+                                onTreatmentSelect={handleTreatmentSelect}
+                            />
                         )}
 
                         <Form.Item
@@ -285,18 +135,20 @@ const PatientVisit = () => {
                             <Select
                                 showSearch
                                 placeholder="Search doctors"
-                                onChange={setSelectedDoctor}
+                                onChange={handleDoctorChange}
                                 filterOption={(input, option) =>
                                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                 }
                             >
                                 {doctors.map(doctor => (
-                                    <Option key={doctor} value={doctor}>
-                                        {doctor}
-                                    </Option>
+                                    <Select.Option key={doctor.id} value={doctor.id}>
+                                        {doctor.doctor_name}
+                                    </Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
+
+                        <DoctorAvailability selectedDoctor={selectedDoctor} />
 
                         <Form.Item>
                             <Button
@@ -308,39 +160,21 @@ const PatientVisit = () => {
                             >
                                 Submit Visit
                             </Button>
-                            <Button onClick={clearVisitData}>
-                                Cancel
-                            </Button>
+                            <Button onClick={clearVisitData}>Cancel</Button>
                         </Form.Item>
                     </Form>
                 )}
 
-
-                {visitType && selectedTreatments.length > 0 && (
-                    <div style={{
-                        marginTop: 16,
-                        padding: '12px 16px',
-                        backgroundColor: '#fafafa',
-                        borderRadius: 4,
-                        border: '1px solid #d9d9d9'
-                    }}>
-                        <Row justify="space-between">
-                            <Col>
-                                <strong>Selected Treatments:</strong>
-                            </Col>
-                            <Col>
-                                <strong>Total:</strong> LKR.{totalCost.toFixed(2)}
-                            </Col>
-                        </Row>
-                        <Divider style={{ margin: '12px 0' }} />
-                        {selectedTreatments.map(treatment => (
-                            <Row key={treatment.id} justify="space-between" style={{ marginBottom: 8 }}>
-                                <Col>{treatment.name}</Col>
-                                <Col>LKR.{treatment.price.toFixed(2)}</Col>
-                            </Row>
-                        ))}
-                    </div>
-                )}
+                <PriceCalculation
+                    visitSubType={visitSubType}
+                    totalCost={totalCost}
+                    selectedTreatments={selectedTreatments}
+                    selectedClinic={selectedClinic}
+                    selectedDoctor={selectedDoctor}
+                    hospitalCharge={hospitalCharge}
+                    customCharges={customCharges}
+                    visitType={visitType}
+                />
             </Card>
         </div>
     );
