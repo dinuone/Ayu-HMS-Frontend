@@ -7,12 +7,12 @@ const VisitTypeSelector = ({ onSelect }) => (
             <h3 style={{ marginBottom: 24 }}>Select Visit Type</h3>
             <Row gutter={16}>
                 <Col span={12}>
-                    <Button block size="large" onClick={() => onSelect('feelo')}>
+                    <Button variant="solid" color="orange" block size="large" onClick={() => onSelect('feelo')}>
                         Feelo App Visit
                     </Button>
                 </Col>
                 <Col span={12}>
-                    <Button block size="large" onClick={() => onSelect('normal')}>
+                    <Button variant="solid" color="purple" block size="large" onClick={() => onSelect('normal')}>
                         Normal Visit
                     </Button>
                 </Col>

@@ -24,7 +24,7 @@ const NormalVisitForm = ({visitSubType, clinicData, treatmentData, selectedClini
                 >
                     <Select showSearch placeholder="Search clinics" onChange={onClinicChange}>
                         {clinicData.map(clinic => (
-                            <Select.Option key={clinic.id} value={clinic.name}>
+                            <Select.Option key={clinic.id} value={clinic.id}>
                                 {clinic.name}
                             </Select.Option>
                         ))}

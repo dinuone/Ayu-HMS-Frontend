@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Button, Card, Col, Form, Row, Select, message } from 'antd';
 import { ArrowLeftOutlined, CheckOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,12 +8,14 @@ import FeeloVisitForm from "./Forms/FeeloVisitForm.jsx";
 import NormalVisitForm from "./Forms/NormalVisitForm.jsx";
 import DoctorAvailability from "./Components/DoctorAvailability.jsx";
 import PriceCalculation from "./Components/PriceCalculation.jsx";
+import api from "../../Services/NetworkManager.js";
 
 
 const PatientVisit = () => {
     const { patientRegNo } = useParams();
     const navigate = useNavigate();
     const [form] = Form.useForm();
+    const [submitLoading, setSubmitLoading] = useState(false);
 
     const {
         visitType,
@@ -82,13 +84,24 @@ const PatientVisit = () => {
         }
 
         try {
-            const payload = preparePayload();
-            console.log('Submitting payload:', payload);
+            setSubmitLoading(true)
+            const payload = {
+                patient_reg_no: patientRegNo,
+                clinic_category_id: values.clinic,
+                patient_type: visitType === 'feelo' ? 1 : 2,
+                visit_type: values.assign_to === "CLINIC /OPD" ? 1 : 2,
+                treatments: selectedTreatments,
+                doctor_id: values.doctor,
+                feelo_app_ref: visitType === 'feelo' ? values.feeloReference : null
+            }
+            console.log('Submitting values:', payload);
             const response = await api.post('patient-visit/create', payload);
             message.success('Visit created successfully!');
+            setSubmitLoading(false);
             clearVisitData();
             navigate('/patients');
         } catch (error) {
+            setSubmitLoading(false);
             console.error('Error submitting form:', error);
             message.error('Failed to register visit');
         }
@@ -152,15 +165,16 @@ const PatientVisit = () => {
 
                         <Form.Item>
                             <Button
-                                type="primary"
+                                color="default"
+                                variant="solid"
                                 icon={<CheckOutlined />}
                                 htmlType="submit"
                                 style={{ marginRight: 8 }}
-                                loading={loading}
+                                loading={submitLoading}
                             >
                                 Submit Visit
                             </Button>
-                            <Button onClick={clearVisitData}>Cancel</Button>
+                            <Button variant="outlined" color="red" onClick={clearVisitData}>Cancel</Button>
                         </Form.Item>
                     </Form>
                 )}

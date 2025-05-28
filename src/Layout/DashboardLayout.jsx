@@ -22,7 +22,7 @@ import {useAuth} from "../Provider/authProvider.jsx";
 import {AiFillMedicineBox, AiOutlineTag} from "react-icons/ai";
 import {MdOutlineAssignmentInd} from "react-icons/md";
 import {IoMdPricetags} from "react-icons/io";
-import {FaClinicMedical} from "react-icons/fa";
+import {FaClinicMedical, FaHospitalUser} from "react-icons/fa";
 import {GiHealthNormal, GiMedicines} from "react-icons/gi";
 import {RiMedicineBottleFill} from "react-icons/ri";
 import {FaUserDoctor} from "react-icons/fa6";
@@ -161,12 +161,17 @@ export default function DashboardLayout({ children }) {
       ],
     },
 
-
     {
       key: '6',
       icon: <UserAddOutlined />,
       label: 'Patients Management',
       path: '/patients',
+    },
+    {
+      key: '7',
+      icon: <FaHospitalUser />,
+      label: 'Patients Visit',
+      path: '/patients-visit',
     },
   ];
 

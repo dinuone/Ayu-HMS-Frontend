@@ -140,8 +140,8 @@ export const useVisitLogic = (patientRegNo,form) => {
         });
     };
 
-    const handleClinicChange = async (clinicName) => {
-        const clinic = clinicData.find(c => c.name === clinicName);
+    const handleClinicChange = async (clinicId) => {
+        const clinic = clinicData.find(c => c.id === clinicId);
         if (!clinic) return;
 
         setSelectedClinic(clinic);
