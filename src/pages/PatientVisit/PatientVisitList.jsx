@@ -158,6 +158,11 @@ const PatientVisitList = () => {
         exportToExcel(exportColumns, flatData, 'Drugs');
     };
 
+    const viewPatientRecord = (visitId) => {
+        console.log(visitId)
+        navigate(`/view-patient-visit/${visitId}`)
+    }
+
     const columns = [
         {
             title: "Registration No",
@@ -219,7 +224,7 @@ const PatientVisitList = () => {
             render: (_, record) => (
                 <Space>
                     <Button
-                        onClick={() => {navigateToVisitPage(record.registration_number)}}
+                        onClick={() => {viewPatientRecord(record.id)}}
                         icon={<EyeFilled/>}
                         color="default"
                         variant="solid" size="small">

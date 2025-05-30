@@ -1,7 +1,9 @@
-import {useRef, useState} from 'react';
-import { Modal, Input, Button, Space, Typography, Divider, Card, Radio } from 'antd';
+import {useEffect, useRef, useState} from 'react';
+import {Modal, Input, Button, Space, Typography, Divider, Card, Radio, message} from 'antd';
 import { QrcodeOutlined, IdcardOutlined } from '@ant-design/icons';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import api from "../../Services/NetworkManager.js";
+import {useNavigate} from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -11,7 +13,15 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
     const [scanning, setScanning] = useState(false);
     const [error, setError] = useState('');
     const scannerContainerRef = useRef(null);
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        if (visible) {
+            setNic('');
+            setError('');
+            setScanning(false);
+        }
+    }, [visible]);
 
     const handleScan = (data) => {
         if (data) {
@@ -22,6 +32,7 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
 
     const handleCancel = () => {
         setScanning(false);
+        setNic('')
         setTimeout(() => {
             onCancel();
         },100)
@@ -33,13 +44,25 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
         setError('Failed to scan QR code');
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (inputMethod === 'nic' && !nic.trim()) {
             setError('Please enter NIC number');
             return;
         }
 
         if (inputMethod === 'nic') {
+            try{
+                const response = await api.get(`patient-visit/check-account/${nic.trim()}`);
+                console.log(response)
+                if(response.data.data.account_exisit){
+                    const regNo = response.data.data.patient_reg_no;
+                    navigate(`/patient-visit/${regNo}`)
+                }else{
+                    message.error("cannot found patient account, please register a new patient");
+                }
+            }catch (err){
+                message.error(error.response?.data?.data?.message || 'Operation failed');
+            }
             onSuccess(nic);
         } else {
             setScanning(true);
