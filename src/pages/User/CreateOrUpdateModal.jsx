@@ -50,7 +50,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
 
     return (
         <Modal
-            visible={visible}
+            open={visible}
             title={initialValues ? "Edit User" : "Create User"}
             okText={initialValues ? "Update" : "Create"}
             onCancel={handleCancel}
@@ -117,7 +117,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                                 onChange={handleRoleChange}
                             >
                                 {roles.map(role => (
-                                    <Select.Option key={role.id} value={role.id}>
+                                    <Select.Option key={role.id} value={role.id} disabled={initialValues?.role?.id ===3}>
                                         {role.name}
                                     </Select.Option>
                                 ))}

@@ -114,8 +114,8 @@ function PatientVisitView() {
                                     />
                                 </Badge>
                                 <div>
-                                    <Title level={4} style={{ margin: 0 }}>{visitData.patient_data?.name}</Title>
-                                    <Text type="secondary">ID: {visitData.patient_data?.registration_number}</Text>
+                                    <Title level={4} style={{ margin: 0 }}>{visitData.patient_data?.name.toUpperCase()}</Title>
+                                    <Text type="secondary">Reg No: {visitData.patient_data?.registration_number}</Text>
                                 </div>
                             </div>
 
@@ -136,14 +136,40 @@ function PatientVisitView() {
                                 </Descriptions.Item>
                                 <Descriptions.Item label={<Space><EnvironmentOutlined /><span>Address</span></Space>}>
                                     <Text>
-                                        {visitData.patient_data?.address_line_1}, {visitData.patient_data?.city}<br />
-                                        {visitData.patient_data?.province}
+                                        {visitData.patient_data?.address_line_1}, <br />
+                                        {visitData.patient_data?.address_line_2} <br />
+                                    </Text>
+                                </Descriptions.Item>
+                                <Descriptions.Item label={<Space><EnvironmentOutlined /><span>Province</span></Space>}>
+                                    <Text>
+                                       {visitData.patient_data?.province}
+                                    </Text>
+                                </Descriptions.Item>
+                                <Descriptions.Item label={<Space><EnvironmentOutlined /><span>District</span></Space>}>
+                                    <Text>
+                                        {visitData.patient_data?.district}
+                                    </Text>
+                                </Descriptions.Item>
+                                <Descriptions.Item label={<Space><EnvironmentOutlined /><span>City</span></Space>}>
+                                    <Text>
+                                        {visitData.patient_data?.city}
                                     </Text>
                                 </Descriptions.Item>
                                 <Descriptions.Item label={<Space><FileTextOutlined /><span>NIC</span></Space>}>
                                     <Text strong>{visitData.patient_data?.nic_number}</Text>
                                 </Descriptions.Item>
                             </Descriptions>
+                            <Divider/>
+                            <Card title="QR Code" style={{ textAlign: 'center' }}>
+                                {/* Assuming qr_code is a URL or base64 data */}
+                                {visitData.patient_data?.qr_code && (
+                                    <img
+                                        src={visitData.patient_data.qr_code}
+                                        alt="Patient QR Code"
+                                        style={{ width: '100%', maxWidth: '200px' }}
+                                    />
+                                )}
+                            </Card>
                         </Space>
                     </Card>
                 </Col>

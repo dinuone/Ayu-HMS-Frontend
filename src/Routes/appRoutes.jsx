@@ -21,6 +21,8 @@ import DoctorAssignList from "../pages/DoctorAssign/DoctorAssignList.jsx";
 import OfferList from "../pages/Offer/OfferList.jsx";
 import PatientVisitList from "../pages/PatientVisit/PatientVisitList.jsx";
 import PatientVisitView from "../pages/PatientVisit/PatientVisitView.jsx";
+import MyAppoinmentList from "../pages/Doctor/MyAppoinments/MyAppoinmentList.jsx";
+import ViewAppointment from "../pages/Doctor/MyAppoinments/ViewAppointment.jsx";
 
 // Lazy load components
 const UserList = React.lazy(() => import("../pages/User/UserList.jsx"));
@@ -66,7 +68,9 @@ export default function AppRoutes (){
                 {path: 'patient-visit/:patientRegNo', element:<PatientVisit/>},
                 {path: 'offer',element:<OfferList/>},
                 {path: 'patients-visit', element:<PatientVisitList/>},
-                {path: 'view-patient-visit/:visitId',element:<PatientVisitView/>}
+                {path: 'view-patient-visit/:visitId',element:<PatientVisitView/>},
+                {path: 'my-appointment-list',element:<MyAppoinmentList/>},
+                {path: 'view-appointment/:visitId',element:<ViewAppointment/>},
             ],
         },
         {

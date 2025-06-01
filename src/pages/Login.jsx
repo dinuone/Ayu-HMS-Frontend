@@ -25,6 +25,7 @@ function Login() {
             firstName: response.data.firstName,
             lastName: response.data.lastName,
             userName: response.data.userName,
+            role : response.data.role
           },
         };
 
