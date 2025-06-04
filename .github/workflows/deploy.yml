@@ -1,4 +1,4 @@
-name: CI/CD Pipeline AYU HMS - Frontend
+name: CI/CD Pipeline - AYU HMS - Frontend
 
 on:
   pull_request:
