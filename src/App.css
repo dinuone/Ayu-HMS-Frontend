@@ -1,9 +1,11 @@
 #root {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
+
+/*background-color: #1FAF67; /* Vibrant green */
+/*background-color: #0072B1; /* Medium blue */
+/*background-color: #FF5722; !* Deep orange *!*/
 
 .logo {
   height: 6em;
@@ -39,4 +41,28 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.full-page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.5); /* Optional: Background opacity */
+  z-index: 9999;
+}
+
+/* Target the spinner's size */
+.full-page-loader .ant-spin-dot {
+  font-size: 64px; /* Adjust this value to make it larger */
+}
+
+/* Optional: Customize the dot sizes */
+.full-page-loader .ant-spin-dot i {
+  width: 16px;
+  height: 16px;
 }

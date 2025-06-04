@@ -14,10 +14,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('https://images.unsplash.com/photo-1497864149936-d3163f0c0f4b?auto=format&fit=crop&w=1920&q=80');
+  background-image: url('/bg-image.jpg');
   background-size: cover;
   background-position: center;
-  filter: blur(8px);
+  filter: blur(5px);
   transform: scale(1.1);
   z-index: 0;
 }
@@ -28,7 +28,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 180, 219, 0.8) 0%, rgba(0, 131, 176, 0.8) 100%);
+  background: linear-gradient(135deg, rgba(0, 201, 167, 0.73) 0%, rgba(146, 254, 157, 0.7) 100%);
   z-index: 1;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .login-title {
-  color: #001529;
+  color: #1FAF67;
   margin: 24px 0 8px;
   font-size: 28px;
   font-weight: 700;
@@ -98,7 +98,6 @@
   font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
-  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
   border: none;
   box-shadow: 0 4px 12px rgba(0, 131, 176, 0.15);
   margin-top: 8px;
@@ -106,7 +105,7 @@
 }
 
 .login-form .ant-btn:hover {
-  background: linear-gradient(135deg, #0083b0 0%, #006687 100%);
+  background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 131, 176, 0.25);
 }
@@ -136,15 +135,23 @@
   width: 60px;
   height: 60px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 131, 176, 0.15);
+  box-shadow: 0 4px 12px rgb(146, 254, 157);
 }
 
 .brand-logo svg {
   font-size: 32px;
   color: white;
+}
+
+.brand-logo img {
+  width: 80px; /* Adjust size as needed */
+  height: 80px;
+  border-radius: 50%; /* Makes it circular */
+  object-fit: cover; /* Ensures the image covers the circle properly */
+  display: block;
 }

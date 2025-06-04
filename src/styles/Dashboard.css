@@ -10,7 +10,6 @@
   height: 64px;
   padding: 16px;
   text-align: center;
-  background: #001529;
   overflow: hidden;
 }
 
@@ -25,14 +24,17 @@
   margin: 0 auto;
 }
 
-.logo-icon svg {
-  color: white;
-  font-size: 20px;
+.logo-icon img {
+  width: 50px; /* Adjust size as needed */
+  height: 50px;
+  border-radius: 50%; /* Makes it circular */
+  object-fit: cover; /* Ensures the image covers the circle properly */
+  display: block;
 }
 
 .dashboard-header {
   padding: 0 24px;
-  background: white;
+  background: white; /* Adding gradient */
   box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.05);
   position: relative;
   z-index: 10;
@@ -40,6 +42,7 @@
   align-items: center;
   justify-content: space-between;
 }
+
 
 .header-actions {
   display: flex;
@@ -57,7 +60,7 @@
 }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
@@ -70,14 +73,20 @@
 }
 
 .ant-menu-item-selected {
-  background: linear-gradient(135deg, #00b4db20 0%, #0083b020 100%) !important;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%)!important;
 }
 
 .ant-menu-item:hover {
-  background: #f0f2f5 !important;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
 }
 
 .dashboard-content {
   padding: 24px;
   background: #f0f2f5;
 }
+
+.ant-menu-item,
+.ant-menu-submenu-title {
+  text-align: left !important;
+}
+

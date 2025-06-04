@@ -1,42 +1,22 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import { BrowserRouter, Route, Navigate } from 'react-router-dom';
 import './App.css';
+import { AuthProvider } from './Provider/authProvider.jsx';
+import AppRoutes from "./Routes/appRoutes.jsx";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
+console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL);
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route 
-          path="/login" 
-          element={
-            !isAuthenticated ? (
-              <Login onLogin={handleLogin} />
-            ) : (
-              <Navigate to="/dashboard" replace />
-            )
-          } 
-        />
-        <Route 
-          path="/dashboard/*" 
-          element={
-            isAuthenticated ? (
-              <Dashboard />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          } 
-        />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter
+          future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+          }}
+      >
+          <AuthProvider>
+              <AppRoutes />
+          </AuthProvider>
+      </BrowserRouter>
   );
 }
 
