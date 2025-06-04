@@ -37,6 +37,6 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
             cd /var/www/harendra-ayu-hms-uat
-            sudo docker-compose pull
-            sudo docker-compose up -d
+            sudo docker compose pull
+            sudo docker compose up -d
           EOF
