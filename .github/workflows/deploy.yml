@@ -28,15 +28,15 @@ jobs:
           docker build --build-arg VITE_API_BASE_URL=https://harendra-ayu-hms-uat-api.cadvex.com/api -t $DOCKERHUB_USERNAME/ayu-hms-web .
           docker push $DOCKERHUB_USERNAME/ayu-hms-web:latest
 
-      - name: Deploy via SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-
-      - name: Restart containers on server
+      - name: Deploy to server via SSH
         run: |
+          mkdir -p ~/.ssh
+          echo "$SERVER_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
             cd /var/www/harendra-ayu-hms-uat
-            docker-compose pull 
-            docker-compose up -d 
+            docker-compose pull
+            docker-compose up -d
           EOF
