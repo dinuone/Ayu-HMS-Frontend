@@ -25,7 +25,7 @@ jobs:
 
       - name: Build and Push Frontend Docker Image
         run: |
-          docker build -t $DOCKERHUB_USERNAME/ayu-hms-web:latest .
+          docker build --build-arg VITE_API_BASE_URL=https://harendra-ayu-hms-uat-api.cadvex.com/api -t $DOCKERHUB_USERNAME/ayu-hms-web .
           docker push $DOCKERHUB_USERNAME/ayu-hms-web:latest
 
       - name: Deploy via SSH
@@ -36,7 +36,7 @@ jobs:
       - name: Restart containers on server
         run: |
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
-            cd /path/to/docker-compose
+            cd /var/www/harendra-ayu-hms-uat
             docker-compose pull 
             docker-compose up -d 
           EOF
