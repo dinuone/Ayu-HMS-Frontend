@@ -298,6 +298,7 @@ export default function DashboardLayout({ children }) {
           }}>
             {children}
           </Content>
+
         </Layout>
       </Layout>
   );

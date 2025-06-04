@@ -1,10 +1,11 @@
 import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import '../styles/Login.css';
-import { login } from '../services/networkManager';
+
 import { useAuth } from '../Provider/authProvider.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import {login} from "../Services/NetworkManager.js";
 
 function Login() {
   const { setAuth } = useAuth();

@@ -30,6 +30,7 @@ import {
     MedicineBoxOutlined,
     FileTextOutlined
 } from '@ant-design/icons';
+import CommonForm from "./CaseSheets/CommonForm.jsx";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -96,7 +97,7 @@ function ViewAppointment(props) {
     ];
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div>
             <Row gutter={[24, 24]}>
                 <Col span={24}>
                     <Title level={3} style={{ marginBottom: 0 }}>
@@ -114,7 +115,7 @@ function ViewAppointment(props) {
                             activeKey={activeTab}
                             onChange={setActiveTab}
                             tabPosition="left"
-                            style={{ minHeight: '500px' }}
+                            style={{ minHeight: '600px' }}
                         >
                             {/* PATIENT INFORMATION TAB */}
                             <TabPane
@@ -183,7 +184,7 @@ function ViewAppointment(props) {
                                 tab={
                                     <span>
                                         <HistoryOutlined />
-                                        Visit History
+                                        Patient History
                                     </span>
                                 }
                                 key="2"
@@ -239,70 +240,15 @@ function ViewAppointment(props) {
 
                             {/* DIAGNOSIS TAB */}
                             <TabPane
-                                tab={
-                                    <span>
-                                        <MedicineBoxOutlined />
-                                        Diagnosis
-                                    </span>
-                                }
+                                tab={<span><MedicineBoxOutlined />Diagnosis</span>}
                                 key="3"
                             >
-                                <Form form={form} layout="vertical">
-                                    <Row gutter={[16, 16]}>
-                                        <Col span={24}>
-                                            <Form.Item label="Symptoms" name="symptoms">
-                                                <TextArea rows={4} placeholder="Enter patient symptoms" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Form.Item label="Diagnosis" name="diagnosis">
-                                                <TextArea rows={4} placeholder="Enter diagnosis" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Form.Item label="Prescription" name="prescription">
-                                                <TextArea rows={4} placeholder="Enter prescription details" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Form.Item label="Notes" name="notes">
-                                                <TextArea rows={2} placeholder="Additional notes" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Button type="primary" htmlType="submit">
-                                                Save Diagnosis
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </Form>
-
-                                <Divider />
-
-                                <Title level={4}>Previous Diagnoses</Title>
-                                <Table
-                                    columns={[
-                                        {
-                                            title: 'Date',
-                                            dataIndex: 'date',
-                                            key: 'date',
-                                        },
-                                        {
-                                            title: 'Diagnosis',
-                                            dataIndex: 'diagnosis',
-                                            key: 'diagnosis',
-                                        },
-                                        {
-                                            title: 'Doctor',
-                                            dataIndex: 'doctor',
-                                            key: 'doctor',
-                                        }
-                                    ]}
-                                    dataSource={[]} // Replace with actual diagnosis history
-                                    rowKey="id"
-                                    pagination={false}
-                                    bordered
-                                />
+                                <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: 16 }}>
+                                    <CommonForm
+                                        visitData={visitData}
+                                        patientData={visitData.patient_data}
+                                    />
+                                </div>
                             </TabPane>
                         </Tabs>
                     </Card>
