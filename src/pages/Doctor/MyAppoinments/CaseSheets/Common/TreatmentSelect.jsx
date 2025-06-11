@@ -3,22 +3,13 @@ import { Form, Select } from 'antd';
 
 const { Option } = Select;
 
-function TreatmentSelect({ treatmentsFromDB, caseSheet, setCaseSheet }) {
-    // treatmentsFromDB = [{ id: 1, name: 'Vein Stripping' }, { id: 2, name: 'Sclerotherapy' }, ...]
-
+function TreatmentSelect({ treatmentsFromDB, treatments, setTreatments }) {
     const handleChange = (selectedIds) => {
-        // selectedIds is an array of treatment IDs
-        // Map selected IDs to objects with id and name
         const selectedTreatments = treatmentsFromDB.filter(t => selectedIds.includes(t.id));
-
-        setCaseSheet((prev) => ({
-            ...prev,
-            treatments: selectedTreatments,
-        }));
+        setTreatments(selectedTreatments);
     };
 
-    // Get currently selected IDs from caseSheet for value prop
-    const selectedIds = (caseSheet.treatments || []).map(t => t.id);
+    const selectedIds = (treatments || []).map(t => t.id);
 
     return (
         <Form.Item name="treatments">

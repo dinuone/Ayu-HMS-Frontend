@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Form,
     Input,
@@ -17,36 +17,18 @@ import {
 } from 'antd';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import TreatmentSelect from "./TreatmentSelect.jsx";
-import DiseaseCodeSelect from "./DiseaseCodeSelect.jsx";
+import TreatmentSelect from "../Common/TreatmentSelect.jsx";
+import DiseaseCodeSelect from "../Common/DiseaseCodeSelect.jsx";
 import {PlusOutlined} from "@ant-design/icons";
+import dayjs from "dayjs";
+import api from "../../../../../Services/NetworkManager.js";
+import ClinicSelect from "../Common/ClinicSelect.jsx";
 
 const { Title, Text } = Typography;
 
 const otherComplaintOptions = ['Gastritis', 'Headache', 'Other'];
 
-const primarySymptoms = [
-    'Engorgement',
-    'Heaviness',
-    'Swelling',
-    'Discoloration',
-    'Itching',
-    'Ulcers',
-    'Other',
-];
-
-const painSides = ['Right', 'Left', 'Both'];
-const illnessOptions = ['HTN', 'DM', 'CHO', 'THY', 'TB'];
-const addictionOptions = ['Smoke', 'Alcohol', 'Betel chewing'];
-
-const specialExamAreas = [
-    'Visible veins',
-    'Swelling',
-    'Discoloration',
-    'Tenderness',
-    'Temperature'
-];
-const examSides = ['Left', 'Right', 'Both'];
+const addictionOptions = ['Smoke', 'Alcohol', 'Betel chewing', 'Other'];
 
 const amaQuestions = [
     {
@@ -81,25 +63,6 @@ const amaQuestions = [
     },
 ];
 
-const treatmentsFromDB = [
-    { id: 1, name: 'Vein Stripping' },
-    { id: 2, name: 'Sclerotherapy' },
-    { id: 3, name: 'Laser Therapy' },
-];
-
-const diseaseCodesFromDB = [
-    { id: 1, code: 'HTN', name: 'Hypertension' },
-    { id: 2, code: 'DM', name: 'Diabetes Mellitus' },
-    { id: 3, code: 'CHO', name: 'Coronary Heart Disease' },
-    // ...etc
-];
-
-const drugList = [
-    { id: 1, name: 'Paracetamol' },
-    { id: 2, name: 'Ibuprofen' },
-    // ... from DB
-];
-
 function StreeRogaForm() {
     const [form] = Form.useForm();
 
@@ -110,6 +73,16 @@ function StreeRogaForm() {
     const [instruction, setInstruction] = useState('');
 
     const [loading , setLoading] = useState(true);
+    const [diseaseCodes, setDiseaseCodes] = useState([]);
+    const [treatments, setTreatments] = useState([]);
+    const [drugs, setDrugs] = useState([]);
+    const [clinics, setClinics] = useState([]);
+    const [nextVisitDate,setNextVisitDate]= useState(null);
+    const [remark,setRemark]= useState(null);
+
+    const [selectedTreatments, setSelectedTreatments] = useState([]);
+    const [selectedDieaseCodes, setSelectedDieaseCodes] = useState([]);
+    const [selectedClinic, setSelectedClinic] = useState([]);
 
     const [caseSheet, setCaseSheet] = useState({
         chiefComplaint: '',
@@ -148,12 +121,39 @@ function StreeRogaForm() {
             progression:'',
             previousTreatment:''
         },
-        dietaryHabits:{
-            options:''
+        personalHistory:{
+            dietaryHabits: {
+                option: '',
+                meals: '',
+                waterIntake: '',
+                other: ''
+            },
+            sleepPatterns:{
+               day:'',
+               night:''
+            },
+            addiction:{
+                option: [],
+                other:''
+            },
+            bath:'',
+            exercise:'',
         },
+        physicalExamination:{
+            pulse:'',
+            bp:'',
+            weight:''
+        },
+        investigation:{
+            bloodTest:[],
+            imagingTest:[],
+            other:''
+        },
+        differentialDiagnosis:'',
         treatments: [],
         diseaseCodes: [],
         prescription: [],
+        diagnosingAMA:{}
 
     });
 
@@ -163,122 +163,22 @@ function StreeRogaForm() {
     }, 500)
 
 
-    const handleMajorIllnessChange = (checkedValues) => {
-        const updatedIllnesses = {};
-        illnessOptions.forEach((illness) => {
-            updatedIllnesses[illness] = checkedValues.includes(illness);
-        });
 
-        setCaseSheet((prev) => ({
-            ...prev,
-            majorIllness: updatedIllnesses,
-        }));
-    };
+    useEffect(() => {
+        fetchMasterData()
+    }, []);
 
-    const handleSleepPatternInputChange = (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            sleepPattern: value,
-        }));
-    };
-
-    const handleSymptomSideChange = (symptom) => (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            primarySymptoms: {
-                ...prev.primarySymptoms,
-                [symptom]: value,
-            },
-        }));
-    };
-
-    const handleDietaryChange = (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            dietaryHabits: {
-                ...prev.dietaryHabits,
-                option: value,
-                otherText: value !== 'Other' ? '' : prev.dietaryHabits.otherText,
-            },
-        }));
-    };
-
-
-    const handleOtherDietaryTextChange = (e) => {
-        setCaseSheet((prev) => ({
-            ...prev,
-            dietaryHabits: {
-                ...prev.dietaryHabits,
-                otherText: e.target.value,
-            },
-        }));
-    };
-
-    const handleBowelChange = (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            bowel: {
-                ...prev.bowel,
-                type: value,
-                note: value === 'Other' ? prev.bowel.note : ''
-            }
-        }));
-    };
-
-    const handleBladderChange = (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            bladder: {
-                ...prev.bladder,
-                type: value,
-                note: value === 'Other' ? prev.bladder.note : ''
-            }
-        }));
-    };
-
-    const handleBowelNoteChange = (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            bowel: {
-                ...prev.bowel,
-                note: value
-            }
-        }));
-    };
-
-    const handleBladderNoteChange = (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            bladder: {
-                ...prev.bladder,
-                note: value
-            }
-        }));
-    };
-
-    const handleAddictionChange = (checkedValues) => {
-        setCaseSheet((prev) => ({
-            ...prev,
-            addiction: checkedValues,
-        }));
-    };
-
-    const handleSpecialExamChange = (symptom) => (e) => {
-        const value = e.target.value;
-        setCaseSheet((prev) => ({
-            ...prev,
-            specialExamination: {
-                ...prev.specialExamination,
-                [symptom]: value,
-            },
-        }));
+    const fetchMasterData = async () => {
+        try {
+            const res = await api.get('patient-log/get-master-data');
+            const { diseaseCodes, drugs, treatments, clinics } = res.data.data;
+            setDiseaseCodes(diseaseCodes);
+            setDrugs(drugs);
+            setTreatments(treatments);
+            setClinics(clinics);
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Failed to fetch data');
+        }
     };
 
     const handleRemove = (index) => {
@@ -323,7 +223,7 @@ function StreeRogaForm() {
                 onFinish={onFinish}
                 autoComplete="off"
             >
-                <Title level={5}>Chief Complain</Title>
+                <Title level={5}>Chief Complaint</Title>
                 <Form.Item name="chiefComplaint">
                     <ReactQuill
                         theme="snow"
@@ -339,9 +239,9 @@ function StreeRogaForm() {
 
                 <Divider />
                 <Title level={5}>Other Complaint</Title>
-                <Form.Item name="otherComplaints" label="Select Complaints">
+                <Form.Item name="otherComplaints" >
                     <Checkbox.Group
-                        options={caseSheet.otherComplaints}
+                        options={otherComplaintOptions}
                         value={caseSheet.selectedOtherComplaints}
                         onChange={(checkedValues) => {
                             setCaseSheet((prev) => ({
@@ -370,7 +270,7 @@ function StreeRogaForm() {
                 <Divider />
                 <Title level={5}>Menstrual History (Arthava Ithihasa)</Title>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Pushpa Darshana (Menarche)</label>
+                    <label style={{ width: 200 }}>Pushpa Darshana (Menarche)</label>
                     <Input
                         value={caseSheet.menstrualHistory.pushpaDarshana}
                         onChange={(e) =>
@@ -387,7 +287,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Regular /Irregular</label>
+                    <label style={{ width: 200 }}>Regular /Irregular</label>
                     <Radio.Group
                         onChange={(e) =>
                             setCaseSheet((prev) => ({
@@ -406,7 +306,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Characters of Menstruation</label>
+                    <label style={{ width: 200 }}>Characters of Menstruation</label>
                     <Input
                         value={caseSheet.menstrualHistory.charactersOfMenstruation}
                         onChange={(e) =>
@@ -423,7 +323,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Duration of Flow</label>
+                    <label style={{ width: 200 }}>Duration of Flow</label>
                     <Input
                         value={caseSheet.menstrualHistory.durationOfFlow}
                         onChange={(e) =>
@@ -439,7 +339,7 @@ function StreeRogaForm() {
                     />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Interval</label>
+                    <label style={{ width: 200 }}>Interval</label>
                     <Input
                         value={caseSheet.menstrualHistory.durationOfFlow}
                         onChange={(e) =>
@@ -456,7 +356,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Pain</label>
+                    <label style={{ width: 200 }}>Pain</label>
                     <Radio.Group
                         onChange={(e) =>
                             setCaseSheet((prev) => ({
@@ -476,7 +376,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Volume</label>
+                    <label style={{ width: 200 }}>Volume</label>
                     <Radio.Group
                         onChange={(e) =>
                             setCaseSheet((prev) => ({
@@ -497,7 +397,7 @@ function StreeRogaForm() {
 
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>LMP</label>
+                    <label style={{ width: 200 }}>LMP</label>
                     <Input
                         value={caseSheet.menstrualHistory.lmp}
                         onChange={(e) =>
@@ -517,7 +417,7 @@ function StreeRogaForm() {
                 <Title level={5}>Obstetric History (Prasawa Ithihasa)</Title>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Number of Pregnancy</label>
+                    <label style={{ width: 200 }}>Number of Pregnancy</label>
                     <Input
                         type="number"
                         value={caseSheet.obstetricHistory.numberOfPregnacy}
@@ -534,7 +434,7 @@ function StreeRogaForm() {
                     />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Labor</label>
+                    <label style={{ width: 200 }}>Labor</label>
                     <Radio.Group
                         onChange={(e) =>
                             setCaseSheet((prev) => ({
@@ -553,7 +453,7 @@ function StreeRogaForm() {
                     </Radio.Group>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Date of Delivery</label>
+                    <label style={{ width: 200 }}>Date of Delivery</label>
                     <DatePicker
                         format="YYYY-MM-DD"
                         onChange={(date, dateString) =>
@@ -570,7 +470,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Particulars of Deliveries</label>
+                    <label style={{ width: 200 }}>Particulars of Deliveries</label>
                     <Input
                         value={caseSheet.obstetricHistory.particularsOfDeliveries}
                         onChange={(e) =>
@@ -587,7 +487,7 @@ function StreeRogaForm() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>History of Garbha Srava / Pata</label>
+                    <label style={{ width: 200 }}>History of Garbha Srava / Pata</label>
                     <Input
                         value={caseSheet.obstetricHistory.historyOfGarbha}
                         onChange={(e) =>
@@ -603,7 +503,7 @@ function StreeRogaForm() {
                     />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Mudha Garbha Ithihasaya</label>
+                    <label style={{ width: 200 }}>Mudha Garbha Ithihasaya</label>
                     <Input
                         value={caseSheet.obstetricHistory.mudhaGarbhaIthihasaya}
                         onChange={(e) =>
@@ -618,33 +518,28 @@ function StreeRogaForm() {
                         style={{ width: 500 }}
                     />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <label style={{ width: 150 }}>Contraceptive history</label>
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.obstetricHistory.contraceptiveHistory}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                obstetricHistory: {
-                                    ...prev.obstetricHistory,
-                                    contraceptiveHistory: e.target.value,
-                                },
-                            }))
-                        }
-                    />
 
-                </div>
-
-
+                <label style={{ width: 150 }}>Contraceptive history</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.obstetricHistory.contraceptiveHistory}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            obstetricHistory: {
+                                ...prev.obstetricHistory,
+                                contraceptiveHistory: e.target.value,
+                            },
+                        }))
+                    }
+                />
 
 
                 <Divider />
                 <Title level={5}>History of Present Illness</Title>
-                <Form.Item
-                    label="Onset"
-                    name="onset"
-                >
+
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 80 }}>Onset</label>
                     <Radio.Group
                         value={caseSheet.historyOfPresentIllness.onset}
                         onChange={(e) =>
@@ -661,7 +556,8 @@ function StreeRogaForm() {
                         <Radio value="Gradual">Gradual</Radio>
                         <Radio value="Sudden">Sudden</Radio>
                     </Radio.Group>
-                </Form.Item>
+                </div>
+
 
                 <Form.Item
                     label="Progression"
@@ -735,7 +631,6 @@ function StreeRogaForm() {
                                 },
                             }))
                         }
-                        style={{ width: 500 }}
                     />
                 </div>
 
@@ -752,7 +647,6 @@ function StreeRogaForm() {
                                 },
                             }))
                         }
-                        style={{ width: 500 }}
                     />
                 </div>
 
@@ -769,7 +663,6 @@ function StreeRogaForm() {
                                 },
                             }))
                         }
-                        style={{ width: 500 }}
                     />
                 </div>
 
@@ -786,7 +679,6 @@ function StreeRogaForm() {
                                 },
                             }))
                         }
-                        style={{ width: 500 }}
                     />
                 </div>
 
@@ -803,7 +695,6 @@ function StreeRogaForm() {
                                 },
                             }))
                         }
-                        style={{ width: 500 }}
                     />
                 </div>
 
@@ -859,215 +750,346 @@ function StreeRogaForm() {
                 <Title level={5}>Personal History</Title>
                 {/*TODO Personal History Changes - >  Ref Images  */}
 
-                {/*<Form.Item label="Dietary Habits" >*/}
-                {/*    <Radio.Group*/}
-                {/*        value={caseSheet.dietaryHabits.option}*/}
-                {/*        onChange={handleDietaryChange}*/}
-                {/*    >*/}
-                {/*        <Radio value="Vegetarian">Vegetarian</Radio>*/}
-                {/*        <Radio value="Skip Meals">Skip Meals</Radio>*/}
-                {/*        <Radio value="Other">Other</Radio>*/}
-                {/*    </Radio.Group>*/}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Dietary Habits</label>
+                        <Radio.Group
+                            value={caseSheet.personalHistory.dietaryHabits.option}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        dietaryHabits: {
+                                            ...prev.personalHistory.dietaryHabits,
+                                            option: value,
+                                        },
+                                    },
+                                }));
+                            }}
+                        >
+                            <Radio value="Vegetarian">Vegetarian</Radio>
+                            <Radio value="Non Vegetarian">Non Vegetarian</Radio>
+                        </Radio.Group>
+                    </div>
 
-                {/*    {caseSheet.dietaryHabits.option === 'Other' && (*/}
-                {/*        <Form.Item*/}
-                {/*            style={{ marginTop: 8 }}*/}
-                {/*            name="dietaryOtherText"*/}
-                {/*            rules={[{ required: true, message: 'Please specify dietary habit' }]}*/}
-                {/*        >*/}
-                {/*            <Input*/}
-                {/*                placeholder="Please specify"*/}
-                {/*                value={caseSheet.dietaryHabits.otherText}*/}
-                {/*                onChange={handleOtherDietaryTextChange}*/}
-                {/*            />*/}
-                {/*        </Form.Item>*/}
-                {/*    )}*/}
-                {/*</Form.Item>*/}
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Meals</label>
+                        <Input
+                            placeholder="e.g., 3 meals per day"
+                            value={caseSheet.personalHistory.dietaryHabits.meals}
+                            onChange={(e) =>
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        dietaryHabits: {
+                                            ...prev.personalHistory.dietaryHabits,
+                                            meals: e.target.value,
+                                        },
+                                    },
+                                }))
+                            }
+                        />
+                    </div>
 
-                {/*<Form.Item*/}
-                {/*    label="Sleep Pattern"*/}
-                {/*    name="sleepPattern"*/}
-                {/*>*/}
-                {/*    <Input*/}
-                {/*        value={caseSheet.sleepPattern}*/}
-                {/*        onChange={handleSleepPatternInputChange}*/}
-                {/*        placeholder="e.g. Normal, Disturbed, Insomnia"*/}
-                {/*    />*/}
-                {/*</Form.Item>*/}
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Water Intake</label>
+                        <Input
+                            placeholder="e.g., 2 liters/day"
+                            value={caseSheet.personalHistory.dietaryHabits.waterIntake}
+                            onChange={(e) =>
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        dietaryHabits: {
+                                            ...prev.personalHistory.dietaryHabits,
+                                            waterIntake: e.target.value,
+                                        },
+                                    },
+                                }))
+                            }
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Other</label>
+                        <Input
+                            placeholder="Specify if any"
+                            value={caseSheet.personalHistory.dietaryHabits.other}
+                            onChange={(e) =>
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        dietaryHabits: {
+                                            ...prev.personalHistory.dietaryHabits,
+                                            other: e.target.value,
+                                        },
+                                    },
+                                }))
+                            }
+                        />
+                    </div>
+                </div>
 
 
-                {/*<Form.Item label="Bowel">*/}
-                {/*    <Radio.Group*/}
-                {/*        value={caseSheet.bowel.type}*/}
-                {/*        onChange={handleBowelChange}*/}
-                {/*    >*/}
-                {/*        <Radio value="D">D (Day)</Radio>*/}
-                {/*        <Radio value="N">N (Night)</Radio>*/}
-                {/*        <Radio value="Other">Other</Radio>*/}
-                {/*    </Radio.Group>*/}
+                <label style={{ width: 150 }}>Sleep Patterns</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Day</label>
+                        <Input
+                            value={caseSheet.personalHistory.sleepPatterns.day}
+                            onChange={(e) =>
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        sleepPatterns: {
+                                            ...prev.personalHistory.sleepPatterns,
+                                            day: e.target.value,
+                                        },
+                                    },
+                                }))
+                            }
+                            style={{width:500}}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Night</label>
+                        <Input
+                            value={caseSheet.personalHistory.sleepPatterns.night}
+                            onChange={(e) =>
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        sleepPatterns: {
+                                            ...prev.personalHistory.sleepPatterns,
+                                            night: e.target.value,
+                                        },
+                                    },
+                                }))
+                            }
+                            style={{width:500}}
+                        />
+                    </div>
+                </div>
 
-                {/*    {caseSheet.bowel.type === 'Other' && (*/}
-                {/*        <Form.Item*/}
-                {/*            style={{ marginTop: 8 }}*/}
-                {/*            name="bowelNote"*/}
-                {/*            rules={[{ required: true, message: 'Please specify if Bowel is Other' }]}*/}
-                {/*        >*/}
-                {/*            <Input.TextArea*/}
-                {/*                placeholder="Specify bowel issue"*/}
-                {/*                rows={3}*/}
-                {/*                value={caseSheet.bowel.note}*/}
-                {/*                onChange={handleBowelNoteChange}*/}
-                {/*            />*/}
-                {/*        </Form.Item>*/}
-                {/*    )}*/}
-                {/*</Form.Item>*/}
 
-                {/*<Form.Item label="Bladder" >*/}
-                {/*    <Radio.Group*/}
-                {/*        value={caseSheet.bladder.type}*/}
-                {/*        onChange={handleBladderChange}*/}
-                {/*    >*/}
-                {/*        <Radio value="D">D (Day)</Radio>*/}
-                {/*        <Radio value="N">N (Night)</Radio>*/}
-                {/*        <Radio value="Other">Other</Radio>*/}
-                {/*    </Radio.Group>*/}
 
-                {/*    {caseSheet.bladder.type === 'Other' && (*/}
-                {/*        <Form.Item*/}
-                {/*            style={{ marginTop: 8 }}*/}
-                {/*            name="bladderNote"*/}
-                {/*            rules={[{ required: true, message: 'Please specify if Bladder is Other' }]}*/}
-                {/*        >*/}
-                {/*            <Input.TextArea*/}
-                {/*                placeholder="Specify bladder issue"*/}
-                {/*                rows={3}*/}
-                {/*                value={caseSheet.bladder.note}*/}
-                {/*                onChange={handleBladderNoteChange}*/}
-                {/*            />*/}
-                {/*        </Form.Item>*/}
-                {/*    )}*/}
-                {/*</Form.Item>*/}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={{ width: 150 }}>Addiction</label>
+                        <Checkbox.Group
+                            options={addictionOptions}
+                            value={caseSheet.personalHistory.addiction.option}
+                            onChange={(checkedValues) =>
+                                setCaseSheet((prev) => ({
+                                    ...prev,
+                                    personalHistory: {
+                                        ...prev.personalHistory,
+                                        addiction: {
+                                            ...prev.personalHistory.addiction,
+                                            option: checkedValues,
+                                            other: checkedValues.includes('Other') ? prev.personalHistory.addiction.other : '',
+                                        },
+                                    },
+                                }))
+                            }
+                        />
+                    </div>
 
-                {/*<Form.Item label="Addiction" name="addiction">*/}
-                {/*    <Checkbox.Group*/}
-                {/*        options={addictionOptions}*/}
-                {/*        value={caseSheet.addiction}*/}
-                {/*        onChange={handleAddictionChange}*/}
-                {/*    />*/}
-                {/*</Form.Item>*/}
+                    {caseSheet.personalHistory.addiction.option.includes('Other') && (
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <label style={{ width: 150 }}>Specify Other</label>
+                            <Input
+                                placeholder="Enter details"
+                                value={caseSheet.personalHistory.addiction.other}
+                                onChange={(e) =>
+                                    setCaseSheet((prev) => ({
+                                        ...prev,
+                                        personalHistory: {
+                                            ...prev.personalHistory,
+                                            addiction: {
+                                                ...prev.personalHistory.addiction,
+                                                other: e.target.value,
+                                            },
+                                        },
+                                    }))
+                                }
+                            />
+                        </div>
+                    )}
+                </div>
+
+
 
                 <Divider />
                 <Title level={5}>Physical Examination</Title>
 
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16}}>
+                    <label style={{ width: 150 }}>Pulse</label>
+                    <Input
+                        value={caseSheet.physicalExamination.pulse}
+                        onChange={(e) =>
+                            setCaseSheet((prev) => ({
+                                ...prev,
+                                physicalExamination: {
+                                    ...prev.physicalExamination,
+                                    pulse: e.target.value,
+                                },
+                            }))
+                        }
+                        style={{width:500}}
+                    />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>B/P</label>
+                    <Input
+                        value={caseSheet.physicalExamination.bp}
+                        onChange={(e) =>
+                            setCaseSheet((prev) => ({
+                                ...prev,
+                                physicalExamination: {
+                                    ...prev.physicalExamination,
+                                    bp: e.target.value,
+                                },
+                            }))
+                        }
+                        style={{width:500}}
+                    />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>Weight</label>
+                    <Input
+                        value={caseSheet.physicalExamination.weight}
+                        onChange={(e) =>
+                            setCaseSheet((prev) => ({
+                                ...prev,
+                                physicalExamination: {
+                                    ...prev.physicalExamination,
+                                    weight: e.target.value,
+                                },
+                            }))
+                        }
+                        style={{width:500}}
+                    />
+                </div>
 
                 <Divider />
-                {/*<Title level={5}>Special Examination</Title>*/}
-                {/*<Row gutter={[16, 16]}>*/}
-                {/*    {specialExamAreas.map((symptom) => (*/}
-                {/*        <Col span={24} key={symptom} style={{ display: 'flex', alignItems: 'center' }}>*/}
-                {/*            <div style={{ minWidth: 130, fontWeight: 'bold' }}>{symptom}</div>*/}
-                {/*            <div style={{ margin: '0 8px' }}>|</div>*/}
-                {/*            <Form.Item*/}
-                {/*                name={['specialExamination', symptom]}*/}
-                {/*                noStyle*/}
-                {/*                rules={[{ required: true, message: `Please select a side for ${symptom}` }]}*/}
-                {/*            >*/}
-                {/*                <Radio.Group*/}
-                {/*                    value={caseSheet.specialExamination[symptom]}*/}
-                {/*                    onChange={handleSpecialExamChange(symptom)}*/}
-                {/*                >*/}
-                {/*                    {examSides.map((side) => (*/}
-                {/*                        <Radio key={side} value={side}>*/}
-                {/*                            {side}*/}
-                {/*                        </Radio>*/}
-                {/*                    ))}*/}
-                {/*                </Radio.Group>*/}
-                {/*            </Form.Item>*/}
-                {/*        </Col>*/}
-                {/*    ))}*/}
-                {/*</Row>*/}
+                <Title level={5}>Investigations</Title>
 
-                {/*<Divider />*/}
-                {/*<Title level={5}>Investigations</Title>*/}
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>Blood Test</label>
+                    <Radio.Group
+                        value={caseSheet.investigation.bloodTest}
+                        onChange={(e) =>
+                            setCaseSheet((prev) => ({
+                                ...prev,
+                                investigation: {
+                                    ...prev.investigation,
+                                    bloodTest: e.target.value,
+                                },
+                            }))
+                        }
 
-                {/*<Form.Item*/}
+                    >
+                        <Radio value="FBC">FBC</Radio>
+                        <Radio value="ESR">ESR</Radio>
+                        <Radio value="CRP">CRP</Radio>
+                    </Radio.Group>
+                </div>
 
-                {/*    name='investigations'*/}
-                {/*>*/}
-                {/*    <Input.TextArea*/}
-                {/*        placeholder=""*/}
-                {/*        rows={3}*/}
-                {/*        value={caseSheet.bladder.note} // need change*/}
-                {/*        onChange={handleBladderNoteChange}*/}
-                {/*    />*/}
-                {/*</Form.Item>*/}
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>Imaging Test</label>
+                    <Radio.Group
+                        value={caseSheet.investigation.imagingTest}
+                        onChange={(e) =>
+                            setCaseSheet((prev) => ({
+                                ...prev,
+                                investigation: {
+                                    ...prev.investigation,
+                                    imagingTest: e.target.value,
+                                },
+                            }))
+                        }
+
+                    >
+                        <Radio value="X ray">X ray</Radio>
+                        <Radio value="MRI">MRI</Radio>
+                    </Radio.Group>
+                </div>
 
 
+                <Divider />
+                <Title level={5}>Differential Diagnosis</Title>
+                <Form.Item>
+                    <ReactQuill
+                        theme="snow"
+                        value={caseSheet.differentialDiagnosis}
+                        onChange={(e) =>
+                            setCaseSheet((prev) => ({
+                                ...prev,
+                                differentialDiagnosis: e.target.value,
+                            }))
+                        }
+                    />
+                </Form.Item>
 
+                <Divider />
+                <Title level={5}>Diagnosis</Title>
+                <DiseaseCodeSelect
+                    diseaseCodesFromDB={diseaseCodes}
+                    selectedDiseaseCodes={selectedDieaseCodes}
+                    setSelectedDiseaseCodes={setSelectedDieaseCodes}
+                />
 
-
-                {/*<Divider />*/}
-                {/*<Title level={5}>Differential Diagnosis</Title>*/}
-                {/*<Form.Item name="differentialdiagnosis">*/}
-                {/*    <ReactQuill*/}
-                {/*        theme="snow"*/}
-                {/*        value={differentialdiagnosis}*/}
-                {/*        onChange={(value) => {*/}
-                {/*            setDifferentialdiagnosis(value);*/}
-                {/*            form.setFieldsValue({ differentialdiagnosis: value });*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*</Form.Item>*/}
-
-                {/*<Divider />*/}
-                {/*<Title level={5}>Diagnosis</Title>*/}
-                {/*<DiseaseCodeSelect*/}
-                {/*    diseaseCodesFromDB={diseaseCodesFromDB}*/}
-                {/*    caseSheet={caseSheet}*/}
-                {/*    setCaseSheet={setCaseSheet}*/}
-                {/*/>*/}
-
-                {/*<Divider/>*/}
-                {/*<Title level={5}>Diagnosing AMA Condition</Title>*/}
-                {/*{amaQuestions.map(({ label, name, options }) => (*/}
-                {/*    <Form.Item*/}
-                {/*        key={name}*/}
-                {/*        name={['diagnosingAMA', name]}*/}
-                {/*        rules={[{ required: true, message: `Please select an option for ${label}` }]}*/}
-                {/*    >*/}
-                {/*        <Row align="middle" gutter={16}>*/}
-                {/*            <Col flex="150px">*/}
-                {/*                {label}*/}
-                {/*            </Col>*/}
-                {/*            <Col flex="auto">*/}
-                {/*                <Radio.Group*/}
-                {/*                    onChange={(e) =>*/}
-                {/*                        setCaseSheet((prev) => ({*/}
-                {/*                            ...prev,*/}
-                {/*                            diagnosingAMA: {*/}
-                {/*                                ...prev.diagnosingAMA,*/}
-                {/*                                [name]: e.target.value,*/}
-                {/*                            },*/}
-                {/*                        }))*/}
-                {/*                    }*/}
-                {/*                >*/}
-                {/*                    {options.map((opt) => (*/}
-                {/*                        <Radio key={opt} value={opt}>*/}
-                {/*                            {opt}*/}
-                {/*                        </Radio>*/}
-                {/*                    ))}*/}
-                {/*                </Radio.Group>*/}
-                {/*            </Col>*/}
-                {/*        </Row>*/}
-                {/*    </Form.Item>*/}
-                {/*))}*/}
+                <Divider/>
+                <Title level={5}>Diagnosing AMA Condition</Title>
+                {amaQuestions.map(({ label, name, options }) => (
+                    <Form.Item
+                        key={name}
+                        name={['diagnosingAMA', name]}
+                        rules={[{ required: true, message: `Please select an option for ${label}` }]}
+                    >
+                        <Row align="middle" gutter={16}>
+                            <Col flex="150px">
+                                {label}
+                            </Col>
+                            <Col flex="auto">
+                                <Radio.Group
+                                    onChange={(e) =>
+                                        setCaseSheet((prev) => ({
+                                            ...prev,
+                                            diagnosingAMA: {
+                                                ...prev.diagnosingAMA,
+                                                [name]: e.target.value,
+                                            },
+                                        }))
+                                    }
+                                >
+                                    {options.map((opt) => (
+                                        <Radio key={opt} value={opt}>
+                                            {opt}
+                                        </Radio>
+                                    ))}
+                                </Radio.Group>
+                            </Col>
+                        </Row>
+                    </Form.Item>
+                ))}
 
                 <Divider />
                 <Title level={5}>Treatments</Title>
                 <TreatmentSelect
-                    treatmentsFromDB={treatmentsFromDB}
-                    caseSheet={caseSheet}
-                    setCaseSheet={setCaseSheet}
+                    treatmentsFromDB={treatments}
+                    treatments={selectedTreatments}
+                    setTreatments={setSelectedTreatments}
                 />
 
                 <Divider />
@@ -1077,14 +1099,14 @@ function StreeRogaForm() {
                         <Select
                             showSearch
                             placeholder="Select drug"
-                            style={{ width: 160 }}
+                            style={{ width: 250 }}
                             onChange={(value) => {
-                                const selected = drugList.find((d) => d.id === value);
+                                const selected = drugs.find((d) => d.id === value);
                                 setCurrentDrug(selected);
                             }}
                             value={currentDrug?.id}
                         >
-                            {drugList.map((drug) => (
+                            {drugs.map((drug) => (
                                 <Select.Option key={drug.id} value={drug.id}>
                                     {drug.name}
                                 </Select.Option>
@@ -1130,7 +1152,6 @@ function StreeRogaForm() {
                     </Form.Item>
                 </Form>
 
-                {/*TODO : Next Visit Date - Specific Date selection */}
 
                 <List
                     style={{ marginBottom: '16px' }}
@@ -1147,6 +1168,35 @@ function StreeRogaForm() {
                         </List.Item>
                     )}
                 />
+
+                <Divider/>
+
+                <ClinicSelect
+                    clinicsFromDB={clinics}
+                    selectedClinics={selectedClinic}
+                    setSelectedClinics={setSelectedClinic}
+                />
+
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>Next Visit Date</label>
+                    <DatePicker
+                        format="YYYY-MM-DD"
+                        value={nextVisitDate}
+                        onChange={(date, dateString) => setNextVisitDate(dateString)}
+                        style={{ width: 200 }}
+                    />
+                </div>
+
+                <div style={{marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>Remark</label>
+                    <ReactQuill
+                        theme="snow"
+                        value={remark}
+                        onChange={(value) => setRemark(value)}
+                    />
+                </div>
+
+                <Divider />
 
                 <Form.Item>
                     <Button variant="solid" color="default" htmlType="submit">

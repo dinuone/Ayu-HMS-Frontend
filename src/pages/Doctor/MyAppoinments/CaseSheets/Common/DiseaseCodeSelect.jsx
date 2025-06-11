@@ -3,19 +3,13 @@ import { Form, Select } from 'antd';
 
 const { Option } = Select;
 
-function DiseaseCodeSelect({ diseaseCodesFromDB, caseSheet, setCaseSheet }) {
-    // Map selected disease code IDs to full objects
+function DiseaseCodeSelect({ diseaseCodesFromDB, selectedDiseaseCodes, setSelectedDiseaseCodes }) {
     const handleChange = (selectedIds) => {
-        const selectedDiseaseCodes = diseaseCodesFromDB.filter(dc => selectedIds.includes(dc.id));
-
-        setCaseSheet((prev) => ({
-            ...prev,
-            diseaseCodes: selectedDiseaseCodes,
-        }));
+        const selected = diseaseCodesFromDB.filter(dc => selectedIds.includes(dc.id));
+        setSelectedDiseaseCodes(selected);
     };
 
-    // Selected disease code IDs from caseSheet
-    const selectedIds = (caseSheet.diseaseCodes || []).map(dc => dc.id);
+    const selectedIds = (selectedDiseaseCodes || []).map(dc => dc.id);
 
     return (
         <Form.Item label="Disease Codes" name="diseaseCodes">
