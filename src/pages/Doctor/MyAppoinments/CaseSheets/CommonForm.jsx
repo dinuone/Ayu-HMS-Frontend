@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
 import {Descriptions, Divider, Flex, Form, Input, Radio} from 'antd';
 import { Typography } from "antd";
-import VericoseVeinsForm from "./VericoseVein/VericoseVeinsForm.jsx";
+import StreeRogaForm from "./StreeRoga/StreeRogaForm.jsx";
+import BodyParts from "./StreeRoga/BodyParts.jsx";
 
 const { Title, Text } = Typography;
 
 const options = [
     { label: 'General', value: 'General' },
-    { label: 'Vericose Veins', value: 'Vericose Veins' },
     { label: 'Stree Roga', value: 'Stree Roga' },
-    { label: 'Skin Lesion', value: 'Skin Lesion' },
+
 ];
 
 function CommonForm({ visitData, patientData }) {
@@ -107,7 +107,9 @@ function CommonForm({ visitData, patientData }) {
 
                 <Divider/>
 
-                {selectedCategory === 'Vericose Veins' && ( <VericoseVeinsForm/> )}
+
+
+                {selectedCategory === 'Stree Roga' && ( <StreeRogaForm/> )}
 
             </div>
         </Flex>

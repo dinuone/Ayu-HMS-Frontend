@@ -249,16 +249,16 @@ function PatientVisitView() {
                                 </Card>
                             )}
 
-                            <Divider />
+                            {/*<Divider />*/}
 
-                            <Space>
-                                <Button type="primary" icon={<PrinterOutlined />}>
-                                    Print Summary
-                                </Button>
-                                <Button icon={<MailOutlined />}>
-                                    Send to Patient
-                                </Button>
-                            </Space>
+                            {/*<Space>*/}
+                            {/*    <Button type="primary" icon={<PrinterOutlined />}>*/}
+                            {/*        Print Summary*/}
+                            {/*    </Button>*/}
+                            {/*    <Button icon={<MailOutlined />}>*/}
+                            {/*        Send to Patient*/}
+                            {/*    </Button>*/}
+                            {/*</Space>*/}
                         </Space>
                     </Card>
                 </Col>

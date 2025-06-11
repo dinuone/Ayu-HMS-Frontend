@@ -99,23 +99,23 @@ function ViewAppointment(props) {
     return (
         <div>
             <Row gutter={[24, 24]}>
-                <Col span={24}>
-                    <Title level={3} style={{ marginBottom: 0 }}>
-                        Chit Number: <Tag color="blue" style={{ fontSize: '1rem' }}>{visitData.chit_number}</Tag>
-                    </Title>
-                    <Divider />
-                </Col>
+
 
                 <Col span={24}>
                     <Card
                         loading={loading}
                         style={{ borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
                     >
+                        <Title level={3} style={{ marginBottom: 0, }} >
+                            CHIT NUMBER : <Tag color="blue" style={{ fontSize: '1rem' }}>{visitData.chit_number}</Tag>
+                        </Title>
+                        <Divider />
+
                         <Tabs
                             activeKey={activeTab}
                             onChange={setActiveTab}
                             tabPosition="left"
-                            style={{ minHeight: '600px' }}
+
                         >
                             {/* PATIENT INFORMATION TAB */}
                             <TabPane
