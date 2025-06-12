@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     Form,
     Input,
@@ -20,7 +20,6 @@ import 'react-quill/dist/quill.snow.css';
 import TreatmentSelect from "../Common/TreatmentSelect.jsx";
 import DiseaseCodeSelect from "../Common/DiseaseCodeSelect.jsx";
 import {PlusOutlined} from "@ant-design/icons";
-import dayjs from "dayjs";
 import api from "../../../../../Services/NetworkManager.js";
 import ClinicSelect from "../Common/ClinicSelect.jsx";
 
@@ -64,25 +63,28 @@ const amaQuestions = [
 ];
 
 function StreeRogaForm() {
-    const [form] = Form.useForm();
+    const formRef = useRef();;
+
 
     const [showOtherInput, setShowOtherInput] = useState(false);
     const [prescription, setPrescription] = useState([]); // standalone
     const [currentDrug, setCurrentDrug] = useState(null);
     const [qty, setQty] = useState('');
     const [instruction, setInstruction] = useState('');
+    const [duration, setDuration] = useState('')
 
     const [loading , setLoading] = useState(true);
     const [diseaseCodes, setDiseaseCodes] = useState([]);
     const [treatments, setTreatments] = useState([]);
     const [drugs, setDrugs] = useState([]);
     const [clinics, setClinics] = useState([]);
-    const [nextVisitDate,setNextVisitDate]= useState(null);
+    const [nextVisitDate,setNextVisitDate]= useState('');
     const [remark,setRemark]= useState(null);
 
     const [selectedTreatments, setSelectedTreatments] = useState([]);
     const [selectedDieaseCodes, setSelectedDieaseCodes] = useState([]);
     const [selectedClinic, setSelectedClinic] = useState([]);
+
 
     const [caseSheet, setCaseSheet] = useState({
         chiefComplaint: '',
@@ -150,9 +152,6 @@ function StreeRogaForm() {
             other:''
         },
         differentialDiagnosis:'',
-        treatments: [],
-        diseaseCodes: [],
-        prescription: [],
         diagnosingAMA:{}
 
     });
@@ -187,74 +186,50 @@ function StreeRogaForm() {
         setCaseSheet((prev) => ({ ...prev, prescription: updated }));
     };
 
-    const handleEdit = (index) => {
-        const item = prescription[index];
-        setCurrentDrug({ id: item.id, name: item.name });
-        setQty(item.qty);
-        setInstruction(item.instruction);
-
-        // Remove the old one so it can be updated on re-add
-        const updated = prescription.filter((_, i) => i !== index);
-        setPrescription(updated);
-        setCaseSheet((prev) => ({ ...prev, prescription: updated }));
-    };
 
 
-    const onFinish = (values) => {
-        const finalCaseSheet = {
-            ...caseSheet,
-            chiefComplaint: values.chiefComplaint,
-            otherComplaints: values.otherComplaints || [],
-            username: values.username,
-        };
-
-        setCaseSheet(finalCaseSheet);
-        console.log('📄 Final Case Sheet:', finalCaseSheet);
-        message.success('Form submitted successfully!');
-        // You can now pass `finalCaseSheet` to parent or API
-    };
+    const handleSubmit = async () => {
+        console.log("casesheet ----",caseSheet)
+        console.log("prescription ----",prescription)
+        console.log("selectedTreatments ----",selectedTreatments)
+        console.log("selectedClinic ----",selectedClinic)
+        console.log("selectedDieaseCodes ----",selectedDieaseCodes)
+        console.log("next visit date ---",nextVisitDate)
+    }
 
     return (
-        <Card loading={loading}>
-            <Form
+        <Card loading={loading} ref={formRef}>
 
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                autoComplete="off"
-            >
                 <Title level={5}>Chief Complaint</Title>
-                <Form.Item name="chiefComplaint">
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.chiefComplaint}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                chiefComplaint: e.target.value,
-                            }))
-                        }
-                    />
-                </Form.Item>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.chiefComplaint}
+                    onChange={(value) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            chiefComplaint: value,
+                        }))
+                    }
+
+                />
 
                 <Divider />
                 <Title level={5}>Other Complaint</Title>
-                <Form.Item name="otherComplaints" >
-                    <Checkbox.Group
-                        options={otherComplaintOptions}
-                        value={caseSheet.selectedOtherComplaints}
-                        onChange={(checkedValues) => {
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                selectedOtherComplaints: checkedValues,
-                            }));
-                            setShowOtherInput(checkedValues.includes('Other'));
-                        }}
-                    />
-                </Form.Item>
+                <Checkbox.Group
+                    options={otherComplaintOptions}
+                    value={caseSheet.selectedOtherComplaints}
+                    onChange={(checkedValues) => {
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            selectedOtherComplaints: checkedValues,
+                        }));
+                        setShowOtherInput(checkedValues.includes('Other'));
+                    }}
+                />
 
                 {showOtherInput && (
-                    <Form.Item label="Please specify">
+                    <>
+                        <label style={{ width: 200 }}>Please specify</label>
                         <Input
                             value={caseSheet.otherComplaintDetail}
                             onChange={(e) =>
@@ -264,7 +239,8 @@ function StreeRogaForm() {
                                 }))
                             }
                         />
-                    </Form.Item>
+                    </>
+
                 )}
 
                 <Divider />
@@ -523,15 +499,17 @@ function StreeRogaForm() {
                 <ReactQuill
                     theme="snow"
                     value={caseSheet.obstetricHistory.contraceptiveHistory}
-                    onChange={(e) =>
+                    onChange={(value) =>
                         setCaseSheet((prev) => ({
                             ...prev,
                             obstetricHistory: {
                                 ...prev.obstetricHistory,
-                                contraceptiveHistory: e.target.value,
+                                contraceptiveHistory: value,
                             },
                         }))
                     }
+
+
                 />
 
 
@@ -559,63 +537,56 @@ function StreeRogaForm() {
                 </div>
 
 
-                <Form.Item
-                    label="Progression"
-                    name='progression'
-                >
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.historyOfPresentIllness.progression}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                historyOfPresentIllness: {
-                                    ...prev.historyOfPresentIllness,
-                                    progression: e.target.value,
-                                },
-                            }))
-                        }
-                    />
 
-                </Form.Item>
+                <label style={{ width: 200 }}>Progression</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.historyOfPresentIllness.progression}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            historyOfPresentIllness: {
+                                ...prev.historyOfPresentIllness,
+                                progression: e.target.value,
+                            },
+                        }))
+                    }
+                />
 
-                <Form.Item
-                    label="Previous treatment"
-                    name='previousTreatment'
-                >
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.historyOfPresentIllness.previousTreatment}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                historyOfPresentIllness: {
-                                    ...prev.historyOfPresentIllness,
-                                    previousTreatment: e.target.value,
-                                },
-                            }))
-                        }
-                    />
-                </Form.Item>
+
+                <label style={{ width: 200 }}>Previous treatment</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.historyOfPresentIllness.previousTreatment}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            historyOfPresentIllness: {
+                                ...prev.historyOfPresentIllness,
+                                previousTreatment: e.target.value,
+                            },
+                        }))
+                    }
+                />
 
                 <Divider />
                 <Title level={5}>Previous Medical History</Title>
-                <Form.Item label="Previous joint problems" name="previousJoinProblem">
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.previousMedicalHistory.previousJointProblem}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                previousMedicalHistory: {
-                                    ...prev.previousMedicalHistory,
-                                    previousJointProblem: e.target.value,
-                                },
-                            }))
-                        }
 
-                    />
-                </Form.Item>
+                <label style={{ width: 200 }}>Previous joint problems</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.previousMedicalHistory.previousJointProblem}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            previousMedicalHistory: {
+                                ...prev.previousMedicalHistory,
+                                previousJointProblem: e.target.value,
+                            },
+                        }))
+                    }
+
+                />
 
                 <label style={{ width: 150 }}>Other Major Illness</label>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
@@ -698,53 +669,50 @@ function StreeRogaForm() {
                     />
                 </div>
 
-                <Form.Item label="Surgeries" name="surgeries">
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.previousMedicalHistory.surgeries}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                previousMedicalHistory: {
-                                    ...prev.previousMedicalHistory,
-                                    surgeries: e.target.value,
-                                },
-                            }))
-                        }
-                    />
-                </Form.Item>
+                <label style={{ width: 200 }}>Surgeries</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.previousMedicalHistory.surgeries}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            previousMedicalHistory: {
+                                ...prev.previousMedicalHistory,
+                                surgeries: e.target.value,
+                            },
+                        }))
+                    }
+                />
 
-                <Form.Item label="Allergies" name="allergies">
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.previousMedicalHistory.allergies}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                previousMedicalHistory: {
-                                    ...prev.previousMedicalHistory,
-                                    allergies: e.target.value,
-                                },
-                            }))
-                        }
-                    />
-                </Form.Item>
+                <label style={{ width: 200 }}>Allergies</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.previousMedicalHistory.allergies}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            previousMedicalHistory: {
+                                ...prev.previousMedicalHistory,
+                                allergies: e.target.value,
+                            },
+                        }))
+                    }
+                />
 
-                <Form.Item label="Family history" name="faimlyHistory">
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.previousMedicalHistory.familyHistory}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                previousMedicalHistory: {
-                                    ...prev.previousMedicalHistory,
-                                    familyHistory: e.target.value,
-                                },
-                            }))
-                        }
-                    />
-                </Form.Item>
+                <label style={{ width: 200 }}>Family history</label>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.previousMedicalHistory.familyHistory}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            previousMedicalHistory: {
+                                ...prev.previousMedicalHistory,
+                                familyHistory: e.target.value,
+                            },
+                        }))
+                    }
+                />
 
                 <Divider />
                 <Title level={5}>Personal History</Title>
@@ -1028,18 +996,16 @@ function StreeRogaForm() {
 
                 <Divider />
                 <Title level={5}>Differential Diagnosis</Title>
-                <Form.Item>
-                    <ReactQuill
-                        theme="snow"
-                        value={caseSheet.differentialDiagnosis}
-                        onChange={(e) =>
-                            setCaseSheet((prev) => ({
-                                ...prev,
-                                differentialDiagnosis: e.target.value,
-                            }))
-                        }
-                    />
-                </Form.Item>
+                <ReactQuill
+                    theme="snow"
+                    value={caseSheet.differentialDiagnosis}
+                    onChange={(e) =>
+                        setCaseSheet((prev) => ({
+                            ...prev,
+                            differentialDiagnosis: e.target.value,
+                        }))
+                    }
+                />
 
                 <Divider />
                 <Title level={5}>Diagnosis</Title>
@@ -1052,36 +1018,30 @@ function StreeRogaForm() {
                 <Divider/>
                 <Title level={5}>Diagnosing AMA Condition</Title>
                 {amaQuestions.map(({ label, name, options }) => (
-                    <Form.Item
-                        key={name}
-                        name={['diagnosingAMA', name]}
-                        rules={[{ required: true, message: `Please select an option for ${label}` }]}
-                    >
-                        <Row align="middle" gutter={16}>
-                            <Col flex="150px">
-                                {label}
-                            </Col>
-                            <Col flex="auto">
-                                <Radio.Group
-                                    onChange={(e) =>
-                                        setCaseSheet((prev) => ({
-                                            ...prev,
-                                            diagnosingAMA: {
-                                                ...prev.diagnosingAMA,
-                                                [name]: e.target.value,
-                                            },
-                                        }))
-                                    }
-                                >
-                                    {options.map((opt) => (
-                                        <Radio key={opt} value={opt}>
-                                            {opt}
-                                        </Radio>
-                                    ))}
-                                </Radio.Group>
-                            </Col>
-                        </Row>
-                    </Form.Item>
+                    <Row key={name} align="middle" gutter={16}>
+                        <Col flex="150px">
+                            {label}
+                        </Col>
+                        <Col flex="auto">
+                            <Radio.Group
+                                onChange={(e) =>
+                                    setCaseSheet((prev) => ({
+                                        ...prev,
+                                        diagnosingAMA: {
+                                            ...prev.diagnosingAMA,
+                                            [name]: e.target.value,
+                                        },
+                                    }))
+                                }
+                            >
+                                {options.map((opt) => (
+                                    <Radio key={opt} value={opt}>
+                                        {opt}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Col>
+                    </Row>
                 ))}
 
                 <Divider />
@@ -1094,8 +1054,9 @@ function StreeRogaForm() {
 
                 <Divider />
                 <Title level={5}>Prescription</Title>
-                <Form layout="inline" style={{ marginBottom: '16px' }}>
-                    <Form.Item label="Drug Name">
+                <Row gutter={16} style={{ marginBottom: '16px' }} align="middle">
+                    <Col>
+                        <label>Drug Name</label>
                         <Select
                             showSearch
                             placeholder="Select drug"
@@ -1112,21 +1073,32 @@ function StreeRogaForm() {
                                 </Select.Option>
                             ))}
                         </Select>
-                    </Form.Item>
-                    <Form.Item label="Qty">
-                        <Input value={qty} onChange={(e) => setQty(e.target.value)} style={{ width: 80 }} />
-                    </Form.Item>
-                    <Form.Item label="Instruction">
+                    </Col>
+
+                    <Col>
+                        <label>Qty</label>
+                        <Input
+                            value={qty}
+                            onChange={(e) => setQty(e.target.value)}
+                            style={{ width: 80 }}
+                        />
+                    </Col>
+
+                    <Col>
+                        <label>Instruction</label>
                         <Input value={instruction} onChange={(e) => setInstruction(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item label="Duration">
-                        <Input value={instruction} onChange={(e) => setInstruction(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item label="Action">
+                    </Col>
+
+                    <Col>
+                        <label>Duration</label>
+                        <Input value={duration} onChange={(e) => setDuration(e.target.value)} />
+                    </Col>
+
+                    <Col>
+                        <label>&nbsp;</label> {/* For spacing */}
                         <Button
                             icon={<PlusOutlined />}
-                            variant="solid"
-                            color="orange"
+                            type="primary"
                             onClick={() => {
                                 if (!currentDrug || !qty || !instruction) return;
 
@@ -1135,22 +1107,21 @@ function StreeRogaForm() {
                                     name: currentDrug.name,
                                     qty,
                                     instruction,
+                                    duration
                                 };
 
                                 const updatedList = [...prescription, newEntry];
                                 setPrescription(updatedList);
-                                setCaseSheet((prev) => ({ ...prev, prescription: updatedList }));
-
-                                // Clear fields
                                 setCurrentDrug(null);
                                 setQty('');
                                 setInstruction('');
+                                setDuration('');
                             }}
                         >
                             Add
                         </Button>
-                    </Form.Item>
-                </Form>
+                    </Col>
+                </Row>
 
 
                 <List
@@ -1160,11 +1131,10 @@ function StreeRogaForm() {
                     renderItem={(item, index) => (
                         <List.Item
                             actions={[
-                                <Button size="small" onClick={() => handleEdit(index)}>Edit</Button>,
                                 <Button size="small" danger onClick={() => handleRemove(index)}>Remove</Button>
                             ]}
                         >
-                            {item.name} - Qty: {item.qty}, Instruction: {item.instruction}
+                            {item.name} - Qty: {item.qty}, Instruction: {item.instruction},  Duration : {item.duration}
                         </List.Item>
                     )}
                 />
@@ -1181,7 +1151,6 @@ function StreeRogaForm() {
                     <label style={{ width: 150 }}>Next Visit Date</label>
                     <DatePicker
                         format="YYYY-MM-DD"
-                        value={nextVisitDate}
                         onChange={(date, dateString) => setNextVisitDate(dateString)}
                         style={{ width: 200 }}
                     />
@@ -1198,12 +1167,15 @@ function StreeRogaForm() {
 
                 <Divider />
 
-                <Form.Item>
-                    <Button variant="solid" color="default" htmlType="submit">
+
+
+                <div style={{ marginTop: 16, display: 'flex', gap: 16 }}>
+
+                    <Button variant="solid" color="default" onClick={() => handleSubmit()}>
                         Submit Case Sheet
                     </Button>
-                </Form.Item>
-            </Form>
+                </div>
+
         </Card>
 
     );
