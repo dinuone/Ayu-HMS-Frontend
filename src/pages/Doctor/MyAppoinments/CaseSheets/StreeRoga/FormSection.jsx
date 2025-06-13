@@ -1,7 +1,7 @@
 // FormSections.jsx
 import React, { memo } from 'react';
 import { Divider, Typography } from 'antd';
-import ChiefComplaint from './sections/ChiefComplaint';
+import ChiefComplaint from './Sections/ChiefComplaint.jsx';
 import OtherComplaint from "./Sections/OtherComplaint.jsx";
 import MenstrualHistory from "./Sections/MenstrualHistory.jsx";
 import ObstetricHistory from "./Sections/ObstetricHistory.jsx";
