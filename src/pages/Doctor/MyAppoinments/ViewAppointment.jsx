@@ -65,6 +65,8 @@ function ViewAppointment(props) {
         return gender === 'Male' ? <ManOutlined /> : <WomanOutlined />;
     };
 
+    console.log(visitData)
+
     return (
         <div>
             <Row gutter={[24, 24]}>
@@ -200,7 +202,7 @@ function ViewAppointment(props) {
                                     <Col span={24}>
                                         <Title level={4} style={{ marginTop: '24px' }}>Previous Visits</Title>
                                         <Divider/>
-                                        <PreviousVisits patientId={visitData.patient_data.id}/>
+                                        <PreviousVisits patientId={visitData?.patient_data?.id}/>
                                     </Col>
                                 </Row>
 
