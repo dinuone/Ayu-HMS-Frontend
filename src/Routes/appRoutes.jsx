@@ -23,6 +23,7 @@ import PatientVisitList from "../pages/PatientVisit/PatientVisitList.jsx";
 import PatientVisitView from "../pages/PatientVisit/PatientVisitView.jsx";
 import MyAppoinmentList from "../pages/Doctor/MyAppoinments/MyAppoinmentList.jsx";
 import ViewAppointment from "../pages/Doctor/MyAppoinments/ViewAppointment.jsx";
+import InvoiceView from "../pages/PatientVisit/InvoiceView.jsx";
 
 // Lazy load components
 const UserList = React.lazy(() => import("../pages/User/UserList.jsx"));
@@ -71,6 +72,7 @@ export default function AppRoutes (){
                 {path: 'view-patient-visit/:visitId',element:<PatientVisitView/>},
                 {path: 'my-appointment-list',element:<MyAppoinmentList/>},
                 {path: 'view-appointment/:visitId',element:<ViewAppointment/>},
+                {path: 'view-invoice/:invoiceNo',element:<InvoiceView/>},
             ],
         },
         {

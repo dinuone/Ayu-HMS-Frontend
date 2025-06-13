@@ -31,6 +31,7 @@ import {
     FileTextOutlined
 } from '@ant-design/icons';
 import CommonForm from "./CaseSheets/CommonForm.jsx";
+import PreviousVisits from "./PreviousVisits.jsx";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -64,58 +65,26 @@ function ViewAppointment(props) {
         return gender === 'Male' ? <ManOutlined /> : <WomanOutlined />;
     };
 
-    const visitHistoryColumns = [
-        {
-            title: 'Date',
-            dataIndex: 'visit_date',
-            key: 'visit_date',
-        },
-        {
-            title: 'Doctor',
-            dataIndex: 'doctor_name',
-            key: 'doctor_name',
-        },
-        {
-            title: 'Type',
-            dataIndex: 'visit_type',
-            key: 'visit_type',
-            render: (text) => <Tag color={text === 'Clinic' ? 'geekblue' : 'green'}>{text}</Tag>
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            render: (text) => (
-                <Tag color={
-                    text === 'PENDING' ? 'orange' :
-                        text === 'COMPLETED' ? 'green' : 'red'
-                }>
-                    {text}
-                </Tag>
-            )
-        },
-    ];
-
     return (
         <div>
             <Row gutter={[24, 24]}>
-                <Col span={24}>
-                    <Title level={3} style={{ marginBottom: 0 }}>
-                        Chit Number: <Tag color="blue" style={{ fontSize: '1rem' }}>{visitData.chit_number}</Tag>
-                    </Title>
-                    <Divider />
-                </Col>
+
 
                 <Col span={24}>
                     <Card
                         loading={loading}
                         style={{ borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
                     >
+                        <Title level={3} style={{ marginBottom: 0, }} >
+                            CHIT NUMBER : <Tag color="blue" style={{ fontSize: '1rem' }}>{visitData.chit_number}</Tag>
+                        </Title>
+                        <Divider />
+
                         <Tabs
                             activeKey={activeTab}
                             onChange={setActiveTab}
                             tabPosition="left"
-                            style={{ minHeight: '600px' }}
+
                         >
                             {/* PATIENT INFORMATION TAB */}
                             <TabPane
@@ -158,9 +127,9 @@ function ViewAppointment(props) {
                                             <Descriptions.Item label={<span>{getGenderIcon(visitData.patient_data?.gender)} Gender/Age</span>}>
                                                 {visitData.patient_data?.gender}, {visitData.patient_data?.age} yrs
                                             </Descriptions.Item>
-                                            <Descriptions.Item label={<span><HeartOutlined /> Weight</span>}>
-                                                {visitData.patient_data?.weight} kg
-                                            </Descriptions.Item>
+                                            {/*<Descriptions.Item label={<span><HeartOutlined /> Weight</span>}>*/}
+                                            {/*    {visitData.patient_data?.weight} kg*/}
+                                            {/*</Descriptions.Item>*/}
                                             <Descriptions.Item label={<span><PhoneOutlined /> Contact</span>}>
                                                 {visitData.patient_data?.contact_no}
                                             </Descriptions.Item>
@@ -189,67 +158,69 @@ function ViewAppointment(props) {
                                 }
                                 key="2"
                             >
+
                                 <Row gutter={[16, 16]}>
-                                    <Col span={24}>
-                                        <Title level={4}>Current Visit</Title>
-                                        <Descriptions column={2} bordered size="small">
-                                            <Descriptions.Item label="Visit Date">
-                                                {visitData.visit_date}
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label="Visit Type">
-                                                <Tag color={visitData.visit_type === 'Clinic' ? 'geekblue' : 'green'}>
-                                                    {visitData.visit_type}
-                                                </Tag>
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label="Patient Type">
-                                                <Tag color={visitData.patient_type === 'Normal' ? 'blue' : 'gold'}>
-                                                    {visitData.patient_type}
-                                                </Tag>
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label="Clinic Category">
-                                                {visitData.clinic_category}
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label="Doctor">
-                                                {visitData.doctor_name}
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label="Status">
-                                                <Tag
-                                                    color={
-                                                        visitData.status === 'PENDING' ? 'orange' :
-                                                            visitData.status === 'COMPLETED' ? 'green' : 'red'
-                                                    }
-                                                >
-                                                    {visitData.status}
-                                                </Tag>
-                                            </Descriptions.Item>
-                                        </Descriptions>
-                                    </Col>
+                                    {visitData.status === "PENDING" && (
+                                        <Col span={24}>
+                                            <Title level={4}>Current Visit</Title>
+                                            <Descriptions column={2} bordered size="small">
+                                                <Descriptions.Item label="Visit Date">
+                                                    {visitData.visit_date}
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label="Visit Type">
+                                                    <Tag color={visitData.visit_type === 'Clinic' ? 'geekblue' : 'green'}>
+                                                        {visitData.visit_type}
+                                                    </Tag>
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label="Patient Type">
+                                                    <Tag color={visitData.patient_type === 'Normal' ? 'blue' : 'gold'}>
+                                                        {visitData.patient_type}
+                                                    </Tag>
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label="Clinic Category">
+                                                    {visitData.clinic_category}
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label="Doctor">
+                                                    {visitData.doctor_name}
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label="Status">
+                                                    <Tag
+                                                        color={
+                                                            visitData.status === 'PENDING' ? 'orange' :
+                                                                visitData.status === 'COMPLETED' ? 'green' : 'red'
+                                                        }
+                                                    >
+                                                        {visitData.status}
+                                                    </Tag>
+                                                </Descriptions.Item>
+                                            </Descriptions>
+                                        </Col>
+                                    )}
 
                                     <Col span={24}>
                                         <Title level={4} style={{ marginTop: '24px' }}>Previous Visits</Title>
-                                        <Table
-                                            columns={visitHistoryColumns}
-                                            dataSource={[]} // Replace with actual visit history data
-                                            rowKey="id"
-                                            pagination={false}
-                                            bordered
-                                        />
+                                        <Divider/>
+                                        <PreviousVisits patientId={visitData.patient_data.id}/>
                                     </Col>
                                 </Row>
+
                             </TabPane>
 
                             {/* DIAGNOSIS TAB */}
-                            <TabPane
-                                tab={<span><MedicineBoxOutlined />Diagnosis</span>}
-                                key="3"
-                            >
-                                <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: 16 }}>
-                                    <CommonForm
-                                        visitData={visitData}
-                                        patientData={visitData.patient_data}
-                                    />
-                                </div>
-                            </TabPane>
+                            {visitData.status === "PENDING" && (
+                                <TabPane
+                                    tab={<span><MedicineBoxOutlined />Diagnosis</span>}
+                                    key="3"
+                                >
+                                    <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: 16 }}>
+                                        <CommonForm
+                                            visitData={visitData}
+                                            patientData={visitData.patient_data}
+                                        />
+                                    </div>
+                                </TabPane>
+                           )}
+
                         </Tabs>
                     </Card>
                 </Col>

@@ -186,6 +186,7 @@ const DrugList = () => {
 
         const exportColumns = [
             { title: 'Drug Name', dataIndex: 'name' },
+            { title: 'Drug Code', dataIndex: 'drug_code' },
             { title: 'Unit Price', dataIndex: 'unit_price' },
             { title: 'Drug Category', dataIndex: 'drug_category' },
             { title: 'Brand', dataIndex: 'brand' },
@@ -201,6 +202,10 @@ const DrugList = () => {
         {
             title: 'Drug Name',
             dataIndex: 'name',
+        },
+        {
+            title: 'Drug Code',
+            dataIndex: 'drug_code',
         },
         {
             title: 'Unit Price',

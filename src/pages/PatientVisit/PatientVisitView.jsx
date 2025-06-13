@@ -31,7 +31,7 @@ import {
     CheckCircleOutlined,
     CloseCircleOutlined, DashboardOutlined
 } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import api from "../../Services/NetworkManager.js";
 
 const { Title, Text } = Typography;
@@ -40,6 +40,7 @@ function PatientVisitView() {
     const [loading, setLoading] = useState(false);
     const [visitData, setVisitData] = useState({});
     const { visitId } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         FetchVisitData();
@@ -86,6 +87,12 @@ function PatientVisitView() {
                 {status}
             </Tag>
         );
+    };
+
+    const handleViewInvoice = () => {
+        navigate(`/view-invoice/${visitData.invoice.invoice_no}`, {
+            state: { invoice: visitData.invoice }
+        });
     };
 
     return (
@@ -249,20 +256,86 @@ function PatientVisitView() {
                                 </Card>
                             )}
 
-                            <Divider />
+                            {/*<Divider />*/}
 
-                            <Space>
-                                <Button type="primary" icon={<PrinterOutlined />}>
-                                    Print Summary
-                                </Button>
-                                <Button icon={<MailOutlined />}>
-                                    Send to Patient
-                                </Button>
-                            </Space>
+                            {/*<Space>*/}
+                            {/*    <Button type="primary" icon={<PrinterOutlined />}>*/}
+                            {/*        Print Summary*/}
+                            {/*    </Button>*/}
+                            {/*    <Button icon={<MailOutlined />}>*/}
+                            {/*        Send to Patient*/}
+                            {/*    </Button>*/}
+                            {/*</Space>*/}
                         </Space>
                     </Card>
+
+                    <Card
+                        title={
+                            <Space>
+                                <FileTextOutlined style={{ fontSize: 22, color: "#faad14" }} />
+                                <Title level={5} style={{ margin: 0 }}>Invoice</Title>
+                            </Space>
+                        }
+                        style={{
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                            marginTop: 24,
+                            background: '#fff'
+                        }}
+                        headStyle={{ borderBottom: 0 }}
+                    >
+                        {visitData.invoice?.invoice_no ? (
+                            <div
+                                onClick={handleViewInvoice}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    padding: '20px 24px',
+                                    background: '#ffffff',
+                                    border: '1px solid #d9d9d9',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                                    transition: 'all 0.3s ease',
+                                    gap: '16px',
+                                    width: '100%',
+                                    maxWidth: '500px',
+                                    margin: '16px 0'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'}
+                                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'}
+                            >
+                                <div
+                                    style={{
+                                        backgroundColor: '#fffbe6',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    <FileTextOutlined style={{ fontSize: 36, color: '#faad14' }} />
+                                </div>
+                                <div>
+                                    <Text strong style={{ fontSize: 16, color: '#262626' }}>
+                                        {visitData.invoice.invoice_no}
+                                    </Text>
+                                    <br />
+                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                        Click to view the invoice
+                                    </Text>
+                                </div>
+                            </div>
+                        ) : (
+                            <Text type="secondary">No invoice available for this visit</Text>
+                        )}
+
+                    </Card>
                 </Col>
+
             </Row>
+
         </div>
     );
 }

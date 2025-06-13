@@ -107,7 +107,7 @@ export default function DashboardLayout({ children }) {
       icon: <DashboardOutlined />,
       label: 'Dashboard',
       path: '/dashboard',
-      roles: ["SuperAdmin", "Branch Admin", "Doctor", "Ticketing Officer", "MOI"]
+      roles: ["SuperAdmin", "Branch Admin", "Doctor", "Coordinator", "MOI"]
     },
     {
       key: '2',
@@ -215,14 +215,14 @@ export default function DashboardLayout({ children }) {
       icon: <UserAddOutlined />,
       label: 'Patients Management',
       path: '/patients',
-      roles: ["SuperAdmin", "Branch Admin", "Ticketing Officer"]
+      roles: ["SuperAdmin", "Branch Admin", "Coordinator"]
     },
     {
       key: '7',
       icon: <FaHospitalUser />,
       label: 'Patients Visit',
       path: '/patients-visit',
-      roles: ["SuperAdmin", "Branch Admin", "Ticketing Officer"]
+      roles: ["SuperAdmin", "Branch Admin", "Coordinator"]
     },
     {
       key: '8',

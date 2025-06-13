@@ -254,19 +254,19 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                     <Radio.Group options={genderOptions}  />
                 </Form.Item>
 
-                <Form.Item
-                    name="weight"
-                    label="Weight"
-                    rules={[
-                        { required: false },
-                        { type: 'number', min: 1, max: 500, message: 'Weight must be between 1kg and 500kg!' },
-                    ]}
-                >
-                    <InputNumber
-                        addonAfter="kg"
-                        style={{ width: '100%' }}
-                    />
-                </Form.Item>
+                {/*<Form.Item*/}
+                {/*    name="weight"*/}
+                {/*    label="Weight"*/}
+                {/*    rules={[*/}
+                {/*        { required: false },*/}
+                {/*        { type: 'number', min: 1, max: 500, message: 'Weight must be between 1kg and 500kg!' },*/}
+                {/*    ]}*/}
+                {/*>*/}
+                {/*    <InputNumber*/}
+                {/*        addonAfter="kg"*/}
+                {/*        style={{ width: '100%' }}*/}
+                {/*    />*/}
+                {/*</Form.Item>*/}
 
                 <Form.Item
                     name="marital_status"

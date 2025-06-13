@@ -43,6 +43,14 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                 </Form.Item>
 
                 <Form.Item
+                    name="drug_code"
+                    label="Drug Code"
+                    rules={[{ required: true, message: 'Please input drug code!' }]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
                     name="brand"
                     label="Brand"
                     rules={[{ required: false, }]}

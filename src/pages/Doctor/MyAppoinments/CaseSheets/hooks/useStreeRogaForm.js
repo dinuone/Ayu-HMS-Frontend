@@ -1,0 +1,194 @@
+// hooks/useStreeRogaForm.js
+import { useState, useEffect, useCallback } from 'react';
+import api from '../../../../../Services/NetworkManager.js';
+import { message } from 'antd';
+import {useNavigate} from "react-router-dom";
+
+const initialCaseSheet = {
+    chiefComplaint: '',
+    otherComplaints: [],
+    otherComplaint_specify:'',
+    menstrualHistory: {
+        pushpaDarshana: '',
+        regularIrregular: '',
+        charactersOfMenstruation:'',
+        lmp: '',
+        durationOfFlow:'',
+        interval:'',
+        pain:'',
+        volume:'',
+    },
+    obstetricHistory:{
+        numberOfPregnacy:'',
+        labour:'',
+        dateOfLastDelivery:'',
+        particularsOfDeliveries:'',
+        historyOfGarbha:'',
+        mudhaGarbhaIthihasaya:'',
+        contraceptiveHistory:''
+    },
+    previousMedicalHistory:{
+        previousJointProblem:'',
+        otherMajorIllness_HTN:'',
+        otherMajorIllness_DM:'',
+        otherMajorIllness_CHO:'',
+        otherMajorIllness_THY:'',
+        otherMajorIllness_TB:'',
+        surgeries:'',
+        allergies:'',
+        familyHistory:'',
+    },
+    historyOfPresentIllness:{
+        onset:'',
+        progression:'',
+        previousTreatment:''
+    },
+    personalHistory:{
+        dietaryHabits: {
+            option: '',
+            meals: '',
+            waterIntake: '',
+            other: ''
+        },
+        sleepPatterns:{
+            day:'',
+            night:''
+        },
+        addiction:{
+            option: [],
+            other:''
+        },
+        bath:'',
+        exercise:'',
+    },
+    physicalExamination:{
+        pulse:'',
+        bp:'',
+        weight:''
+    },
+    investigation:{
+        bloodTest:[],
+        imagingTest:[],
+        other:''
+    },
+    differentialDiagnosis:'',
+    diagnosingAMA:{},
+    selectedDiseaseCodes:[],
+    selectedTreatments:[],
+    selectedClinics:[],
+    nextVisitDate:'',
+    remarks:''
+};
+
+export function useStreeRogaForm(visitId,regNumber,chitNumber) {
+    const [submitting, setSubmitting] = useState(false);
+    const [caseSheet, setCaseSheet] = useState(initialCaseSheet);
+    const [prescription, setPrescription] = useState([]);
+    const navigate = useNavigate()
+    const [masterData, setMasterData] = useState({
+        diseaseCodes: [],
+        drugs: [],
+        treatments: [],
+        clinics: [],
+    });
+    const [loading, setLoading] = useState(true);
+
+    // Fetch master data on mount
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await api.get('patient-log/get-master-data');
+                setMasterData(res.data.data);
+                setLoading(false);
+            } catch (error) {
+                message.error(error.response?.data?.message || 'Failed to fetch data');
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Generic field change handler
+    const handleFieldChange = useCallback((path, value) => {
+        setCaseSheet(prev => {
+            const paths = path.split('.');
+            const newState = {...prev};
+            let current = newState;
+
+            for (let i = 0; i < paths.length - 1; i++) {
+                if (!current[paths[i]]) current[paths[i]] = {};
+                current[paths[i]] = {...current[paths[i]]};
+                current = current[paths[i]];
+            }
+
+            current[paths[paths.length - 1]] = value;
+            return newState;
+        });
+    }, []);
+
+    // Add prescription item
+    const handleAddPrescription = useCallback((item) => {
+        setPrescription(prev => [...prev, item]);
+    }, []);
+
+    // Remove prescription item
+    const handleRemovePrescription = useCallback((index) => {
+        setPrescription(prev => prev.filter((_, i) => i !== index));
+    }, []);
+
+    // Form submission
+    const handleSubmit = useCallback(async () => {
+        setSubmitting(true);
+
+        // TODO : UpLoad documents
+        var isAssignedToClinics = false;
+        if (caseSheet.selectedClinics.length > 0) {
+            isAssignedToClinics = true;
+        }
+
+        const payload = {
+            patient_reg_no: regNumber,
+            visit_id: visitId,
+            casesheet: JSON.stringify(caseSheet),
+            prescription: prescription,
+            is_assigned_to_clinic: isAssignedToClinics,
+            next_visit_date: caseSheet.nextVisitDate,
+            chit_number: chitNumber,
+            treatments: caseSheet.selectedTreatments,
+            clinics: caseSheet.selectedClinics,
+            diagnosis: caseSheet.selectedDiseaseCodes,
+            remarks: caseSheet.remarks
+        }
+
+        console.log("payload -----", payload)
+
+        try {
+            const res = await api.post('patient-log/Create', payload);
+            if (res.status === 200) {
+                message.success('Case sheet saved successfully');
+                setCaseSheet(initialCaseSheet);
+                setPrescription([]);
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Failed to submit case sheet');
+        } finally {
+            setSubmitting(false); // Stop loading
+            navigate('/my-appointment-list')
+        }
+
+        // Add your submission logic here
+    }, [caseSheet, prescription, visitId, regNumber, chitNumber]);
+
+    return {
+        caseSheet,
+        prescription,
+        masterData,
+        loading,
+        handleFieldChange,
+        handleAddPrescription,
+        handleRemovePrescription,
+        handleSubmit,
+
+    };
+}

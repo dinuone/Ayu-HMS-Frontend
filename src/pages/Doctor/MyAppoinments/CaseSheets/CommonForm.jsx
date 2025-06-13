@@ -1,22 +1,21 @@
 import React, {useState} from 'react';
 import {Descriptions, Divider, Flex, Form, Input, Radio} from 'antd';
 import { Typography } from "antd";
-import VericoseVeinsForm from "./VericoseVein/VericoseVeinsForm.jsx";
+import StreeRogaForm from "./StreeRoga/StreeRogaForm.jsx";
 
 const { Title, Text } = Typography;
 
 const options = [
     { label: 'General', value: 'General' },
-    { label: 'Vericose Veins', value: 'Vericose Veins' },
     { label: 'Stree Roga', value: 'Stree Roga' },
-    { label: 'Skin Lesion', value: 'Skin Lesion' },
+
 ];
 
 function CommonForm({ visitData, patientData }) {
     const today = new Date().toISOString().split('T')[0];
 
 
-
+    console.log(visitData)
     const items = [
         {
             key: '1',
@@ -81,6 +80,7 @@ function CommonForm({ visitData, patientData }) {
     return (
         <Flex vertical gap="middle">
             <Radio.Group
+                size="large"
                 options={options}
                 defaultValue="General"
                 optionType="button"
@@ -107,7 +107,12 @@ function CommonForm({ visitData, patientData }) {
 
                 <Divider/>
 
-                {selectedCategory === 'Vericose Veins' && ( <VericoseVeinsForm/> )}
+
+
+                {selectedCategory === 'Stree Roga' && ( <StreeRogaForm
+                    visitId={visitData?.id}
+                    regNumber={patientData?.registration_number}
+                    chitNumber={visitData?.chit_number}/> )}
 
             </div>
         </Flex>
