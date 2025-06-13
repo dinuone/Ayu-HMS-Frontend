@@ -1,34 +1,39 @@
 // ClinicSelect.jsx
 import React from 'react';
-import { Form, Select } from 'antd';
+import {DatePicker, Form, Select} from 'antd';
 
 const { Option } = Select;
 
-function ClinicSelect({ clinicsFromDB, selectedClinics, setSelectedClinics }) {
+function ClinicSelect({ clinicsFromDB, value = [], onChange }) {
     const handleChange = (selectedIds) => {
-        const selected = clinicsFromDB.filter(clinic => selectedIds.includes(clinic.id));
-        setSelectedClinics(selected);
+        const selectedClinics = clinicsFromDB.filter(t => selectedIds.includes(t.id));
+        onChange(selectedClinics);
     };
 
-    const selectedIds = (selectedClinics || []).map(clinic => clinic.id);
+
+
+    const selectedIds = value.map(t => t.id);
 
     return (
-        <Form.Item label="Assign to Clinics" name="clinics">
+
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+            <label style={{ width: 150 }}>Assign to Clinics</label>
             <Select
                 mode="multiple"
                 placeholder="Select clinics"
                 value={selectedIds}
                 onChange={handleChange}
                 optionLabelProp="label"
-                style={{ minWidth: 300 }}
+                style={{ minWidth: 500 }}
             >
-                {clinicsFromDB.map(({ id, name }) => (
-                    <Option key={id} value={id} label={name}>
-                        {name}
+                {clinicsFromDB.map((clinic) => (
+                    <Option key={clinic.id} value={clinic.id} label={clinic.name}>
+                        {clinic.name}
                     </Option>
                 ))}
             </Select>
-        </Form.Item>
+        </div>
+
     );
 }
 

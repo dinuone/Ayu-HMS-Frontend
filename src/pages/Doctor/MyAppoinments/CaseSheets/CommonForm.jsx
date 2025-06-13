@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Descriptions, Divider, Flex, Form, Input, Radio} from 'antd';
 import { Typography } from "antd";
 import StreeRogaForm from "./StreeRoga/StreeRogaForm.jsx";
-import BodyParts from "./StreeRoga/BodyParts.jsx";
 
 const { Title, Text } = Typography;
 
@@ -16,7 +15,7 @@ function CommonForm({ visitData, patientData }) {
     const today = new Date().toISOString().split('T')[0];
 
 
-
+    console.log(visitData)
     const items = [
         {
             key: '1',
@@ -81,6 +80,7 @@ function CommonForm({ visitData, patientData }) {
     return (
         <Flex vertical gap="middle">
             <Radio.Group
+                size="large"
                 options={options}
                 defaultValue="General"
                 optionType="button"
@@ -109,7 +109,10 @@ function CommonForm({ visitData, patientData }) {
 
 
 
-                {selectedCategory === 'Stree Roga' && ( <StreeRogaForm/> )}
+                {selectedCategory === 'Stree Roga' && ( <StreeRogaForm
+                    visitId={visitData?.id}
+                    regNumber={patientData?.registration_number}
+                    chitNumber={visitData?.chit_number}/> )}
 
             </div>
         </Flex>

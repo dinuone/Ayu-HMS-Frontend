@@ -1,33 +1,39 @@
 import React from 'react';
-import { Form, Select } from 'antd';
+import {Form, Select, Typography} from 'antd';
 
 const { Option } = Select;
+const { Title } = Typography;
 
-function TreatmentSelect({ treatmentsFromDB, treatments, setTreatments }) {
+function TreatmentSelect({ treatmentsFromDB, value = [], onChange }) {
     const handleChange = (selectedIds) => {
         const selectedTreatments = treatmentsFromDB.filter(t => selectedIds.includes(t.id));
-        setTreatments(selectedTreatments);
+        onChange(selectedTreatments);
     };
 
-    const selectedIds = (treatments || []).map(t => t.id);
+    const selectedIds = value.map(t => t.id); // Expecting `value` to be an array of treatment objects
 
     return (
-        <Form.Item name="treatments">
-            <Select
-                mode="multiple"
-                placeholder="Select treatments"
-                value={selectedIds}
-                onChange={handleChange}
-                optionLabelProp="label"
-                style={{ minWidth: 300 }}
-            >
-                {treatmentsFromDB.map((treatment) => (
-                    <Option key={treatment.id} value={treatment.id} label={treatment.name}>
-                        {treatment.name}
-                    </Option>
-                ))}
-            </Select>
-        </Form.Item>
+
+        <>
+            <Title level={5}>Treatments</Title>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                <Select
+                    mode="multiple"
+                    placeholder="Select treatments"
+                    value={selectedIds}
+                    onChange={handleChange}
+                    optionLabelProp="label"
+                    style={{ minWidth: 600 }}
+                >
+                    {treatmentsFromDB.map((treatment) => (
+                        <Option key={treatment.id} value={treatment.id} label={treatment.name}>
+                            {treatment.name}
+                        </Option>
+                    ))}
+                </Select>
+            </div>
+        </>
+
     );
 }
 
