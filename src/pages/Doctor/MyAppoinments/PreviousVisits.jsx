@@ -6,7 +6,7 @@ import {useNavigate} from "react-router-dom";
 import {globalSearch} from "../../../Utils/Search.js";
 import api from "../../../Services/NetworkManager.js";
 
-function PreviousVisits({visitId}) {
+function PreviousVisits({patientId}) {
 
     const navigate = useNavigate()
     const [tableData, setTableData] = useState([]);
@@ -28,7 +28,7 @@ function PreviousVisits({visitId}) {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get(`patient-visit/get-by-patient/${visitId}`);
+            const res = await api.get(`patient-visit/get-by-patient/${patientId}`);
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {

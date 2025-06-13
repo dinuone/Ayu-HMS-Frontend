@@ -200,7 +200,7 @@ function ViewAppointment(props) {
                                     <Col span={24}>
                                         <Title level={4} style={{ marginTop: '24px' }}>Previous Visits</Title>
                                         <Divider/>
-                                        <PreviousVisits visitId={visitData.id}/>
+                                        <PreviousVisits patientId={visitData.patient_data.id}/>
                                     </Col>
                                 </Row>
 
