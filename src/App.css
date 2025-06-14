@@ -66,3 +66,235 @@
   width: 16px;
   height: 16px;
 }
+
+
+/* Modern Login Styles with Animations */
+.modern-login-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-login-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a365d 0%, #153e75 100%);
+  z-index: -2;
+}
+
+.modern-login-background.animate-background {
+  animation: gradientShift 15s ease infinite alternate;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.modern-login-gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+  background-size: cover;
+  opacity: 0.1;
+  animation: fadeInOut 8s ease-in-out infinite alternate;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+/* Floating shapes animation */
+.floating-shapes {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(2px);
+  animation: float 15s infinite linear;
+}
+
+.shape-1 {
+  width: 150px;
+  height: 150px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 250px;
+  height: 250px;
+  bottom: 15%;
+  right: 10%;
+  animation-delay: 2s;
+  animation-duration: 20s;
+}
+
+.shape-3 {
+  width: 100px;
+  height: 100px;
+  top: 60%;
+  left: 30%;
+  animation-delay: 4s;
+  animation-duration: 25s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg);
+  }
+}
+
+/* Rest of your existing styles... */
+.modern-login-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 2rem;
+}
+
+.modern-login-card {
+  width: 100%;
+  max-width: 450px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: none;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  animation: cardEntrance 0.8s ease-out;
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modern-login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+}
+
+.modern-brand-logo img {
+  height: 60px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.modern-brand-logo img:hover {
+  transform: scale(1.05);
+}
+
+.modern-login-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.modern-login-subtitle {
+  color: #718096;
+  font-size: 1rem;
+}
+
+.modern-login-form {
+  padding: 0 1.5rem;
+}
+
+.modern-input {
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s;
+}
+
+.modern-input:hover {
+  border-color: #cbd5e0;
+}
+
+.modern-input:focus {
+  border-color: #1a365d;
+  box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.2);
+}
+
+.modern-input-prefix {
+  color: #a0aec0;
+  margin-right: 8px;
+}
+
+.modern-login-button {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 500;
+  background: linear-gradient(135deg, #1a365d 0%, #153e75 100%);
+  border: none;
+  transition: all 0.3s;
+}
+
+.modern-login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+}
+
+.modern-login-button:active {
+  transform: translateY(0);
+}
+
+.modern-login-footer {
+  text-align: center;
+  padding: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 1rem;
+}
+
+.modern-version-info {
+  color: #718096;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .modern-login-card {
+    max-width: 100%;
+    box-shadow: none;
+  }
+
+  .modern-login-content {
+    padding: 1rem;
+  }
+
+  .floating-shapes {
+    display: none;
+  }
+}
