@@ -9,28 +9,28 @@ function StreeRogaForm({visitId,regNumber,chitNumber}) {
         caseSheet,
         prescription,
         masterData,
-        loading,
         handleFieldChange,
         handleAddPrescription,
         handleRemovePrescription,
         handleSubmit,
+        submitting
     } = useStreeRogaForm(visitId,regNumber,chitNumber);
 
     return (
-        <Card loading={loading}>
-            <FormSections
-                caseSheet={caseSheet}
-                prescription={prescription}
-                masterData={masterData}
-                onFieldChange={handleFieldChange}
-                onAddPrescription={handleAddPrescription}
-                onRemovePrescription={handleRemovePrescription}
-            />
+       <>
+           <FormSections
+               caseSheet={caseSheet}
+               prescription={prescription}
+               masterData={masterData}
+               onFieldChange={handleFieldChange}
+               onAddPrescription={handleAddPrescription}
+               onRemovePrescription={handleRemovePrescription}
+           />
 
-            <Divider />
+           <Divider />
 
-            <SubmitSection onSubmit={handleSubmit} />
-        </Card>
+           <SubmitSection onSubmit={handleSubmit} loading={submitting}/>
+       </>
     );
 }
 

@@ -13,7 +13,7 @@ const PersonalHistory = memo(({data, onChange, otherComplaintDetail, onDetailCha
 
     return (
         <>
-            <Title level={5}>Previous Medical History</Title>
+            <Title level={5}>Personal History</Title>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: 150 }}>Dietary Habits</label>

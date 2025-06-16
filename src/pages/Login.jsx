@@ -65,7 +65,7 @@ function Login() {
               <div className="modern-brand-logo">
                 <img src="/logo.PNG" alt="Cadvex Logo" />
               </div>
-              <h1 className="modern-login-title">Welcome to Cadvex</h1>
+              <h1 className="modern-login-title">Welcome to HMS</h1>
               <p className="modern-login-subtitle">Sign in to access your account</p>
             </div>
 

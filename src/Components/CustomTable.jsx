@@ -20,7 +20,8 @@ const CustomTable = ({
                          handleSearch,
                          clearFilter,
                          handleFilter,
-                         clearButtonEnable
+                         clearButtonEnable,
+                         rowClassName
                      }) => {
 
     // Updated rendering of cell content with `onCell`
@@ -129,6 +130,7 @@ const CustomTable = ({
 
             {/* Table Section */}
             <Table
+                rowClassName={rowClassName}
                 rowKey="id"
                 columns={columns.map(handleColumnRender)}  // Apply the updated rendering function
                 dataSource={data}

@@ -298,3 +298,14 @@
     display: none;
   }
 }
+
+/*table comp styles*/
+.highlight-row {
+  background-color: #fffbe6 !important; /* Light yellow background */
+  font-weight: 500;
+  border-left: 3px solid #faad14; /* Orange left border */
+}
+
+.highlight-row:hover td {
+  background-color: #fff8e1 !important; /* Slightly darker yellow on hover */
+}
