@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Button, Checkbox, Divider, Collapse, Row, Col, message, Typography} from 'antd';
 import { MinusOutlined, CaretRightOutlined} from '@ant-design/icons';
-import CardiovascularSystem from './Sections/CardiovascularSystem.jsx';
+import CardioVascularSystem from './Sections/CardioVascularSystem.jsx';
 import RespiratorySystem from './Sections/RespiratorySystem.jsx'
 import GastroIntestinalSystem from "./Sections/GastroIntestinalSystem.jsx";
 import CirculatorySystem from "./Sections/CirculatorySystem.jsx";
@@ -27,7 +27,7 @@ const { Panel } = Collapse;
 const systemComponents = {
     respiratory: RespiratorySystem,
     gastroIntestinal: GastroIntestinalSystem,
-    cardiovascular: CardiovascularSystem,
+    cardiovascular: CardioVascularSystem,
     circulatory: CirculatorySystem,
     muscular: MuscularSystem,
     skeletal: SkeletalSystem,
