@@ -6,8 +6,7 @@ import {useNavigate} from "react-router-dom";
 import {globalSearch} from "../../../Utils/Search.js";
 import api from "../../../Services/NetworkManager.js";
 
-function PreviousVisits({patientId}) {
-
+function PreviousVisits({patientId, highlightChitNumber}) {  // Add highlightChitNumber prop
     const navigate = useNavigate()
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -22,7 +21,6 @@ function PreviousVisits({patientId}) {
         status: "All",
         date:[],
         patient_type:[]
-        // add more in future as needed
     });
 
     const fetchData = async () => {
@@ -42,10 +40,8 @@ function PreviousVisits({patientId}) {
         fetchData();
     }, []);
 
-
-
     const handleSearch = () => {
-        const result = globalSearch(tableData, searchText); // Use global search function
+        const result = globalSearch(tableData, searchText);
         setFilteredData(result);
     };
 
@@ -57,14 +53,10 @@ function PreviousVisits({patientId}) {
                 is_active : filterValues.status,
                 category_ids : filterValues.drug_category
             }
-            // const response = await crudService.filter(payload);
-            // setTableData(response.data.data);
-            // setFilteredData(response.data.data);
-            // setClearButtonEnable(true)
+            // Filter implementation
         } catch (error) {
             message.error(error.response?.data?.message || 'Operation failed');
         }
-
     }
 
     const clearFilter = () => {
@@ -77,10 +69,15 @@ function PreviousVisits({patientId}) {
         setClearButtonEnable(false);
     };
 
+    // Add rowClassName function to highlight matching rows
+    const rowClassName = (record) => {
+        return record.chit_number === highlightChitNumber ? 'highlight-row' : '';
+    };
+
     const columns = [
         {
-            title: "Registration No",
-            dataIndex: "patient_reg_no",
+            title: 'Chit No',
+            dataIndex: 'chit_number',
             render: (record) => (
                 <strong>{record}</strong>
             )
@@ -114,13 +111,6 @@ function PreviousVisits({patientId}) {
             )
         },
         {
-            title: 'Chit No',
-            dataIndex: 'chit_number',
-            render: (record) => (
-                <strong>{record}</strong>
-            )
-        },
-        {
             title: 'Status',
             dataIndex: 'status',
             render: (status) => (
@@ -138,19 +128,15 @@ function PreviousVisits({patientId}) {
             render: (_, record) => (
                 <Space>
                     <Button
-
                         icon={<EyeFilled/>}
                         color="default"
-                        variant="solid" size="small">
-
-                    </Button>
-
+                        variant="solid"
+                        size="small"
+                    />
                 </Space>
             )
         }
     ];
-
-
 
     return (
         <CustomTable
@@ -171,6 +157,7 @@ function PreviousVisits({patientId}) {
                     [key]: value
                 }));
             }}
+            rowClassName={rowClassName}  // Add rowClassName prop
         />
     );
 }

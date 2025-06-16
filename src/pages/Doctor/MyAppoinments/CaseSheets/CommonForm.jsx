@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {Descriptions, Divider, Flex, Form, Input, Radio} from 'antd';
+import {Button, Descriptions, Divider, Flex, Form, Input, Radio, Result} from 'antd';
 import { Typography } from "antd";
 import StreeRogaForm from "./StreeRoga/StreeRogaForm.jsx";
+import GeneralForm from "./General/GeneralForm.jsx";
 
 const { Title, Text } = Typography;
 
@@ -109,10 +110,27 @@ function CommonForm({ visitData, patientData }) {
 
 
 
-                {selectedCategory === 'Stree Roga' && ( <StreeRogaForm
-                    visitId={visitData?.id}
-                    regNumber={patientData?.registration_number}
-                    chitNumber={visitData?.chit_number}/> )}
+                {selectedCategory === 'Stree Roga' && patientData?.gender === "Female" ? (
+                    <StreeRogaForm
+                        visitId={visitData?.id}
+                        regNumber={patientData?.registration_number}
+                        chitNumber={visitData?.chit_number}
+                    />
+                ) : selectedCategory === 'Stree Roga' && (
+                    <Result
+                        status="warning"
+                        title="Stree Roga form is only applicable for female patients."
+
+                    />
+                )}
+
+                {selectedCategory === "General" && (
+                    <GeneralForm
+                        visitId={visitData?.id}
+                        regNumber={patientData?.registration_number}
+                        chitNumber={visitData?.chit_number}
+                    />
+                )}
 
             </div>
         </Flex>

@@ -91,7 +91,7 @@ export function useStreeRogaForm(visitId,regNumber,chitNumber) {
         treatments: [],
         clinics: [],
     });
-    const [loading, setLoading] = useState(true);
+
 
     // Fetch master data on mount
     useEffect(() => {
@@ -99,10 +99,9 @@ export function useStreeRogaForm(visitId,regNumber,chitNumber) {
             try {
                 const res = await api.get('patient-log/get-master-data');
                 setMasterData(res.data.data);
-                setLoading(false);
             } catch (error) {
                 message.error(error.response?.data?.message || 'Failed to fetch data');
-                setLoading(false);
+
             }
         };
 
@@ -184,11 +183,10 @@ export function useStreeRogaForm(visitId,regNumber,chitNumber) {
         caseSheet,
         prescription,
         masterData,
-        loading,
         handleFieldChange,
         handleAddPrescription,
         handleRemovePrescription,
         handleSubmit,
-
+        submitting
     };
 }
