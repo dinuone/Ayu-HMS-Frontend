@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import CustomTable from "../../../Components/CustomTable.jsx";
+import CustomTable from "../../../../Components/CustomTable.jsx";
 import {Button, message, Popconfirm, Space, Tag, Tooltip} from "antd";
-import {DeleteOutlined, EyeFilled} from "@ant-design/icons";
+import {CheckCircleFilled, DeleteOutlined, EyeFilled} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
-import {globalSearch} from "../../../Utils/Search.js";
-import api from "../../../Services/NetworkManager.js";
+import {globalSearch} from "../../../../Utils/Search.js";
+import api from "../../../../Services/NetworkManager.js";
+import {AiOutlineWarning} from "react-icons/ai";
+import {FcTodoList} from "react-icons/fc";
 
 function PreviousVisits({patientId, highlightChitNumber}) {  // Add highlightChitNumber prop
     const navigate = useNavigate()
@@ -30,7 +32,7 @@ function PreviousVisits({patientId, highlightChitNumber}) {  // Add highlightChi
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
+           console.log(error)
         } finally {
             setLoading(false);
         }
@@ -74,6 +76,10 @@ function PreviousVisits({patientId, highlightChitNumber}) {  // Add highlightChi
         return record.chit_number === highlightChitNumber ? 'highlight-row' : '';
     };
 
+    const navigateToView = (visitId) => {
+        navigate(`/view-case-sheet/${visitId}`)
+    }
+
     const columns = [
         {
             title: 'Chit No',
@@ -114,7 +120,8 @@ function PreviousVisits({patientId, highlightChitNumber}) {  // Add highlightChi
             title: 'Status',
             dataIndex: 'status',
             render: (status) => (
-                <Tag color="processing">
+                <Tag icon={status  === "COMPLETED" ? <CheckCircleFilled/> : ""}
+                     color={status  === "COMPLETED" ? 'green-inverse' : 'processing'}>
                     <strong>{status}</strong>
                 </Tag>
             ),
@@ -128,6 +135,8 @@ function PreviousVisits({patientId, highlightChitNumber}) {  // Add highlightChi
             render: (_, record) => (
                 <Space>
                     <Button
+                        disabled={record.status ==="PENDING"}
+                        onClick={() => navigateToView(record.id)}
                         icon={<EyeFilled/>}
                         color="default"
                         variant="solid"

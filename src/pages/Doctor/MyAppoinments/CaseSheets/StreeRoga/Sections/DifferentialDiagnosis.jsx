@@ -6,7 +6,7 @@ import 'react-quill-new/dist/quill.snow.css';
 const { Title } = Typography;
 
 
-const DifferentialDiagnosis = memo(({value, onChange}) => {
+const DifferentialDiagnosis = memo(({value, onChange, readonly = false}) => {
 
     return (
         <>
@@ -14,6 +14,7 @@ const DifferentialDiagnosis = memo(({value, onChange}) => {
 
             <div style={{marginBottom:16}}>
                 <ReactQuill
+                    readOnly={readonly}
                     theme="snow"
                     value={value}
                     onChange={onChange}

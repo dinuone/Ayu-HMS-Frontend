@@ -31,7 +31,7 @@ import {
     FileTextOutlined
 } from '@ant-design/icons';
 import CommonForm from "./CaseSheets/CommonForm.jsx";
-import PreviousVisits from "./PreviousVisits.jsx";
+import PreviousVisits from "./PreviousVisits/PreviousVisits.jsx";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;

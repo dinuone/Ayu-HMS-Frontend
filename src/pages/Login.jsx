@@ -43,8 +43,8 @@ function Login() {
         message.error('Something went wrong!');
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.data?.message || 'Login failed. Please try again.';
-      message.error(errorMessage);
+      console.log(error)
+
     } finally {
       setLoading(false);
     }

@@ -6,7 +6,7 @@ import 'react-quill-new/dist/quill.snow.css';
 const { Title } = Typography;
 
 
-const PhysicalExam = memo(({data, onChange}) => {
+const PhysicalExam = memo(({data, onChange,readonly = false}) => {
 
     return (
         <>
@@ -16,6 +16,7 @@ const PhysicalExam = memo(({data, onChange}) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16}}>
                 <label style={{ width: 150 }}>Pulse</label>
                 <Input
+                    readOnly={readonly}
                     value={data.pulse}
                     onChange={(e) => onChange('pulse', e.target.value)}
                     style={{width:500}}
@@ -25,6 +26,7 @@ const PhysicalExam = memo(({data, onChange}) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>B/P</label>
                 <Input
+                    readOnly={readonly}
                     value={data.bp}
                     onChange={(e) => onChange('bp', e.target.value)}
                     style={{width:500}}
@@ -34,6 +36,7 @@ const PhysicalExam = memo(({data, onChange}) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Weight</label>
                 <Input
+                    readOnly={readonly}
                     value={data.weight}
                     onChange={(e) => onChange('weight', e.target.value)}
                     style={{width:500}}

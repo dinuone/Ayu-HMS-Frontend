@@ -141,7 +141,8 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
             treatments: caseSheetData.selectedTreatments,
             clinics: caseSheetData.selectedClinics,
             diagnosis: caseSheetData.selectedDiseaseCodes,
-            remarks: caseSheetData.remarks
+            remarks: caseSheetData.remarks,
+            casesheet_type:"General"
         }
 
         console.log("payload -----", payload)
@@ -149,12 +150,11 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
         try {
             const res = await api.post('patient-log/Create', payload);
             if (res.status === 200) {
-                message.success('Case sheet saved successfully');
                 setCaseSheetData(initalCaseSheet);
                 setPrescription([]);
             }
         } catch (error) {
-            message.error(error.response?.data?.message || 'Failed to submit case sheet');
+          console.log(error)
         } finally {
             setLoading(false); // Stop loading
             navigate('/my-appointment-list')
