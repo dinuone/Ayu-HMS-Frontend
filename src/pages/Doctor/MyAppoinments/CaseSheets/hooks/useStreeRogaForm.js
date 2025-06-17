@@ -100,7 +100,7 @@ export function useStreeRogaForm(visitId,regNumber,chitNumber) {
                 const res = await api.get('patient-log/get-master-data');
                 setMasterData(res.data.data);
             } catch (error) {
-                message.error(error.response?.data?.message || 'Failed to fetch data');
+                console.log(error)
 
             }
         };
@@ -157,7 +157,8 @@ export function useStreeRogaForm(visitId,regNumber,chitNumber) {
             treatments: caseSheet.selectedTreatments,
             clinics: caseSheet.selectedClinics,
             diagnosis: caseSheet.selectedDiseaseCodes,
-            remarks: caseSheet.remarks
+            remarks: caseSheet.remarks,
+            casesheet_type:"Stree Roga"
         }
 
         console.log("payload -----", payload)
@@ -165,12 +166,11 @@ export function useStreeRogaForm(visitId,regNumber,chitNumber) {
         try {
             const res = await api.post('patient-log/Create', payload);
             if (res.status === 200) {
-                message.success('Case sheet saved successfully');
                 setCaseSheet(initialCaseSheet);
                 setPrescription([]);
             }
         } catch (error) {
-            message.error(error.response?.data?.message || 'Failed to submit case sheet');
+           console.log(error)
         } finally {
             setSubmitting(false); // Stop loading
             navigate('/my-appointment-list')

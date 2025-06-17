@@ -96,7 +96,6 @@ const PatientVisit = () => {
             }
             console.log('Submitting values:', payload);
             const response = await api.post('patient-visit/create', payload);
-            message.success('Visit created successfully!');
             setSubmitLoading(false);
             clearVisitData();
             navigate('/patients');

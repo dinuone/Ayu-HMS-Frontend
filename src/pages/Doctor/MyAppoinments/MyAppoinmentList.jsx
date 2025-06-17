@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { message, Button, Popconfirm, Space, Tag, Row, Col, Switch, Typography, Tooltip } from 'antd';
 
 import {
+    CheckCircleFilled,
     DeleteOutlined,
     EyeFilled,
     FileExcelOutlined,
@@ -209,7 +210,8 @@ const MyAppoinmentList = () => {
             title: 'Status',
             dataIndex: 'status',
             render: (status) => (
-                <Tag color="processing">
+                <Tag icon={status  === "COMPLETED" ? <CheckCircleFilled/> : ""}
+                     color={status  === "COMPLETED" ? 'green-inverse' : 'processing'}>
                     <strong>{status}</strong>
                 </Tag>
             ),
@@ -223,20 +225,21 @@ const MyAppoinmentList = () => {
             render: (_, record) => (
                 <Space>
                     <Button
+
                         onClick={() => {viewAppointment(record.id)}}
                         icon={<EyeFilled/>}
                         color="default"
                         variant="solid" size="small">
 
                     </Button>
-                    <Popconfirm
-                        title="Sure to delete?"
-                        onConfirm={() => handleDelete(record.id)}
-                    >
-                        <Tooltip title="Delete Record">
-                            <Button type="text" danger icon={<DeleteOutlined />} />
-                        </Tooltip>
-                    </Popconfirm>
+                    {/*<Popconfirm*/}
+                    {/*    title="Sure to delete?"*/}
+                    {/*    onConfirm={() => handleDelete(record.id)}*/}
+                    {/*>*/}
+                    {/*    <Tooltip title="Delete Record">*/}
+                    {/*        <Button type="text" danger icon={<DeleteOutlined />} />*/}
+                    {/*    </Tooltip>*/}
+                    {/*</Popconfirm>*/}
 
                 </Space>
             )

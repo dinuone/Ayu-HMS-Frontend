@@ -33,8 +33,9 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.log("ERROR -------------",error)
         // Handle errors globally
-        if (error.response && error.data.statusCode === 401) {
+        if (error.response && error.response.data.data.statusCode === 401) {
             message.error('Session expired. Please log in again.');
             localStorage.removeItem('authData');
             window.location.href = '/'; // Redirect to login

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import {Col, Radio, Row, Typography} from 'antd';
+import { Col, Radio, Row, Typography, Tag } from 'antd';
 
 const { Title } = Typography;
 
@@ -36,31 +36,37 @@ const amaQuestions = [
     },
 ];
 
-const AMADiagnosis = memo(({data, onChange}) => {
+// Optional: assign colors per answer (customize as needed)
 
+
+const AMADiagnosis = memo(({ data, onChange, readonly = false }) => {
     return (
         <>
             <Title level={5}>Diagnosing AMA Condition</Title>
 
             {amaQuestions.map(({ label, name, options }) => (
-                <Row key={name} align="middle" gutter={12} style={{margin:'20px'}}>
-                    <Col flex="150px">
-                        {label}
-                    </Col>
+                <Row key={name} align="middle" gutter={12} style={{ margin: '20px 0' }}>
+                    <Col flex="150px">{label}</Col>
                     <Col flex="auto">
-                        <Radio.Group
-                            onChange={(e) => onChange(name, e.target.value)}
-                        >
-                            {options.map((opt) => (
-                                <Radio key={opt} value={opt}>
-                                    {opt}
-                                </Radio>
-                            ))}
-                        </Radio.Group>
+                        {readonly ? (
+                            <Tag color="red-inverse" style={{ fontSize: 14 }}>
+                                {data?.[name] || 'Not answered'}
+                            </Tag>
+                        ) : (
+                            <Radio.Group
+                                value={data?.[name]}
+                                onChange={(e) => onChange(name, e.target.value)}
+                            >
+                                {options.map((opt) => (
+                                    <Radio key={opt} value={opt}>
+                                        {opt}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        )}
                     </Col>
                 </Row>
             ))}
-
         </>
     );
 });
