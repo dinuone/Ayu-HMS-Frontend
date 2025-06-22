@@ -3,7 +3,7 @@ import { Card, InputNumber, Input, Select, Row, Col } from 'antd';
 
 const { Option } = Select;
 
-const CardiovascularSystem = ({ data, onChange }) => {
+const CardiovascularSystem = ({ data, onChange,readonly = false }) => {
 
 
     return (
@@ -12,6 +12,7 @@ const CardiovascularSystem = ({ data, onChange }) => {
                 <Col span={8}>
                     <label>Heart Rate (bpm)</label>
                     <InputNumber
+                        readOnly={readonly}
                         style={{ width: '100%' }}
                         value={data?.heartRate}
                         onChange={(value) => onChange('heartRate', value)}
@@ -20,6 +21,7 @@ const CardiovascularSystem = ({ data, onChange }) => {
                 <Col span={8}>
                     <label>Lymph Nodes</label>
                     <Input
+                        readOnly={readonly}
                         value={data?.lymphNodes}
                         onChange={(e) => onChange('lymphNodes', e.target.value)}
                         placeholder="120/80"
@@ -28,6 +30,7 @@ const CardiovascularSystem = ({ data, onChange }) => {
                 <Col span={8}>
                     <label>Body Temperature</label>
                     <Input
+                        readOnly={readonly}
                         value={data?.bodyTemperature}
                         onChange={(e) => onChange('bodyTemperature', e.target.value)}
                         placeholder="120/80"

@@ -3,7 +3,7 @@ import {Card, InputNumber, Select, Row, Col, Input, Checkbox} from 'antd';
 
 const { Option } = Select;
 
-const IntegumentarySystem = ({ data, onChange }) => {
+const IntegumentarySystem = ({ data, onChange,readonly = false }) => {
 
 
     return (
@@ -11,6 +11,7 @@ const IntegumentarySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Skin</label>
                 <Input
+                    readOnly={readonly}
                     value={data.skin}
                     onChange={(e) => onChange('skin', e.target.value)}
                 />
@@ -18,6 +19,7 @@ const IntegumentarySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Body Hair</label>
                 <Input
+                    readOnly={readonly}
                     value={data.bodyHair}
                     onChange={(e) => onChange('bodyHair', e.target.value)}
                 />
@@ -25,6 +27,7 @@ const IntegumentarySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Sweat</label>
                 <Input
+                    readOnly={readonly}
                     value={data.sweat}
                     onChange={(e) => onChange('sweat', e.target.value)}
                 />

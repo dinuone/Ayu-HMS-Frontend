@@ -1,9 +1,9 @@
 import React from 'react';
-import {Card, InputNumber, Select, Row, Col, Input, Checkbox} from 'antd';
+import {Card, InputNumber, Select, Row, Col, Input, Checkbox, Tag} from 'antd';
 
 const { Option } = Select;
 
-const GastroIntestinalSystem = ({ data, onChange }) => {
+const GastroIntestinalSystem = ({ data, onChange,readonly = false }) => {
 
 
 
@@ -15,6 +15,7 @@ const GastroIntestinalSystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Mouth</label>
                 <Input
+                    readOnly={readonly}
                     value={data.mouth}
                     onChange={(e) => onChange('Mouth', e.target.value)}
                 />
@@ -22,6 +23,7 @@ const GastroIntestinalSystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Tongue</label>
                 <Input
+                    readOnly={readonly}
                     value={data.tongue}
                     onChange={(e) => onChange('tongue', e.target.value)}
                 />
@@ -29,6 +31,7 @@ const GastroIntestinalSystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Abdomen</label>
                 <Input
+                    readOnly={readonly}
                     value={data.abdomen}
                     onChange={(e) => onChange('abdomen', e.target.value)}
                 />
@@ -36,28 +39,61 @@ const GastroIntestinalSystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Ambilties</label>
                 <Input
+                    readOnly={readonly}
                     value={data.ambilties}
                     onChange={(e) => onChange('ambilties', e.target.value)}
                 />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Food Intake</label>
-                <Checkbox.Group
-                    options={foodIntakeValues}
-                    value={data.foodIntake}
-                    onChange={(checkedValues) => onChange('foodIntake', checkedValues)}
+                {readonly ? (
+                    <>
+                        {data.foodIntake.length === 0 ? (
+                            <Tag color="red-inverse">None</Tag>
+                        ) : (
+                            data.foodIntake.map((val) => (
+                                <Tag key={val}  color="red-inverse" style={{ marginBottom: 6 }}>
+                                    {val}
+                                </Tag>
+                            ))
+                        )}
 
-                />
+                    </>
+                ) : (
+                    <Checkbox.Group
+                        options={foodIntakeValues}
+                        value={data.foodIntake}
+                        onChange={(checkedValues) => onChange('foodIntake', checkedValues)}
+
+                    />
+                )}
+
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Food Digestion</label>
-                <Checkbox.Group
-                    options={foodDigestionValues}
-                    value={data.foodDigestion}
-                    onChange={(checkedValues) => onChange('foodDigestion', checkedValues)}
+                {readonly ? (
+                    <>
+                        {data.foodDigestion.length === 0 ? (
+                            <Tag color="red-inverse">None</Tag>
+                        ) : (
+                            data.foodDigestion.map((val) => (
+                                <Tag key={val}  color="red-inverse" style={{ marginBottom: 6 }}>
+                                    {val}
+                                </Tag>
+                            ))
+                        )}
 
-                />
+                    </>
+                ) : (
+                    <Checkbox.Group
+                        options={foodDigestionValues}
+                        value={data.foodDigestion}
+                        onChange={(checkedValues) => onChange('foodDigestion', checkedValues)}
+
+                    />
+                )}
+
             </div>
 
         </Card>

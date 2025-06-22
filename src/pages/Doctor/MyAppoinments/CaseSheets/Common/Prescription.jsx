@@ -47,6 +47,10 @@ function Prescription({ drugs, items = [], onAdd, onRemove }) {
                             setCurrentDrug(selected);
                         }}
                         value={currentDrug?.id}
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                            option.children.toLowerCase().includes(input.toLowerCase())
+                        }
                     >
                         {drugs.map((drug) => (
                             <Select.Option key={drug.id} value={drug.id}>

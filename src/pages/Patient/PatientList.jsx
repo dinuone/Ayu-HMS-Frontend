@@ -4,7 +4,7 @@ import api from '../../Services/NetworkManager.js';
 import {
     CheckCircleFilled,
     DeleteOutlined,
-    EditOutlined,
+    EditOutlined, EyeFilled, EyeOutlined,
     FileExcelOutlined,
     PlusOutlined, UsergroupAddOutlined
 } from '@ant-design/icons';
@@ -185,6 +185,9 @@ const PatientList = () => {
         navigate(`/patient-visit/${patientRegNo}`)
     }
 
+    const ViewPatientPage = (patientId) =>{
+        navigate(`/view-patient/${patientId}`)
+    }
 
     const handleExport = () => {
         const flatData = filteredData.map(item => ({
@@ -255,6 +258,14 @@ const PatientList = () => {
                         color="default"
                         variant="solid" size="small">
                         Add Visit
+                    </Button>
+
+                    <Button
+                        onClick={() => {ViewPatientPage(record.id)}}
+                        icon={<EyeFilled/>}
+                        color="green"
+                        variant="solid" size="small">
+                        View
                     </Button>
 
                     <Tooltip title="Status Update">

@@ -5,25 +5,26 @@ import {
     CheckCircleFilled,
     DeleteOutlined,
     EyeFilled,
-    FileExcelOutlined,
+    FileExcelOutlined, HistoryOutlined,
     PlusOutlined,
 } from '@ant-design/icons';
 
 
 import {useNavigate} from "react-router-dom";
 import {FaHospitalUser} from "react-icons/fa";
-import CrudService from "../../../Services/CrudService.js";
-import {globalSearch} from "../../../Utils/Search.js";
-import {exportToExcel} from "../../../Services/ExcelExport.js";
-import CustomTable from "../../../Components/CustomTable.jsx";
-import api from "../../../Services/NetworkManager.js";
+import {exportToExcel} from "../../Services/ExcelExport.js";
+import CustomTable from "../../Components/CustomTable.jsx";
+import {globalSearch} from "../../Utils/Search.js";
+import api from "../../Services/NetworkManager.js";
+
+
 
 
 
 const { Title } = Typography;
-const crudService = CrudService('patient-visit');
 
-const MyAppoinmentList = () => {
+
+const AppointmentHistory = () => {
     const navigate = useNavigate()
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -44,7 +45,7 @@ const MyAppoinmentList = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('patient-visit/get-patient-visits-for-doctor');
+            const res = await api.get('patient-visit/get-appointment-history');
             setTableData(res.data.data);
             setFilteredData(res.data.data);
         } catch (error) {
@@ -58,44 +59,6 @@ const MyAppoinmentList = () => {
         fetchData();
     }, []);
 
-
-    const toggleStatus = async (id) => {
-        try {
-            await crudService.updateStatus(id);
-            await fetchData();
-        } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    };
-
-    const handleBulkDelete = async () => {
-        try {
-            await crudService.deleteAll(selectedRowKeys);
-            await fetchData();
-            setSelectedRowKeys([]);
-        } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    };
-
-    const getSelectedRecord = async (id) => {
-        try {
-            const response = await crudService.getOne(id);
-            setSelectedRecord(response.data.data);
-            setModalVisible(true);
-        } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await crudService.delete(id);
-            await fetchData();
-        } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
-        }
-    };
 
     const handleSearch = () => {
         const result = globalSearch(tableData, searchText); // Use global search function
@@ -131,8 +94,10 @@ const MyAppoinmentList = () => {
     };
 
 
-    const navigateToVisitPage = (patientRegNo) => {
-        navigate(`/patient-visit/${patientRegNo}`)
+
+
+    const navigateToView = (visitId) => {
+        navigate(`/view-case-sheet/${visitId}`)
     }
 
 
@@ -160,10 +125,7 @@ const MyAppoinmentList = () => {
         exportToExcel(exportColumns, flatData, 'Drugs');
     };
 
-    const viewAppointment = (visitId) => {
-        console.log(visitId)
-        navigate(`/view-appointment/${visitId}`)
-    }
+
 
     const columns = [
         {
@@ -226,7 +188,7 @@ const MyAppoinmentList = () => {
                 <Space>
                     <Button
 
-                        onClick={() => {viewAppointment(record.id)}}
+                        onClick={() => {navigateToView(record.id)}}
                         icon={<EyeFilled/>}
                         color="default"
                         variant="solid" size="small">
@@ -279,8 +241,8 @@ const MyAppoinmentList = () => {
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Title level={3} style={{ color: "#495057" }}>
-                            <FaHospitalUser style={{ fontSize: 20, marginRight: 10 }} />
-                            My Appointments
+                            <HistoryOutlined style={{ fontSize: 20, marginRight: 10 }} />
+                            Appointments History
                         </Title>
                     </Col>
                     <Col>
@@ -308,8 +270,6 @@ const MyAppoinmentList = () => {
                 filters={filters}
                 selectedRowKeys={selectedRowKeys}
                 onRowSelectionChange={setSelectedRowKeys}
-                onDelete={handleDelete}
-                onBulkDelete={handleBulkDelete}
                 loading={loading}
                 handleSearch={handleSearch}
                 handleFilter={handleFilter}
@@ -328,4 +288,4 @@ const MyAppoinmentList = () => {
     );
 };
 
-export default MyAppoinmentList;
+export default AppointmentHistory;

@@ -14,7 +14,7 @@ import {
   FileAddOutlined,
   DollarCircleOutlined,
   UserAddOutlined,
-  MoneyCollectFilled,
+  MoneyCollectFilled, HistoryOutlined,
 } from '@ant-design/icons';
 import '../styles/Dashboard.css';
 import PropTypes from "prop-types";
@@ -60,6 +60,7 @@ export default function DashboardLayout({ children }) {
     '/patient-visit/': 'Patient Visit',
     '/doctor-assign': 'Doctor Assign',
     '/offer': 'Offer',
+    '/appointments-history': 'Appointments History',
   };
 
   const currentTitle = routeTitles[location.pathname] || 'Dashboard';
@@ -215,20 +216,27 @@ export default function DashboardLayout({ children }) {
       icon: <UserAddOutlined />,
       label: 'Patients Management',
       path: '/patients',
-      roles: ["SuperAdmin", "Branch Admin", "Coordinator"]
+      roles: ["SuperAdmin", "Branch Admin", "Coordinator","Doctor"]
     },
     {
       key: '7',
       icon: <FaHospitalUser />,
       label: 'Patients Visit',
       path: '/patients-visit',
-      roles: ["SuperAdmin", "Branch Admin", "Coordinator"]
+      roles: ["SuperAdmin", "Branch Admin", "Coordinator","Doctor"]
     },
     {
       key: '8',
       icon: <BsListTask />,
       label: 'My Appointments',
       path: '/my-appointment-list',
+      roles: ["Doctor"]
+    },
+    {
+      key: '9',
+      icon: <HistoryOutlined />,
+      label: 'Appointments History',
+      path: '/appointments-history',
       roles: ["Doctor"]
     },
   ];

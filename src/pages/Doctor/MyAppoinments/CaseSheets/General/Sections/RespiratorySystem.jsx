@@ -3,7 +3,7 @@ import {Card, InputNumber, Select, Row, Col, Input} from 'antd';
 
 const { Option } = Select;
 
-const RespiratorySystem = ({ data, onChange }) => {
+const RespiratorySystem = ({ data, onChange,readonly = false }) => {
 
 
 
@@ -12,6 +12,7 @@ const RespiratorySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Cough</label>
                 <Input
+                    readOnly={readonly}
                     value={data.cough}
                     onChange={(e) => onChange('cough', e.target.value)}
                 />
@@ -19,6 +20,7 @@ const RespiratorySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Throat</label>
                 <Input
+                    readOnly={readonly}
                     value={data.throat}
                     onChange={(e) => onChange('throat', e.target.value)}
                 />
@@ -26,6 +28,7 @@ const RespiratorySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Langs</label>
                 <Input
+                    readOnly={readonly}
                     value={data.langs}
                     onChange={(e) => onChange('langs', e.target.value)}
                 />
@@ -33,6 +36,7 @@ const RespiratorySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Respiratory Rate (BPM)</label>
                 <Input
+                    readOnly={readonly}
                     value={data.respiratoryRate}
                     onChange={(e) => onChange('respiratoryRate', e.target.value)}
                 />
@@ -40,6 +44,7 @@ const RespiratorySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Expectorant</label>
                 <Input
+                    readOnly={readonly}
                     value={data.expectorant}
                     onChange={(e) => onChange('expectorant', e.target.value)}
                 />
@@ -47,6 +52,7 @@ const RespiratorySystem = ({ data, onChange }) => {
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Head</label>
                 <Input
+                    readOnly={readonly}
                     value={data.head}
                     onChange={(e) => onChange('head', e.target.value)}
                 />
