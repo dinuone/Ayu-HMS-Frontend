@@ -33,6 +33,7 @@ function ViewCaseSheet() {
     const [patientLog, setPatientLog] = useState(null);
     const [caseSheet, setCaseSheet] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [visitData,setVisitData] = useState([]);
 
     // Function to handle go back action
     const handleGoBack = () => {
@@ -78,24 +79,46 @@ function ViewCaseSheet() {
 
         if (params.visitId) {
             fetchData();
+
         }
+
     }, [params.visitId]);
+
+
+    useEffect(() => {
+        if (caseSheet && patientLog?.patient_id) {
+            fetchVisitHistory();
+        }
+    }, [caseSheet]);
+
+    const fetchVisitHistory = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get(`patient-visit/get-by-patient/${patientLog.patient_id}`);
+            setVisitData(res.data.data);
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     console.log(patientLog)
     console.log(caseSheet)
 
-    const previousVisits = [
-        { id: 1, date: '2025-06-15', doctor_name: 'Dr. Smith', summary: 'Follow-up visit for hypertension.' },
-        { id: 2, date: '2025-05-10', doctor_name: 'Dr. Jones', summary: 'Initial consultation and diagnosis.' },
-        // ...
-    ]
+
     return (
         <>
             {patientLog?.casesheet_type === "General" && (
                 <ViewGeneralCaseSheet
+                    visitData={visitData}
                     patientLog={patientLog}
                     caseSheet={caseSheet}
+                    loading={loading}
+                    onBack={handleGoBack}
+                    onDownload={handleDownload}
+
 
                 />
             )}
@@ -107,7 +130,7 @@ function ViewCaseSheet() {
                     loading={loading}
                     onBack={handleGoBack}
                     onDownload={handleDownload}
-                    previousVisits={previousVisits}
+                    visitData={visitData}
                 />
             )}
         </>

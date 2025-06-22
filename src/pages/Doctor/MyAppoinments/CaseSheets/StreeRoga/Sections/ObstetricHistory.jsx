@@ -1,10 +1,11 @@
 import React, { memo } from 'react';
-import {DatePicker, Input, Radio, Tag, Typography} from 'antd';
+import {Checkbox, DatePicker, Input, Radio, Tag, Typography} from 'antd';
 import ReactQuill from "react-quill-new";
 import 'react-quill-new/dist/quill.snow.css';
 
 const { Title } = Typography;
 
+const labourOptions = ['NVD', 'Induced', 'LSCS']
 
 const ObstetricHistory = memo(({data, onChange,readonly = false}) => {
 
@@ -22,27 +23,48 @@ const ObstetricHistory = memo(({data, onChange,readonly = false}) => {
                 />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <label style={{ width: 200 }}>Labor</label>
-                {readonly ? (
-                    <Tag color="red-inverse">
-                        {data?.labour || 'Not selected'}
-                    </Tag>
-                ) :(
-                    <Radio.Group
-                        onChange={(e) => onChange('labour', e.target.value)}
-                        value={data.labour}
-                    >
-                        <Radio value="NVD">NVD</Radio>
-                        <Radio value="Induced">Induced</Radio>
-                        <Radio value="LSCS">LSCS</Radio>
-                    </Radio.Group>
-                )}
+            <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                    <label style={{ width: 200 }}>Labor</label>
+                    {readonly ? (
+                        <Tag color="red-inverse">
+                            {data?.labour != null ? data?.labour : 'Not selected'}
+                        </Tag>
+                    ) : (
+                        <Checkbox.Group
+                            options={labourOptions}
+                            value={data.labour || []}
+                            onChange={(checkedValues) => onChange('labour', checkedValues)}
+                        />
+                    )}
+                </div>
 
+                {!readonly &&
+                    (data.labour || []).map((item) => (
+                        <div
+                            key={item}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                marginLeft: 200,
+                                marginBottom: 8,
+                            }}
+                        >
+                            <label style={{ width: 120, marginTop: 6 }}>{item} Specify</label>
+                            <Input.TextArea
+                                rows={3}
+                                value={data[`${item.toLowerCase()}_specify`] || ''}
+                                onChange={(e) =>
+                                    onChange(`${item.toLowerCase()}_specify`, e.target.value)
+                                }
+                                style={{ width: 400 }}
+                            />
+                        </div>
+                    ))}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <label style={{ width: 200 }}>Date of Delivery</label>
+                <label style={{ width: 200 }}>Date of Last Delivery</label>
                 <DatePicker
                     readOnly={readonly}
                     format="YYYY-MM-DD"

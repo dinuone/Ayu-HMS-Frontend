@@ -3,7 +3,7 @@ import { Card, Input } from 'antd';
 
 // A small, reusable input component for the reflex points.
 // Using an Ant Design Input component.
-const ReflexInput = ({ value, onChange, placeholder }) => (
+const ReflexInput = ({ value, onChange, placeholder,readonly = false }) => (
     <Input
         value={value}
         onChange={onChange}
@@ -22,14 +22,7 @@ const inputStyle = {
 // The main component that renders the stickman and the input fields.
 const ReflexesStickman = ({ data = {}, onChange }) => {
 
-    // Handles changes in any of the input fields.
-    // It calls the parent's onChange handler with the updated data structure.
-    const handleChange = (field, event) => {
-        // We get the new value from the input event.
-        const value = event.target.value;
-        // The parent component manages the state via this onChange prop.
-        onChange('reflexes', { ...data, [field]: value });
-    };
+
 
     // An array to define all the input points, their positions, and labels.
     // This makes the JSX cleaner and easier to manage.
@@ -88,7 +81,7 @@ const ReflexesStickman = ({ data = {}, onChange }) => {
                         <ReflexInput
                             placeholder={point.label}
                             value={data[point.name]}
-                            onChange={(e) => handleChange(point.name, e)}
+                            onChange={(e) => onChange(point.name, e.target.value)}
                         />
                     </div>
                 ))}

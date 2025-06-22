@@ -11,12 +11,16 @@ const initialCaseSheet = {
     menstrualHistory: {
         pushpaDarshana: '',
         regularIrregular: '',
-        charactersOfMenstruation:'',
+        charactersOfMenstruation_color:'',
+        charactersOfMenstruation_order:'',
+        charactersOfMenstruation_other:'',
         lmp: '',
         durationOfFlow:'',
         interval:'',
         pain:'',
+        pain_specify:'',
         volume:'',
+        volume_specify:''
     },
     obstetricHistory:{
         numberOfPregnacy:'',
@@ -66,11 +70,7 @@ const initialCaseSheet = {
         bp:'',
         weight:''
     },
-    investigation:{
-        bloodTest:[],
-        imagingTest:[],
-        other:''
-    },
+    investigation:"",
     differentialDiagnosis:'',
     diagnosingAMA:{},
     selectedDiseaseCodes:[],

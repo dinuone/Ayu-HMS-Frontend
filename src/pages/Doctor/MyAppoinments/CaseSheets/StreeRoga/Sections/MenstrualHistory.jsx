@@ -31,21 +31,50 @@ const MenstrualHistory = memo(({data, onChange,readonly = false}) => {
                         value={data.regularIrregular}
                     >
                         <Radio value="Regular">Regular</Radio>
-                        <Radio value="Irregular">Irregular</Radio>
+                        <Radio value="Irregular-Regular">Irregular-Regular</Radio>
+                        <Radio value="Irregular-Irregular">Irregular-Irregular</Radio>
                     </Radio.Group>
                 )}
 
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <label style={{ width: 200 }}>Characters of Menstruation</label>
-                <Input
-                    readOnly={readonly}
-                    value={data.charactersOfMenstruation}
-                    onChange={(e) => onChange('charactersOfMenstruation', e.target.value)}
-                    style={{ width: 500 }}
-                />
+            <div style={{ marginBottom: 16 }}>
+                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 8 }}>
+                    Characteristic of Menstruation
+                </label>
+
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                    <label style={{ width: 100 }}>Color</label>
+                    <Input
+                        readOnly={readonly}
+                        value={data.charactersOfMenstruation_color}
+                        onChange={(e) => onChange('charactersOfMenstruation_color', e.target.value)}
+                        style={{ width: 400 }}
+                    />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                    <label style={{ width: 100 }}>Order</label>
+                    <Input
+                        readOnly={readonly}
+                        value={data.charactersOfMenstruation_order}
+                        onChange={(e) => onChange('charactersOfMenstruation_order', e.target.value)}
+                        style={{ width: 400 }}
+                    />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ width: 100 }}>Other</label>
+                    <Input
+                        readOnly={readonly}
+                        value={data.charactersOfMenstruation_other}
+                        onChange={(e) => onChange('charactersOfMenstruation_other', e.target.value)}
+                        style={{ width: 400 }}
+                    />
+                </div>
             </div>
+
+
 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 200 }}>Duration of Flow</label>
@@ -67,24 +96,38 @@ const MenstrualHistory = memo(({data, onChange,readonly = false}) => {
                 />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <label style={{ width: 200 }}>Pain</label>
-                {readonly ? (
-                    <Tag color="red-inverse">
-                        {data?.pain || 'Not selected'}
-                    </Tag>
-                ) :(
-                    <Radio.Group
-                        onChange={(e) => onChange('pain', e.target.value)}
-                        value={data.pain}
-                    >
-                        <Radio value="Before">Before</Radio>
-                        <Radio value="After">After</Radio>
-                        <Radio value="During">During</Radio>
-                    </Radio.Group>
-                )}
-
+            <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                    <label style={{ width: 200 }}>Pain</label>
+                    {readonly ? (
+                        <Tag color="red-inverse">{data?.pain || 'Not selected'}</Tag>
+                    ) : (
+                        <Radio.Group
+                            onChange={(e) => onChange('pain', e.target.value)}
+                            value={data.pain}
+                        >
+                            <Radio value="Before">Before</Radio>
+                            <Radio value="After">After</Radio>
+                            <Radio value="During">During</Radio>
+                        </Radio.Group>
+                    )}
+                </div>
             </div>
+
+            {!readonly && data.pain && (
+                <>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                        <label style={{ width: 200, marginTop: 6 }}>{`${data.pain} Specify`}</label>
+                        <Input.TextArea
+                            rows={4}
+                            value={data.pain_specify}
+                            onChange={(e) => onChange('pain_specify', e.target.value)}
+                            style={{ width: 500 }}
+                        />
+                    </div>
+                </>
+            )}
+
 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 200 }}>Volume</label>
@@ -104,6 +147,20 @@ const MenstrualHistory = memo(({data, onChange,readonly = false}) => {
                     )}
 
             </div>
+
+            {!readonly && data.volume && (
+                <>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                        <label style={{ width: 200, marginTop: 6 }}>{`${data.volume} Specify`}</label>
+                        <Input.TextArea
+                            rows={4}
+                            value={data.volume_specify}
+                            onChange={(e) => onChange('volume_specify', e.target.value)}
+                            style={{ width: 500 }}
+                        />
+                    </div>
+                </>
+            )}
 
 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>

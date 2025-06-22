@@ -16,7 +16,7 @@ const tableHeaderStyle = {
     fontWeight: 'bold',
 };
 
-const MotorFunctions = ({ data = {}, onChange }) => {
+const MotorFunctions = ({ data = {}, onChange,readonly = false }) => {
 
     return (
 
@@ -40,7 +40,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                             <Input
                                 size="small"
                                 value={data?.powerRightLower}
-                                onChange={e => handleChange('powerRightLower', e.target.value)}
+                                onChange={e => onChange('powerRightLower', e.target.value)}
                                 placeholder="--/5"
                             />
                         </td>
@@ -48,7 +48,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                             <Input
                                 size="small"
                                 value={data?.powerLeftLower}
-                                onChange={e => handleChange('powerLeftLower', e.target.value)}
+                                onChange={e => onChange('powerLeftLower', e.target.value)}
                                 placeholder="--/5"
                             />
                         </td>
@@ -59,7 +59,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                             <Input
                                 size="small"
                                 value={data?.powerRightUpper}
-                                onChange={e => handleChange('powerRightUpper', e.target.value)}
+                                onChange={e => onChange('powerRightUpper', e.target.value)}
                                 placeholder="--/5"
                             />
                         </td>
@@ -67,7 +67,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                             <Input
                                 size="small"
                                 value={data?.powerLeftUpper}
-                                onChange={e => handleChange('powerLeftUpper', e.target.value)}
+                                onChange={e => onChange('powerLeftUpper', e.target.value)}
                                 placeholder="--/5"
                             />
                         </td>
@@ -80,7 +80,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                         <td style={tableCellStyle}>
                             <Select
                                 value={data?.toneRightLower}
-                                onChange={value => handleChange('toneRightLower', value)}
+                                onChange={value => onChange('toneRightLower', value)}
                                 style={{ width: '100%' }}
                                 placeholder="Select"
                                 size="small"
@@ -93,7 +93,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                         <td style={tableCellStyle}>
                             <Select
                                 value={data?.toneLeftLower}
-                                onChange={value => handleChange('toneLeftLower', value)}
+                                onChange={value => onChange('toneLeftLower', value)}
                                 style={{ width: '100%' }}
                                 placeholder="Select"
                                 size="small"
@@ -109,7 +109,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                         <td style={tableCellStyle}>
                             <Select
                                 value={data?.toneRightUpper}
-                                onChange={value => handleChange('toneRightUpper', value)}
+                                onChange={value => onChange('toneRightUpper', value)}
                                 style={{ width: '100%' }}
                                 placeholder="Select"
                                 size="small"
@@ -122,7 +122,7 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                         <td style={tableCellStyle}>
                             <Select
                                 value={data?.toneLeftUpper}
-                                onChange={value => handleChange('toneLeftUpper', value)}
+                                onChange={value => onChange('toneLeftUpper', value)}
                                 style={{ width: '100%' }}
                                 placeholder="Select"
                                 size="small"
@@ -137,7 +137,9 @@ const MotorFunctions = ({ data = {}, onChange }) => {
                 </table>
             </Card>
 
-            <ReflexesStickman/>
+            <ReflexesStickman
+                data={data}
+                onChange={onChange}/>
         </>
 
 

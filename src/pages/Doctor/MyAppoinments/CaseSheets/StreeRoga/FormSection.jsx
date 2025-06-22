@@ -39,18 +39,7 @@ const FormSections = memo(({caseSheet, prescription, masterData, onFieldChange, 
             />
 
             <Divider />
-            <MenstrualHistory
-                data={caseSheet.menstrualHistory}
-                onChange={(field, value) => onFieldChange(`menstrualHistory.${field}`, value)}
-            />
 
-            <Divider />
-            <ObstetricHistory
-                data={caseSheet.obstetricHistory}
-                onChange={(field, value) => onFieldChange(`obstetricHistory.${field}`, value)}
-            />
-
-            <Divider />
             <PresentIllness
                 data={caseSheet.historyOfPresentIllness}
                 onChange={(field, value) => onFieldChange(`historyOfPresentIllness.${field}`, value)}
@@ -77,9 +66,24 @@ const FormSections = memo(({caseSheet, prescription, masterData, onFieldChange, 
             />
 
             <Divider />
+
+            <MenstrualHistory
+               data={caseSheet.menstrualHistory}
+               onChange={(field, value) => onFieldChange(`menstrualHistory.${field}`, value)}
+            />
+
+             <Divider />
+
+            <ObstetricHistory
+                data={caseSheet.obstetricHistory}
+                onChange={(field, value) => onFieldChange(`obstetricHistory.${field}`, value)}
+            />
+
+           <Divider />
+
             <Investigations
-                data={caseSheet.investigation}
-                onChange={(field, value) => onFieldChange(`investigation.${field}`, value)}
+                value={caseSheet.investigation}
+                onChange={(value) => onFieldChange('investigation', value)}
             />
 
             <Divider/>

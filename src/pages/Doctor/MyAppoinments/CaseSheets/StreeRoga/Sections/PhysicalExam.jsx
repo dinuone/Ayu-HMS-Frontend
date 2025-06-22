@@ -13,13 +13,14 @@ const PhysicalExam = memo(({data, onChange,readonly = false}) => {
             <Title level={5}>Physical Examination</Title>
 
 
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16}}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                 <label style={{ width: 150 }}>Pulse</label>
                 <Input
                     readOnly={readonly}
                     value={data.pulse}
                     onChange={(e) => onChange('pulse', e.target.value)}
-                    style={{width:500}}
+                    addonAfter="bpm"
+                    style={{ width: 500 }}
                 />
             </div>
 
@@ -29,7 +30,8 @@ const PhysicalExam = memo(({data, onChange,readonly = false}) => {
                     readOnly={readonly}
                     value={data.bp}
                     onChange={(e) => onChange('bp', e.target.value)}
-                    style={{width:500}}
+                    addonAfter="mmHg"
+                    style={{ width: 500 }}
                 />
             </div>
 
@@ -39,9 +41,11 @@ const PhysicalExam = memo(({data, onChange,readonly = false}) => {
                     readOnly={readonly}
                     value={data.weight}
                     onChange={(e) => onChange('weight', e.target.value)}
-                    style={{width:500}}
+                    addonAfter="kg"
+                    style={{ width: 500 }}
                 />
             </div>
+
 
         </>
     );

@@ -312,11 +312,11 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
             />
 
             <NextVisit
-                value={caseSheetData.nextVisitDate || {}}
+                value={caseSheetData.nextVisitDate || ""}
                 onChange={(value) => handleSystemChange('nextVisitDate', value)}
             />
             <Remarks
-                value={caseSheetData.remarks || {}}
+                value={caseSheetData.remarks || ""}
                 onChange={(value) => handleSystemChange('remarks', value)}
             />
 

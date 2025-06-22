@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form, Select, Typography} from 'antd';
+import { Form, Select, Typography } from 'antd';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -10,10 +10,9 @@ function TreatmentSelect({ treatmentsFromDB, value = [], onChange }) {
         onChange(selectedTreatments);
     };
 
-    const selectedIds = value.map(t => t.id); // Expecting `value` to be an array of treatment objects
+    const selectedIds = value.map(t => t.id); // value is an array of treatment objects
 
     return (
-
         <>
             <Title level={5}>Treatments</Title>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
@@ -23,17 +22,25 @@ function TreatmentSelect({ treatmentsFromDB, value = [], onChange }) {
                     value={selectedIds}
                     onChange={handleChange}
                     optionLabelProp="label"
+                    showSearch
+                    optionFilterProp="label"
+                    filterOption={(input, option) =>
+                        option.label.toLowerCase().includes(input.toLowerCase())
+                    }
                     style={{ minWidth: 600 }}
                 >
                     {treatmentsFromDB.map((treatment) => (
-                        <Option key={treatment.id} value={treatment.id} label={treatment.name}>
+                        <Option
+                            key={treatment.id}
+                            value={treatment.id}
+                            label={treatment.name}
+                        >
                             {treatment.name}
                         </Option>
                     ))}
                 </Select>
             </div>
         </>
-
     );
 }
 

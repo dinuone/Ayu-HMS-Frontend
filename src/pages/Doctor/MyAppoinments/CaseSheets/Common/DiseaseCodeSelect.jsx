@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form, Select, Typography} from 'antd';
+import { Form, Select, Typography } from 'antd';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -13,7 +13,6 @@ function DiseaseCodeSelect({ diseaseCodesFromDB, value = [], onChange }) {
     const selectedIds = value.map(dc => dc.id); // value is an array of selected disease code objects
 
     return (
-
         <>
             <label style={{ width: 150 }}>Disease Codes</label>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
@@ -23,6 +22,11 @@ function DiseaseCodeSelect({ diseaseCodesFromDB, value = [], onChange }) {
                     value={selectedIds}
                     onChange={handleChange}
                     optionLabelProp="label"
+                    showSearch
+                    optionFilterProp="label"
+                    filterOption={(input, option) =>
+                        option.label.toLowerCase().includes(input.toLowerCase())
+                    }
                     style={{ minWidth: 600 }}
                 >
                     {diseaseCodesFromDB.map(({ id, name }) => (
@@ -33,8 +37,6 @@ function DiseaseCodeSelect({ diseaseCodesFromDB, value = [], onChange }) {
                 </Select>
             </div>
         </>
-
-
     );
 }
 
