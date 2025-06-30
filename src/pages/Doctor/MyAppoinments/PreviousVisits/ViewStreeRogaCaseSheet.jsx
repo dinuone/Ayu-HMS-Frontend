@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import { Button, Card, Descriptions, Divider, Space, Table, Typography, Tabs, Timeline, Collapse, Tag } from 'antd';
 import ChiefComplaint from "../CaseSheets/StreeRoga/Sections/ChiefComplaint.jsx";
 import OtherComplaint from "../CaseSheets/StreeRoga/Sections/OtherComplaint.jsx";
@@ -16,13 +16,29 @@ import Remarks from "../CaseSheets/Common/Remarks.jsx";
 import { DownloadOutlined } from "@ant-design/icons";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import dayjs from 'dayjs';
+import {PDFCaseSheetStreeRoga} from "./PDF/PDFCaseSheetStreeRoga.jsx";
+import { PDFDownloadLink } from '@react-pdf/renderer';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
-function ViewStreeRogaCaseSheet({ patientLog, caseSheet, loading, onBack, onDownload, previousVisits = [] }) {
+function ViewStreeRogaCaseSheet({ patientLog, caseSheet, loading, onBack, previousVisits = [] }) {
     const today = new Date().toISOString().split('T')[0];
+
+    const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+    const pdfRef = useRef();
+
+    const DownloadButton = () => (
+        <PDFDownloadLink
+            document={<PDFCaseSheetStreeRoga patientLog={patientLog} caseSheet={caseSheet} />}
+            fileName={`case-sheet-${patientLog?.chit_number || 'unknown'}.pdf`}
+        >
+            {({ loading }) => (
+                <Button variant="solid" color="orange" icon={<DownloadOutlined/>} loading={loading}>Download Case Sheet</Button>
+            )}
+        </PDFDownloadLink>
+    );
 
     const containerStyle = {
         maxWidth: 1200,
@@ -378,7 +394,9 @@ function ViewStreeRogaCaseSheet({ patientLog, caseSheet, loading, onBack, onDown
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px', textAlign: 'right' }}>
                 <Space>
                     <Button onClick={onBack} variant="solid" color="default" icon={<RiArrowGoBackFill />}>Back</Button>
-                    <Button onClick={onDownload} variant="solid" color="orange" icon={<DownloadOutlined />}>Download Case Sheet</Button>
+                    {DownloadButton()}
+                    {/*<Button onClick={handleDownload} variant="solid" color="orange" icon={<DownloadOutlined />}  loading={isGeneratingPDF} >Download Case Sheet</Button>*/}
+
                 </Space>
             </div>
 
