@@ -46,14 +46,6 @@ function ViewCaseSheet() {
         window.history.back();
     }
 
-    function handleDownload() {
-        // Download patientLog and caseSheet JSON as file (simple example)
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ patientLog, caseSheet }, null, 2));
-        const dlAnchorElem = document.createElement('a');
-        dlAnchorElem.setAttribute("href", dataStr);
-        dlAnchorElem.setAttribute("download", `case_sheet_${patientLog.id}.json`);
-        dlAnchorElem.click();
-    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -117,9 +109,6 @@ function ViewCaseSheet() {
                     caseSheet={caseSheet}
                     loading={loading}
                     onBack={handleGoBack}
-                    onDownload={handleDownload}
-
-
                 />
             )}
 
@@ -129,7 +118,6 @@ function ViewCaseSheet() {
                     caseSheet={caseSheet}
                     loading={loading}
                     onBack={handleGoBack}
-                    onDownload={handleDownload}
                     visitData={visitData}
                 />
             )}

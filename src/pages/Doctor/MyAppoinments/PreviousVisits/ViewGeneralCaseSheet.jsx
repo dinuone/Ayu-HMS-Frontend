@@ -32,7 +32,7 @@ const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
-function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, onBack, onDownload,  }) {
+function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, onBack,  }) {
 
     console.log("patientLog Data ::::::::::::::::::::::",patientLog)
     console.log("Visit Data ::::::::::::::::::::::",visitData)
