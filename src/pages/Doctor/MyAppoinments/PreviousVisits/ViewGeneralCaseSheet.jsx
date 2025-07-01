@@ -27,6 +27,8 @@ import CardiovascularSystem from "../CaseSheets/General/Sections/CardioVascularS
 import SkeletalSystem from "../CaseSheets/General/Sections/SkeletalSystem.jsx";
 import SensoryFunctions from "../CaseSheets/General/Sections/SensoryFunctions.jsx";
 import {useNavigate} from "react-router-dom";
+import {PDFDownloadLink} from "@react-pdf/renderer";
+import {PDFCaseSheetStreeRoga} from "./PDF/PDFCaseSheetStreeRoga.jsx";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -470,12 +472,14 @@ function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, o
         </Card>
     );
 
+
+
     return (
         <div style={containerStyle}>
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px', textAlign: 'right' }}>
                 <Space>
                     <Button onClick={onBack} variant="solid" color="default" icon={<RiArrowGoBackFill />}>Back</Button>
-                    <Button onClick={onDownload} variant="solid" color="orange" icon={<DownloadOutlined />}>Download Case Sheet</Button>
+                    {/*<Button variant="solid" color="orange" icon={<DownloadOutlined /> }>Download Case Sheet</Button>*/}
                 </Space>
             </div>
 
