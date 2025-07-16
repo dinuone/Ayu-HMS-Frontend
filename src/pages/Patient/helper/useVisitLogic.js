@@ -16,6 +16,7 @@ export const useVisitLogic = (patientRegNo,form) => {
     const [hospitalCharge, setHospitalCharge] = useState(0);
     const [customCharges, setCustomCharges] = useState({});
     const [doctorShift, setDoctorShift] = useState(null);
+    const [treatmentPrice,setTreatmentPrice] = useState(null);
 
 
     const getCurrentDay = () => {
@@ -85,10 +86,18 @@ export const useVisitLogic = (patientRegNo,form) => {
             const res = await api.post(`patient-visit/get-available-dcotors-for-treatments`, { treatments: values });
             setDoctors(res.data.data);
             setSelectedDoctor(null);
+            await CalculateTreatmentPrice(values);
         } catch (err) {
             console.log(err);
         }
     };
+
+    const CalculateTreatmentPrice = async (values) => {
+        const response = await api.post(`offer/calculate-treatment-total`, {
+            treatment_ids: values  // assuming backend accepts this
+        });
+        setTreatmentPrice(response.data.data);
+    }
 
     const fetchTreatments = async () => {
         try{
@@ -241,5 +250,6 @@ export const useVisitLogic = (patientRegNo,form) => {
         handleClinicChange,
         handleDoctorChange,
         clearVisitData,
+        treatmentPrice
     };
 };

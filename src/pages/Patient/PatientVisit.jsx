@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Button, Card, Col, Form, Row, Select, message } from 'antd';
 import { ArrowLeftOutlined, CheckOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import {useVisitLogic} from "./helper/useVisitLogic.js";
 import VisitTypeSelector from "./Components/VisitTypeSelector.jsx";
-import FeeloVisitForm from "./Forms/FeeloVisitForm.jsx";
+import PromotionVisitForm from "./Forms/PromotionVisitForm.jsx";
 import NormalVisitForm from "./Forms/NormalVisitForm.jsx";
 import DoctorAvailability from "./Components/DoctorAvailability.jsx";
 import PriceCalculation from "./Components/PriceCalculation.jsx";
@@ -16,6 +16,7 @@ const PatientVisit = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [submitLoading, setSubmitLoading] = useState(false);
+
 
     const {
         visitType,
@@ -37,39 +38,9 @@ const PatientVisit = () => {
         handleClinicChange,
         handleDoctorChange,
         clearVisitData,
+        treatmentPrice
     } = useVisitLogic(patientRegNo,form);
 
-    const preparePayload = () => {
-        // Base payload structure
-        const payload = {
-            patient_id: parseInt(patientRegNo), // Assuming patientRegNo is from props/params
-            clinic_category_id: selectedClinic?.id || 0,
-            remarks: "", // You might want to add a remarks field in your form
-            patient_type: 1, // Default value, adjust as needed
-            visit_type: visitType === 'feelo' ? 2 : 1, // Example mapping
-            treatments: [],
-            doctor_id: selectedDoctor?.id || 0,
-            doctor_name: selectedDoctor?.doctor_name || "",
-            feelo_app_ref: visitType === 'feelo' ? form.getFieldValue('feeloReference') || "" : ""
-        };
-
-        // Add treatments if they exist
-        if (selectedTreatments.length > 0) {
-            payload.treatments = selectedTreatments.map(treatment => ({
-                id: treatment.id,
-                name: treatment.name
-            }));
-        }
-
-        // Additional logic for clinic/OPD vs treatment visits
-        if (visitSubType === 'CLINIC /OPD') {
-            payload.visit_type = 1; // Example value for clinic visit
-        } else if (visitSubType === 'TREATMENT') {
-            payload.visit_type = 2; // Example value for treatment visit
-        }
-
-        return payload;
-    };
 
     const handleSubmit = async (values) => {
         if (!selectedDoctor) {
@@ -95,7 +66,7 @@ const PatientVisit = () => {
                 feelo_app_ref: visitType === 'feelo' ? values.feeloReference : null
             }
             console.log('Submitting values:', payload);
-            const response = await api.post('patient-visit/create', payload);
+            await api.post('patient-visit/create', payload);
             setSubmitLoading(false);
             clearVisitData();
             navigate('/patients');
@@ -105,6 +76,10 @@ const PatientVisit = () => {
             message.error('Failed to register visit');
         }
     };
+
+
+
+
 
     return (
         <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px' }}>
@@ -122,10 +97,11 @@ const PatientVisit = () => {
                     <VisitTypeSelector onSelect={setVisitType} />
                 ) : (
                     <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                        {visitType === 'feelo' ? (
-                            <FeeloVisitForm
+                        {visitType === 'promotion' ? (
+                            <PromotionVisitForm
                                 treatmentData={treatmentData}
                                 onTreatmentSelect={handleTreatmentSelect}
+                                platforms={["Facebook","Feelo"]}
                             />
                         ) : (
                             <NormalVisitForm
@@ -179,6 +155,7 @@ const PatientVisit = () => {
                 )}
 
                 <PriceCalculation
+                    visitType={visitType}
                     visitSubType={visitSubType}
                     totalCost={totalCost}
                     selectedTreatments={selectedTreatments}
@@ -186,7 +163,7 @@ const PatientVisit = () => {
                     selectedDoctor={selectedDoctor}
                     hospitalCharge={hospitalCharge}
                     customCharges={customCharges}
-                    visitType={visitType}
+                    treatmentPriceData={treatmentPrice}
                 />
             </Card>
         </div>

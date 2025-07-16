@@ -120,7 +120,8 @@ function Login() {
             </Form>
 
             <div className="modern-login-footer">
-              <p className="modern-version-info">Cadvex v{appVersion}</p>
+              <p className="modern-version-info">© 2025 Harendra Ayurveda Hospital Pvt(Ltd)</p>
+              <p className="modern-version-info">version {appVersion}</p>
             </div>
           </Card>
         </div>

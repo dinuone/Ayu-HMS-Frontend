@@ -26,11 +26,11 @@ const RespiratorySystem = ({ data, onChange,readonly = false }) => {
                 />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <label style={{ width: 150 }}>Langs</label>
+                <label style={{ width: 150 }}>Lungs</label>
                 <Input
                     readOnly={readonly}
-                    value={data.langs}
-                    onChange={(e) => onChange('langs', e.target.value)}
+                    value={data.lungs}
+                    onChange={(e) => onChange('lungs', e.target.value)}
                 />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>

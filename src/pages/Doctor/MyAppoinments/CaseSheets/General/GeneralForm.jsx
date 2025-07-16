@@ -11,8 +11,6 @@ import IntegumentarySystem from "./Sections/IntegumentarySystem.jsx";
 import MotorFunctions from "./Sections/MotorFunctions.jsx";
 import SensoryFunctions from "./Sections/SensoryFunctions.jsx";
 import ReproductiveSystem from "./Sections/ReproductiveSystem.jsx";
-import MedicalHistory from "../StreeRoga/Sections/MedicalHistory.jsx";
-import PersonalHistory from "../StreeRoga/Sections/PersonalHistory.jsx";
 import DiseaseCodeSelect from "../Common/DiseaseCodeSelect.jsx";
 import TreatmentSelect from "../Common/TreatmentSelect.jsx";
 import Prescription from "../Common/Prescription.jsx";
@@ -21,6 +19,13 @@ import NextVisit from "../StreeRoga/Sections/NextVisit.jsx";
 import Remarks from "../Common/Remarks.jsx";
 import {useNavigate} from "react-router-dom";
 import api from "../../../../../Services/NetworkManager.js";
+import ChiefComplaint from "../StreeRoga/Sections/ChiefComplaint.jsx";
+import OtherComplaint from "./Sections/OtherComplaint.jsx";
+import HistoryOfPresentComplaint from "./Sections/HistoryOfPresentComplaint.jsx";
+import TreatmentHistory from "./Sections/TreatmentHistory.jsx";
+import PastIllnesses from "./Sections/PastIllnesses.jsx";
+import PersonalHistory from "./Sections/PersonalHistory.jsx";
+import Prakurthi from "./Sections/Prakurthi.jsx";
 
 const { Panel } = Collapse;
 
@@ -60,7 +65,9 @@ const initalCaseSheet = {
             option: '',
             meals: '',
             waterIntake: '',
-            other: ''
+            other: '',
+            bath:'',
+            exercise:''
         },
         sleepPatterns:{
             day:'',
@@ -74,22 +81,32 @@ const initalCaseSheet = {
         exercise:'',
     },
 
-    previousMedicalHistory:{
+    pastIllnesses:{
         previousJointProblem:'',
-        otherMajorIllness_HTN:'',
-        otherMajorIllness_DM:'',
-        otherMajorIllness_CHO:'',
-        otherMajorIllness_THY:'',
-        otherMajorIllness_TB:'',
-        surgeries:'',
+        pastIllness_HTN:'',
+        pastIllness_DM:'',
+        pastIllness_CHL:'',
+        pastIllness_THY:'',
+        pastIllness_TB:'',
         allergies:'',
         familyHistory:'',
+    },
+    chiefComplaint:'',
+    otherComplaint:'',
+    historyOfPresentComplaint:'',
+    treatmentHistory:{
+        medical:'',
+        surgical:''
     },
     selectedDiseaseCodes:[],
     selectedTreatments:[],
     selectedClinics:[],
     nextVisitDate:'',
-    remarks:''
+    remarks:'',
+    prakurthi:{
+        physical:'',
+        mental:''
+    }
 }
 
 const { Title } = Typography;
@@ -214,10 +231,41 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
 
     return (
         <>
-            <MedicalHistory
-                data={caseSheetData?.previousMedicalHistory || {}}
-                onChange={(field, value) => handleSystemChange(`previousMedicalHistory.${field}`, value)}
+            <ChiefComplaint
+                data={caseSheetData?.chiefComplaint || {}}
+                onChange={(value) => handleSystemChange('chiefComplaint', value)}
             />
+
+            <Divider/>
+
+            <OtherComplaint
+                data={caseSheetData?.otherComplaint || {}}
+                onChange={(value) => handleSystemChange('otherComplaint', value)}
+            />
+            <Divider/>
+
+
+            <HistoryOfPresentComplaint
+                data={caseSheetData?.historyOfPresentComplaint || {}}
+                onChange={(value) => handleSystemChange('historyOfPresentComplaint', value)}
+            />
+
+            <Divider/>
+
+
+            <TreatmentHistory
+                data={caseSheetData?.treatmentHistory || {}}
+                onChange={(field, value) => handleSystemChange(`treatmentHistory.${field}`, value)}
+            />
+            <Divider/>
+
+
+            <PastIllnesses
+                data={caseSheetData?.pastIllnesses || {}}
+                onChange={(field, value) => handleSystemChange(`pastIllnesses.${field}`, value)}
+            />
+
+
 
             <Divider/>
 
@@ -225,6 +273,13 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
                 data={caseSheetData?.personalHistory || {}}
                 onChange={(field, field2, value) => handleSystemChange(`personalHistory.${field}.${field2}`, value)}
                 onDetailChange={(field, field2, value) => handleSystemChange(`personalHistory.${field}.${field2}`, value)}
+            />
+
+            <Divider/>
+
+            <Prakurthi
+                data={caseSheetData?.prakurthi || {}}
+                onChange={(field, value) => handleSystemChange(`prakurthi.${field}`, value)}
             />
 
             <Divider/>

@@ -37,11 +37,11 @@ const GastroIntestinalSystem = ({ data, onChange,readonly = false }) => {
                 />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <label style={{ width: 150 }}>Ambilties</label>
+                <label style={{ width: 150 }}>Umbillcus</label>
                 <Input
                     readOnly={readonly}
-                    value={data.ambilties}
-                    onChange={(e) => onChange('ambilties', e.target.value)}
+                    value={data.umbillcus}
+                    onChange={(e) => onChange('umbillcus', e.target.value)}
                 />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>

@@ -33,8 +33,9 @@ const CirculatorySystem = ({ data, onChange,readonly = false }) => {
                             value={data.rythem}
                             onChange={(e) => onChange('rythem', e.target.value)}
                         >
-                            <Radio value="Regular">Regular</Radio>
-                            <Radio value="Irregular">Irregular</Radio>
+                            <Radio value="Regular-Regular">Regular-Regular</Radio>
+                            <Radio value="Irregular-Irregular">Irregular-Irregular</Radio>
+                            <Radio value="Irregular-Regular">Irregular-Regular</Radio>
 
                         </Radio.Group>
                     )}
@@ -78,8 +79,8 @@ const CirculatorySystem = ({ data, onChange,readonly = false }) => {
                             value={data.character}
                             onChange={(e) => onChange('character', e.target.value)}
                         >
-                            <Radio value="Sthula">Sthula</Radio>
-                            <Radio value="Poorna">Poorna</Radio>
+                            <Radio value="Mrudu">Mrudu</Radio>
+                            <Radio value="Katina">Katina</Radio>
 
                         </Radio.Group>
                     )}
@@ -88,19 +89,27 @@ const CirculatorySystem = ({ data, onChange,readonly = false }) => {
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                     <label style={{ width: 150 }}>Dosha Predominance</label>
                     {readonly ? (
-                        <Tag color="red-inverse">
-                            {data?.dosha || 'Not selected'}
-                        </Tag>
-                    ) :(
-                        <Radio.Group
-                            value={data.dosha}
-                            onChange={(e) => onChange('dosha', e.target.value)}
-                        >
-                            <Radio value="Sthula">Sthula</Radio>
-                            <Radio value="Poorna">Poorna</Radio>
+                        <>
+                            {data.dosha.length === 0 ? (
+                                <Tag color="red-inverse">None</Tag>
+                            ) : (
+                                data.dosha.map((val) => (
+                                    <Tag key={val}  color="red-inverse" style={{ marginBottom: 6 }}>
+                                        {val}
+                                    </Tag>
+                                ))
+                            )}
 
-                        </Radio.Group>
+                        </>
+                    ) : (
+                        <Checkbox.Group
+                            options={["Vata","Pitta","Kapha"]}
+                            value={data.dosha}
+                            onChange={(checkedValues) => onChange('dosha', checkedValues)}
+
+                        />
                     )}
+
 
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
