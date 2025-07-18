@@ -18,6 +18,7 @@ import Prescription from "../Common/Prescription.jsx";
 import ClinicSelect from "../Common/ClinicSelect.jsx";
 import NextVisit from "./Sections/NextVisit.jsx";
 import Remarks from "../Common/Remarks.jsx";
+import DiagnosisInput from '../Common/DiagnosisInput.jsx';
 
 
 const { Title } = Typography;
@@ -94,10 +95,9 @@ const FormSections = memo(({caseSheet, prescription, masterData, onFieldChange, 
 
             <Divider />
             <Title level={5}>Diagnosis</Title>
-            <DiseaseCodeSelect
-                diseaseCodesFromDB={masterData.diseaseCodes}
-                value={caseSheet.selectedDiseaseCodes}
-                onChange={(value) => onFieldChange('selectedDiseaseCodes', value)}
+            <DiagnosisInput  
+                value={caseSheetData.diagnosis || ""}
+                onChange={(value) => handleSystemChange('diagnosis', value)}
             />
 
             <Divider />

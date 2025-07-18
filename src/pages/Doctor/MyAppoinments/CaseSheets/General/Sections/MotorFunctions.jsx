@@ -140,6 +140,18 @@ const MotorFunctions = ({ data = {}, onChange,readonly = false }) => {
             <ReflexesStickman
                 data={data}
                 onChange={onChange}/>
+
+            <Card>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <label style={{ width: 150 }}>Gait</label>
+                    <Input
+                        readOnly={readonly}
+                        value={data.gait}
+                        onChange={(e) => onChange('gait', e.target.value)}
+                    />
+                </div>
+            </Card>
+                
         </>
 
 
