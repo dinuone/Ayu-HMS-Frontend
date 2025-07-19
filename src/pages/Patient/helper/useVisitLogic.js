@@ -42,6 +42,7 @@ export const useVisitLogic = (patientRegNo,form) => {
     };
 
     const calculateTotalCostForClinic = () => {
+        console.log(" Cal CLINIC visit :::::::::::::::::::::::::: Selected Doctor:", selectedDoctor, "Hospital Charge:", hospitalCharge, "Custom Charges:", customCharges);
         if (!selectedDoctor) return 0;
 
         const doctorFee = selectedDoctor?.doctor_fee || 0;
@@ -208,7 +209,8 @@ export const useVisitLogic = (patientRegNo,form) => {
 
 
     useEffect(() => {
-        if (visitType === 'feelo') {
+        if (visitType === 'promotion') {
+            console.log("Calculating total cost for promotion visit ::::::::::::::::::::::::::");
             const total = calculateTotalCostForFeelo()
             setTotalCost(total)
         }
@@ -216,13 +218,16 @@ export const useVisitLogic = (patientRegNo,form) => {
 
     useEffect(() => {
         if (visitType === 'normal' && visitSubType === "CLINIC /OPD") {
+            console.log("Calculating total cost for clinic visit ::::::::::::::::::::::::::");
             const total = calculateTotalCostForClinic();
+            console.log("Total cost for clinic visit:", total);
             setTotalCost(total);
         }
     }, [selectedDoctor, selectedClinic, hospitalCharge, customCharges, visitSubType]);
 
     useEffect(() => {
         if(visitType === 'normal' && visitSubType === "TREATMENT") {
+            console.log("Calculating total cost for treatment visit ::::::::::::::::::::::::::");
             const total = calculateTotalForTreatments()
             setTotalCost(total);
         }

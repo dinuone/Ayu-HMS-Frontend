@@ -96,6 +96,27 @@ const GastroIntestinalSystem = ({ data, onChange,readonly = false }) => {
 
             </div>
 
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <label style={{ width: 150 }}>Agni type</label>
+            
+                                {readonly ? (
+                                    <Tag color="red-inverse">
+                                        {data?.agni.option || 'Not selected'}
+                                    </Tag>
+                                ) :(
+                                    <Radio.Group
+                                        value={data.agni.option}
+                                        onChange={(e) => onChange('agni','option', e.target.value)}
+                                    >
+                                        <Radio value="Sama Agni">Sama Agni</Radio>
+                                        <Radio value="Vishama Agni">Vishama Agni</Radio>
+                                        <Radio value="Tikshna Agni">Tikshna Agni</Radio>
+                                        <Radio value="Mandagni">Mandagni</Radio>
+                                        <Radio value="Bhasmaka Agni">Bhasmaka Agni</Radio>
+                                    </Radio.Group>
+                                )}
+                </div>
+
         </Card>
     );
 };

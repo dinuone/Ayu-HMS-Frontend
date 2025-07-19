@@ -28,12 +28,13 @@ const CardiovascularSystem = ({ data, onChange,readonly = false }) => {
                     />
                 </Col>
                 <Col span={8}>
-                    <label>Body Temperature</label>
+                    <label>Body Temperature (°C) </label>
                     <Input
                         readOnly={readonly}
                         value={data?.bodyTemperature}
                         onChange={(e) => onChange('bodyTemperature', e.target.value)}
                         placeholder="120/80"
+                        suffix="°C"
                     />
                 </Col>
             </Row>
