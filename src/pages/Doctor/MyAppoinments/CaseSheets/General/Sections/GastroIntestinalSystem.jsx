@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, InputNumber, Select, Row, Col, Input, Checkbox, Tag} from 'antd';
+import {Card, InputNumber, Select, Row, Col, Input, Checkbox, Tag, Radio} from 'antd';
 
 const { Option } = Select;
 
@@ -95,6 +95,29 @@ const GastroIntestinalSystem = ({ data, onChange,readonly = false }) => {
                 )}
 
             </div>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <label style={{ width: 150 }}>Agni type</label>
+            
+                                {readonly ? (
+                                    <Tag color="red-inverse">
+                                        {data?.agni || 'Not selected'}
+                                    </Tag>
+                                ) :(
+
+                                    <Radio.Group
+                                        value={data.agni}
+                                        onChange={(e) => onChange('agni', e.target.value)}
+                                    >
+                                        <Radio value="Sama Agni">Sama Agni</Radio>
+                                        <Radio value="Vishama Agni">Vishama Agni</Radio>
+                                        <Radio value="Tikshna Agni">Tikshna Agni</Radio>
+                                        <Radio value="Mandagni">Mandagni</Radio>
+                                        <Radio value="Bhasmaka Agni">Bhasmaka Agni</Radio>
+                                    </Radio.Group>
+
+                                )}
+                </div>
 
         </Card>
     );

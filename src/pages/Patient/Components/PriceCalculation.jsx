@@ -18,6 +18,7 @@ const PriceCalculation = ({
         return null;
     }
 
+    console.log("TOTAL COST :::::", totalCost);
     console.log("VISIT TYPE :::::",visitType)
     console.log("TREATMENT PRICE DATA::::::",treatmentPriceData);
 
@@ -41,7 +42,7 @@ const PriceCalculation = ({
                 </Col>
                 <Col>
                     <h2>
-                        Total: LKR {visitType === 'promotion' ? totalDiscountedPrice.toFixed(2) : totalCost.toFixed(2)}
+                        Total: LKR {visitType === 'promotion' ? totalDiscountedPrice.toFixed(2) : totalCost}
                     </h2>
                 </Col>
             </Row>

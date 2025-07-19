@@ -1,16 +1,8 @@
 import React, {useState} from 'react';
 import { Button, Card, Descriptions, Divider, Space, Table, Typography, Tabs, Timeline, Collapse, Tag } from 'antd';
 import ChiefComplaint from "../CaseSheets/StreeRoga/Sections/ChiefComplaint.jsx";
-import OtherComplaint from "../CaseSheets/StreeRoga/Sections/OtherComplaint.jsx";
-import MenstrualHistory from "../CaseSheets/StreeRoga/Sections/MenstrualHistory.jsx";
-import ObstetricHistory from "../CaseSheets/StreeRoga/Sections/ObstetricHistory.jsx";
-import PresentIllness from "../CaseSheets/StreeRoga/Sections/PresentIllness.jsx";
-import MedicalHistory from "../CaseSheets/StreeRoga/Sections/MedicalHistory.jsx";
+import OtherComplaint from "../CaseSheets/General/Sections/OtherComplaint.jsx";
 import PersonalHistory from "../CaseSheets/StreeRoga/Sections/PersonalHistory.jsx";
-import PhysicalExam from "../CaseSheets/StreeRoga/Sections/PhysicalExam.jsx";
-import Investigations from "../CaseSheets/StreeRoga/Sections/Investigations.jsx";
-import DifferentialDiagnosis from "../CaseSheets/StreeRoga/Sections/DifferentialDiagnosis.jsx";
-import AMADiagnosis from "../CaseSheets/StreeRoga/Sections/AMADiagnosis.jsx";
 import NextVisit from "../CaseSheets/StreeRoga/Sections/NextVisit.jsx";
 import Remarks from "../CaseSheets/Common/Remarks.jsx";
 import {CheckCircleFilled, DownloadOutlined, EyeFilled} from "@ant-design/icons";
@@ -27,8 +19,11 @@ import CardiovascularSystem from "../CaseSheets/General/Sections/CardioVascularS
 import SkeletalSystem from "../CaseSheets/General/Sections/SkeletalSystem.jsx";
 import SensoryFunctions from "../CaseSheets/General/Sections/SensoryFunctions.jsx";
 import {useNavigate} from "react-router-dom";
-import {PDFDownloadLink} from "@react-pdf/renderer";
-import {PDFCaseSheetStreeRoga} from "./PDF/PDFCaseSheetStreeRoga.jsx";
+import LymphaticSystem from "../CaseSheets/General/Sections/LymphaticSystem.jsx";
+import HistoryOfPresentComplaint from "../CaseSheets/General/Sections/HistoryOfPresentComplaint.jsx";
+import TreatmentHistory from "../CaseSheets/General/Sections/TreatmentHistory.jsx";
+import PastIllnesses from "../CaseSheets/General/Sections/PastIllnesses.jsx";
+import Prakurthi from "../CaseSheets/General/Sections/Prakurthi.jsx";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -215,11 +210,73 @@ function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, o
     const renderCaseSheetTab = () => (
         <>
             <Card style={cardStyle} loading={loading}>
-                <MedicalHistory data={caseSheet.previousMedicalHistory} readonly={true} />
+                <ChiefComplaint
+                    data={caseSheet.chiefComplaint}
+                    readonly={true}
+                />
+            </Card>
+
+            <Divider/>
+
+            <Card style={cardStyle} loading={loading}>
+                <OtherComplaint
+                    data={caseSheet.otherComplaint}
+                    readonly={true}
+                />
+            </Card>
+
+            <Divider/>
+
+
+            <Card style={cardStyle} loading={loading}>
+                <HistoryOfPresentComplaint
+                    data={caseSheet.historyOfPresentComplaint}
+                    readonly={true}
+                />
+            </Card>
+
+
+            <Divider/>
+
+            <Card style={cardStyle} loading={loading}>
+                <TreatmentHistory
+                    data={caseSheet.treatmentHistory}
+                    readonly={true}
+                />
+            </Card>
+
+            <Divider/>
+
+            <Card style={cardStyle} loading={loading}>
+                <PastIllnesses
+                    data={caseSheet.pastIllnesses}
+                    readonly={true}
+                />
+            </Card>
+
+            <Divider/>
+
+            <Card style={cardStyle} loading={loading}>
+                <PersonalHistory
+                    data={caseSheet.personalHistory}
+                    readonly={true}
+                />
+            </Card>
+
+            <Divider/>
+
+            <Card style={cardStyle} loading={loading}>
+                <Prakurthi
+                    data={caseSheet.prakurthi}
+                    readonly={true}
+                />
             </Card>
 
             <Card style={cardStyle} loading={loading}>
-                <PersonalHistory data={caseSheet.personalHistory} readonly={true} />
+                <PersonalHistory
+                    data={caseSheet.personalHistory}
+                    readonly={true}
+                />
             </Card>
 
             {caseSheet?.respiratory && (
@@ -250,6 +307,14 @@ function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, o
                 <>
                     <div style={{ marginTop: 16,}}>
                         <ReproductiveSystem data={caseSheet?.reproductiveSystem} readonly={true} />
+                    </div>
+                </>
+            )}
+
+            {caseSheet?.lymphaticSystem && (
+                <>
+                    <div style={{ marginTop: 16,}}>
+                        <LymphaticSystem data={caseSheet?.lymphaticSystem} readonly={true} />
                     </div>
                 </>
             )}

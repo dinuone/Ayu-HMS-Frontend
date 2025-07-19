@@ -26,6 +26,8 @@ import TreatmentHistory from "./Sections/TreatmentHistory.jsx";
 import PastIllnesses from "./Sections/PastIllnesses.jsx";
 import PersonalHistory from "./Sections/PersonalHistory.jsx";
 import Prakurthi from "./Sections/Prakurthi.jsx";
+import LymphaticSystem from "./Sections/LymphaticSystem.jsx";
+import DiagnosisInput from '../Common/DiagnosisInput.jsx';
 
 const { Panel } = Collapse;
 
@@ -40,6 +42,7 @@ const systemComponents = {
     motorFunctions:MotorFunctions,
     sensoryFunctions: SensoryFunctions,
     reproductiveSystem: ReproductiveSystem,
+    lymphaticSystem: LymphaticSystem
 
     // Add other systems here
 };
@@ -54,7 +57,8 @@ const systemDisplayNames = {
     integumentary: "Integumentary System",
     motorFunctions: "Motor Functions",
     sensoryFunctions: "Sensory Functions",
-    reproductiveSystem : "Reproductive System"
+    reproductiveSystem : "Reproductive System",
+    lymphaticSystem: "Lymphatic System"
 
     // Add other systems here
 };
@@ -79,6 +83,7 @@ const initalCaseSheet = {
         },
         bath:'',
         exercise:'',
+        diagnosis:'',
     },
 
     pastIllnesses:{
@@ -106,7 +111,9 @@ const initalCaseSheet = {
     prakurthi:{
         physical:'',
         mental:''
-    }
+    },
+    diagnosis: '',
+
 }
 
 const { Title } = Typography;
@@ -232,21 +239,21 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
     return (
         <>
             <ChiefComplaint
-                data={caseSheetData?.chiefComplaint || {}}
+                value={caseSheetData?.chiefComplaint || {}}
                 onChange={(value) => handleSystemChange('chiefComplaint', value)}
             />
 
             <Divider/>
 
             <OtherComplaint
-                data={caseSheetData?.otherComplaint || {}}
+                value={caseSheetData?.otherComplaint || {}}
                 onChange={(value) => handleSystemChange('otherComplaint', value)}
             />
             <Divider/>
 
 
             <HistoryOfPresentComplaint
-                data={caseSheetData?.historyOfPresentComplaint || {}}
+                value={caseSheetData?.historyOfPresentComplaint || {}}
                 onChange={(value) => handleSystemChange('historyOfPresentComplaint', value)}
             />
 
@@ -337,11 +344,11 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
 
 
             <Divider />
+
             <Title level={5}>Diagnosis</Title>
-            <DiseaseCodeSelect
-                diseaseCodesFromDB={masterData.diseaseCodes}
-                value={caseSheetData?.selectedDiseaseCodes || {}}
-                onChange={(value) => handleSystemChange('selectedDiseaseCodes', value)}
+            <DiagnosisInput  
+                value={caseSheetData.diagnosis || ""}
+                onChange={(value) => handleSystemChange('diagnosis', value)}
             />
 
             <Divider />
@@ -351,7 +358,7 @@ const GeneralForm = ({visitId,regNumber,chitNumber}) => {
                 onChange={(value) => handleSystemChange('selectedTreatments', value)}
             />
 
-            <Divider />
+
             <Prescription
                 drugs={masterData.drugs}
                 items={prescription}
