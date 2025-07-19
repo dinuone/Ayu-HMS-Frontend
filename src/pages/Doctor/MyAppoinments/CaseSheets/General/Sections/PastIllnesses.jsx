@@ -55,7 +55,7 @@ const PastIllnesses = memo(({data, onChange,readonly = false}) => {
                 <label style={{ width: 150 }}>BA</label>
                 <Input
                     readOnly={readonly}
-                    value={data.pastIllness_TB}
+                    value={data.pastIllness_BA}
                     onChange={(e) => onChange('pastIllness_BA', e.target.value)}
                 />
             </div>

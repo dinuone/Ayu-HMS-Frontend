@@ -14,7 +14,7 @@ function Prakurthi({ data = {}, onChange, readonly }) {
                 <ReactQuill
                     readOnly={readonly}
                     theme="snow"
-                    value={data.medical || ''}
+                    value={data.physical || ''}
                     onChange={(value) => onChange('physical', value)}
                 />
             </div>
@@ -24,7 +24,7 @@ function Prakurthi({ data = {}, onChange, readonly }) {
                 <ReactQuill
                     readOnly={readonly}
                     theme="snow"
-                    value={data.surgical || ''}
+                    value={data.mental || ''}
                     onChange={(value) => onChange('mental', value)}
                 />
             </div>

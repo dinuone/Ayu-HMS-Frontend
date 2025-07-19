@@ -11,11 +11,11 @@ const CardiovascularSystem = ({ data, onChange,readonly = false }) => {
             <Row gutter={16}>
                 <Col span={8}>
                     <label>Heart Rate (bpm)</label>
-                    <InputNumber
+                    <Input
                         readOnly={readonly}
-                        style={{ width: '100%' }}
                         value={data?.heartRate}
-                        onChange={(value) => onChange('heartRate', value)}
+                        onChange={(e) => onChange('heartRate', e.target.value)}
+                        placeholder="120/80"
                     />
                 </Col>
                 <Col span={8}>
