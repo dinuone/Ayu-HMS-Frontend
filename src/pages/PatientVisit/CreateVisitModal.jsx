@@ -8,8 +8,8 @@ import {useNavigate} from "react-router-dom";
 const { Text } = Typography;
 
 const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
-    const [inputMethod, setInputMethod] = useState('nic');
-    const [nic, setNic] = useState('');
+    const [inputMethod, setInputMethod] = useState('contact');
+    const [contact, setContact] =useState('')
     const [scanning, setScanning] = useState(false);
     const [error, setError] = useState('');
     const scannerContainerRef = useRef(null);
@@ -17,7 +17,7 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
 
     useEffect(() => {
         if (visible) {
-            setNic('');
+            setContact('');
             setError('');
             setScanning(false);
         }
@@ -25,14 +25,18 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
 
     const handleScan = (data) => {
         if (data) {
+            console.log("QR DATA")
+            console.log(data[0].rawValue)
             setScanning(false);
-            onSuccess(data);
+            var qrdData = JSON.parse(data[0].rawValue)
+            console.log(qrdData)
+            onSuccess(qrdData);
         }
     };
 
     const handleCancel = () => {
         setScanning(false);
-        setNic('')
+        setContact('')
         setTimeout(() => {
             onCancel();
         },100)
@@ -45,14 +49,14 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
     };
 
     const handleSubmit = async () => {
-        if (inputMethod === 'nic' && !nic.trim()) {
-            setError('Please enter NIC number');
+        if (inputMethod === 'contact' && !contact.trim()) {
+            setError('Please enter Contact number');
             return;
         }
 
-        if (inputMethod === 'nic') {
+        if (inputMethod === 'contact') {
             try{
-                const response = await api.get(`patient-visit/check-account/${nic.trim()}`);
+                const response = await api.get(`patient-visit/check-account/${contact.trim()}`);
                 console.log(response)
                 if(response.data.data.account_exisit){
                     const regNo = response.data.data.patient_reg_no;
@@ -63,7 +67,7 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
             }catch (err){
                 message.error(error.response?.data?.data?.message || 'Operation failed');
             }
-            onSuccess(nic);
+            onSuccess(contact);
         } else {
             setScanning(true);
         }
@@ -82,7 +86,7 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
                     key="submit"
                     type="primary"
                     onClick={handleSubmit}
-                    disabled={inputMethod === 'nic' && !nic.trim()}
+                    disabled={inputMethod === 'nic' && !contact.trim()}
                 >
                     {inputMethod === 'qr' ? (scanning ? 'Scanning...' : 'Start Scan') : 'Continue'}
                 </Button>,
@@ -93,12 +97,12 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
                 <Card
                     hoverable
                     onClick={() => {
-                        setInputMethod('nic');
+                        setInputMethod('contact');
                         setError('');
                     }}
                     style={{
                         width: '50%',
-                        border: inputMethod === 'nic' ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                        border: inputMethod === 'contact' ? '2px solid #1890ff' : '1px solid #d9d9d9',
                         cursor: 'pointer',
                         transition: 'all 0.3s',
                         padding: 16,
@@ -109,7 +113,7 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
 
                 >
                     <div style={{
-                        backgroundColor: inputMethod === 'nic' ? '#e6f7ff' : '#fafafa',
+                        backgroundColor: inputMethod === 'contact' ? '#e6f7ff' : '#fafafa',
                         borderRadius: '50%',
                         width: 64,
                         height: 64,
@@ -119,10 +123,10 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
                         marginBottom: 12,
                         transition: 'all 0.3s',
                     }}>
-                        <IdcardOutlined style={{ fontSize: 32, color: inputMethod === 'nic' ? '#1890ff' : '#666' }} />
+                        <IdcardOutlined style={{ fontSize: 32, color: inputMethod === 'contact' ? '#1890ff' : '#666' }} />
                     </div>
-                    <Text strong style={{ fontSize: 16, marginBottom: 4 }}>NIC Number</Text>
-                    <Text type="secondary">Manually enter patient's NIC</Text>
+                    <Text strong style={{ fontSize: 16, marginBottom: 4 }}>Contact Number</Text>
+                    <Text type="secondary">Manually enter patient's Contact Number</Text>
                 </Card>
 
                 <Card
@@ -162,12 +166,12 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
                 </Card>
             </div>
 
-            {inputMethod === 'nic' && (
+            {inputMethod === 'contact' && (
                 <div style={{ marginTop: 16 }}>
                     <Input
-                        placeholder="Enter patient NIC number"
-                        value={nic}
-                        onChange={(e) => setNic(e.target.value)}
+                        placeholder="Enter patient Contact number"
+                        value={contact}
+                        onChange={(e) => setContact(e.target.value)}
                         size="large"
                         prefix={<IdcardOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
                     />
@@ -208,7 +212,7 @@ const CreateVisitModal = ({ visible, onCancel, onSuccess }) => {
 
             <Divider />
             <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
-                {inputMethod === 'nic'
+                {inputMethod === 'contact'
                     ? 'Enter the patient identification number to continue'
                     : 'Scan the patient QR code to automatically fill details'}
             </Text>

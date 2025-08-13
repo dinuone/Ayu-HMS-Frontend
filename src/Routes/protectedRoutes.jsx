@@ -8,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 export default function ProtectedRoute({ children }) {
     const { authData, signOut } = useAuth();
     const [loading, setLoading] = useState(true);
-    const hasChecked = useRef(false); // 👈 track once
+    const hasChecked = useRef(false);
 
     useEffect(() => {
         const checkTokenValidity = () => {

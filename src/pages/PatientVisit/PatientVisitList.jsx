@@ -136,26 +136,30 @@ const PatientVisitList = () => {
 
     const handleExport = () => {
         const flatData = filteredData.map(item => ({
-            name: item.name,
-            unit_price: item.unit_price,
-            drug_category: item.drug_category?.name || '',
-            brand: item.brand,
-            description: item.description || '',
-            is_active: item.is_active ? 'Active' : 'Inactive',
-            created_at: item.created_at,
+            patient_reg_no: item.patient_reg_no,
+            patient_name: item.patient_name,
+            nic_number: item.nic_number || '',
+            doctor_name: item.doctor_name,
+            patient_type: item.patient_type || '',
+            visit_type: item.visit_type,
+            chit_number: item.chit_number,
+            status: item.status,
+            visit_date: item.visit_date,
         }));
 
         const exportColumns = [
-            { title: 'Drug Name', dataIndex: 'name' },
-            { title: 'Unit Price', dataIndex: 'unit_price' },
-            { title: 'Drug Category', dataIndex: 'drug_category' },
-            { title: 'Brand', dataIndex: 'brand' },
-            { title: 'Description', dataIndex: 'description' },
-            { title: 'Status', dataIndex: 'is_active' },
-            { title: 'Created At', dataIndex: 'created_at' }
+            { title: 'Registration No', dataIndex: 'patient_reg_no' },
+            { title: 'patient_name', dataIndex: 'patient_name' },
+            { title: 'Nic No', dataIndex: 'nic_number' },
+            { title: 'Doctor', dataIndex: 'doctor_name' },
+            { title: 'Visit Type', dataIndex: 'patient_type' },
+            { title: 'Assigned To', dataIndex: 'visit_type' },
+            { title: 'Chit No', dataIndex: 'chit_number' },
+            { title: 'Status', dataIndex: 'status' },
+            { title: 'Visit Date', dataIndex: 'visit_date' }
         ];
 
-        exportToExcel(exportColumns, flatData, 'Drugs');
+        exportToExcel(exportColumns, flatData, 'Patient_Visit');
     };
 
     const viewPatientRecord = (visitId) => {
@@ -266,12 +270,24 @@ const PatientVisitList = () => {
         },
     ];
 
-    const handleCreateSuccess = (identifier) => {
+    const  handleCreateSuccess = async (identifier) => {
         setModalVisible(false);
+        console.log("Visita Data ::::::::::::")
         console.log(identifier);
+        if(identifier){
+            const response = await api.get(`patient-visit/check-account/${identifier.contact_no}`);
+            console.log(response)
+            if(response.data.data.account_exisit){
+                const regNo = response.data.data.patient_reg_no;
+                navigate(`/patient-visit/${regNo}`)
+            }else{
+                message.error("cannot found patient account, please register a new patient");
+            }
+        }
+
         // Handle the identifier (NIC or QR data) here
         // if (identifier.length === 12 || identifier.length === 10) { // Basic NIC validation
-        //     navigate(`/patient-visit/new?nic=${identifier}`);
+        //
         // } else {
         //     // Assume it's QR data
         //     navigate(`/patient-visit/new?qr=${identifier}`);

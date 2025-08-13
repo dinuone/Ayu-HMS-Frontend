@@ -69,9 +69,17 @@ const CreateOrUpdateModal = ({visible, onCancel, initialValues, onFinish, loadin
     }, [initialValues, form]);
 
     const handleTreatmentSelect = (value) => {
-        const treatment = treatments.find(t => t.id === value);
-        if (treatment && !selectedTreatments.some(t => t.id === value)) {
-            setSelectedTreatments([...selectedTreatments, treatment]);
+        if (value === 'SELECT_ALL') {
+            // Select all treatments that aren't already selected
+            const newTreatments = treatments.filter(t =>
+                !selectedTreatments.some(st => st.id === t.id)
+            );
+            setSelectedTreatments([...selectedTreatments, ...newTreatments]);
+        } else {
+            const treatment = treatments.find(t => t.id === value);
+            if (treatment && !selectedTreatments.some(t => t.id === value)) {
+                setSelectedTreatments([...selectedTreatments, treatment]);
+            }
         }
     };
 
@@ -124,6 +132,10 @@ const CreateOrUpdateModal = ({visible, onCancel, initialValues, onFinish, loadin
             console.error('Validation failed:', error);
         }
     };
+
+    // Check if all treatments are selected
+    const allTreatmentsSelected = treatments.length > 0 &&
+        selectedTreatments.length === treatments.length;
 
     return (
         <Modal
@@ -217,6 +229,31 @@ const CreateOrUpdateModal = ({visible, onCancel, initialValues, onFinish, loadin
                             filterOption={(input, option) =>
                                 option.children.toLowerCase().includes(input.toLowerCase())
                             }
+                            dropdownRender={(menu) => (
+                                <>
+                                    <div
+                                        style={{
+                                            padding: '8px',
+                                            cursor: 'pointer',
+                                            backgroundColor: allTreatmentsSelected ? '#f0f0f0' : 'transparent'
+                                        }}
+                                        onClick={() => {
+                                            if (allTreatmentsSelected) {
+                                                // If all are selected, clear all
+                                                setSelectedTreatments([]);
+                                            } else {
+                                                // Select all treatments
+                                                setSelectedTreatments([...treatments]);
+                                            }
+                                        }}
+                                    >
+                                        <CheckOutlined style={{ marginRight: 8 }} />
+                                        {allTreatmentsSelected ? 'Deselect All' : 'Select All'}
+                                    </div>
+                                    <Divider style={{ margin: '4px 0' }} />
+                                    {menu}
+                                </>
+                            )}
                         >
                             {treatments
                                 .filter(t => !selectedTreatments.some(st => st.id === t.id))
