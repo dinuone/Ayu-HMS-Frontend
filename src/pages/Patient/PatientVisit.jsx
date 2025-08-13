@@ -59,7 +59,7 @@ const PatientVisit = () => {
             const payload = {
                 patient_reg_no: patientRegNo,
                 clinic_category_id: values.clinic,
-                patient_type: visitType === 'feelo' ? 1 : 2,
+                patient_type: visitType === 'promotion' ? 1 : 2,
                 visit_type: values.assign_to === "CLINIC /OPD" ? 1 : 2,
                 treatments: selectedTreatments,
                 doctor_id: values.doctor,

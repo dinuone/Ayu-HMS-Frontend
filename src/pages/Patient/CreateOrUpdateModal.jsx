@@ -38,7 +38,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
             const res = await api.get('/location/provinces');
             setProvinces(res.data.data);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
+            // message.error(error.response?.data?.message || 'Operation failed');
         }
     }
 
@@ -47,7 +47,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
             const res = await api.get(`/location/districts/${provinceId}`);
             setDistricts(res.data.data);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
+            // message.error(error.response?.data?.message || 'Operation failed');
         }
     }
 
@@ -56,7 +56,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
             const res = await api.get(`/location/cities/${districtId}`);
             setCity(res.data.data);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Operation failed');
+            // message.error(error.response?.data?.message || 'Operation failed');
         }
     }
 
@@ -229,7 +229,7 @@ const CreateOrUpdateModal = ({ visible, onCancel, onSubmit, initialValues, confi
                     name="nic_number"
                     label="Nic Number"
 
-                    rules={[{ required: true,
+                    rules={[{ required: false,
                         pattern: /^(?:\d{9}[vVxX]?|\d{12})$/,
                         message: 'Invalid NIC number! It must be 9 digits followed by an optional letter (v/V/x/X) or exactly 12 digits.'}]}
                 >
