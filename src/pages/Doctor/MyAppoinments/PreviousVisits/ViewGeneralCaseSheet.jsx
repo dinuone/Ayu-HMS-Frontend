@@ -29,10 +29,11 @@ const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
-function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, onBack,  }) {
+function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, onBack, timeline = [] }) {
 
     console.log("patientLog Data ::::::::::::::::::::::",patientLog)
     console.log("Visit Data ::::::::::::::::::::::",visitData)
+    console.log("timeline Data ::::::::::::::::::::::",timeline)
 
     const today = new Date().toISOString().split('T')[0];
     const navigate = useNavigate()
@@ -493,33 +494,37 @@ function ViewGeneralCaseSheet({ visitData = [],patientLog, caseSheet, loading, o
     const renderTimelineTab = () => (
         <Card style={cardStyle}>
             <Timeline mode="left" style={{ marginTop: 16 }}>
-                {visitData.length > 0 ? (
-                    visitData.map((visit, index) => (
+                {timeline.length > 0 ? (
+                    timeline.map((visit, index) => (
                         <Timeline.Item
                             key={index}
                             label={dayjs(visit.visit_date).format('DD MMM YYYY')}
                             color={index === 0 ? 'green' : 'blue'}
                         >
                             <Card size="small" style={{ marginBottom: 16 }}>
+                                <Text>
+                                    {visit.chit_no}
+                                </Text>
+                                <Divider style={{ margin: '8px 0' }} />
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Text strong>{visit.doctor_name || 'Unknown Doctor'}</Text>
                                     <Tag color={index === 0 ? 'green' : 'blue'}>
-                                        {index === 0 ? 'Latest' : `Visit #${visitData.length - index}`}
+                                        {index === 0 ? 'Latest' : `Visit #${timeline.length - index}`}
                                     </Tag>
                                 </div>
                                 <Divider style={{ margin: '8px 0' }} />
                                 <Text strong>Next Visit Date : </Text>
                                 <Text>
-                                    {patientLog.next_visit_date
-                                        ? new Date(patientLog.next_visit_date).toISOString().split('T')[0]
+                                    {visit.next_visit_date
+                                        ? new Date(visit.next_visit_date).toISOString().split('T')[0]
                                         : 'Not specified'}
                                 </Text>
                                 <br />
                                 <Text strong>Diagnosis : </Text>
-                                {patientLog.diease_code?.length > 0 ? (
+                                {visit.treatments?.length > 0 ? (
                                     <Space size={[0, 4]} wrap>
-                                        {patientLog.diease_code.map((item, idx) => (
-                                            <Tag key={idx} color="gold-inverse">{item.name}</Tag>
+                                        {visit.treatments.map((item, idx) => (
+                                            <Tag key={idx} color="gold-inverse">{item}</Tag>
                                         ))}
                                     </Space>
                                 ) : (
