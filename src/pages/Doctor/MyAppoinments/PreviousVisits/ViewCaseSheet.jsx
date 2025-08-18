@@ -34,6 +34,7 @@ function ViewCaseSheet() {
     const [caseSheet, setCaseSheet] = useState(null);
     const [loading, setLoading] = useState(true);
     const [visitData,setVisitData] = useState([]);
+    const [timeline,setTimeLine] = useState([]);
 
     // Function to handle go back action
     const handleGoBack = () => {
@@ -80,6 +81,7 @@ function ViewCaseSheet() {
     useEffect(() => {
         if (caseSheet && patientLog?.patient_id) {
             fetchVisitHistory();
+            fetchTimeLine();
         }
     }, [caseSheet]);
 
@@ -95,6 +97,18 @@ function ViewCaseSheet() {
         }
     };
 
+    const fetchTimeLine = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get(`patient-visit/get-patient-timeline/${patientLog.patient_id}`);
+            setTimeLine(res.data.data)
+        }catch (e){
+            console.log(e);
+        }finally {
+            setLoading(false);
+        }
+    }
+
 
     console.log(patientLog)
     console.log(caseSheet)
@@ -109,6 +123,7 @@ function ViewCaseSheet() {
                     caseSheet={caseSheet}
                     loading={loading}
                     onBack={handleGoBack}
+                    timeline={timeline}
                 />
             )}
 
@@ -119,6 +134,7 @@ function ViewCaseSheet() {
                     loading={loading}
                     onBack={handleGoBack}
                     visitData={visitData}
+                    timeline={timeline}
                 />
             )}
         </>

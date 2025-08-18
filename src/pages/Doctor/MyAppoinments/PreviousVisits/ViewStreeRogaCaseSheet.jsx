@@ -23,7 +23,7 @@ const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
-function ViewStreeRogaCaseSheet({ patientLog, caseSheet, loading, onBack, previousVisits = [] }) {
+function ViewStreeRogaCaseSheet({ patientLog, caseSheet, loading, onBack, previousVisits = [] , timeline = []}) {
     const today = new Date().toISOString().split('T')[0];
 
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
